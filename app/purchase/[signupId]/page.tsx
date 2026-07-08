@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import PurchaseForm from "./purchase-form";
+import Logo from "@/app/logo";
 
 export default async function PurchasePage({ params }: { params: Promise<{ signupId: string }> }) {
   const { signupId } = await params;
@@ -17,6 +18,7 @@ export default async function PurchasePage({ params }: { params: Promise<{ signu
     return (
       <main className="min-h-screen flex items-center justify-center p-6">
         <div className="w-full max-w-md bg-white/80 rounded-2xl shadow-sm border border-black/5 p-8 text-center space-y-4">
+          <Logo className="justify-center flex" />
           <h1 className="font-display text-2xl font-semibold" style={{ color: "var(--lagoon-dark)" }}>
             You&apos;ve already completed your purchase. Thank you!
           </h1>
@@ -32,6 +34,7 @@ export default async function PurchasePage({ params }: { params: Promise<{ signu
     <main className="min-h-screen flex items-center justify-center p-6">
       <div className="w-full max-w-md bg-white/80 rounded-2xl shadow-sm border border-black/5 p-8 space-y-6">
         <div className="text-center space-y-1">
+          <Logo className="justify-center flex mb-2" />
           <h1 className="font-display text-2xl font-semibold" style={{ color: "var(--lagoon-dark)" }}>
             Complete your purchase
           </h1>
