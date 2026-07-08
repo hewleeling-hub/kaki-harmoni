@@ -1,0 +1,44 @@
+import { createClient } from "@/lib/supabase/server";
+import { notFound } from "next/navigation";
+import Link from "next/link";
+import PurchaseForm from "./purchase-form";
+
+export default async function PurchasePage({ params }: { params: Promise<{ signupId: string }> }) {
+  const { signupId } = await params;
+  const supabase = await createClient();
+
+  const { data: signup } = await supabase.from("signups").select("*").eq("id", signupId).maybeSingle();
+
+  if (!signup) {
+    notFound();
+  }
+
+  if (signup.status === "converted") {
+    return (
+      <main className="min-h-screen flex items-center justify-center p-6">
+        <div className="w-full max-w-md bg-white/80 rounded-2xl shadow-sm border border-black/5 p-8 text-center space-y-4">
+          <h1 className="font-display text-2xl font-semibold" style={{ color: "var(--lagoon-dark)" }}>
+            You&apos;ve already completed your purchase. Thank you!
+          </h1>
+          <Link href="/" className="inline-block rounded-lg px-4 py-2.5 font-medium text-white" style={{ background: "var(--lagoon)" }}>
+            Back to home
+          </Link>
+        </div>
+      </main>
+    );
+  }
+
+  return (
+    <main className="min-h-screen flex items-center justify-center p-6">
+      <div className="w-full max-w-md bg-white/80 rounded-2xl shadow-sm border border-black/5 p-8 space-y-6">
+        <div className="text-center space-y-1">
+          <h1 className="font-display text-2xl font-semibold" style={{ color: "var(--lagoon-dark)" }}>
+            Complete your purchase
+          </h1>
+          <p className="text-black/60 text-sm">Hi {signup.name.split(" ")[0]}, lock in your spot.</p>
+        </div>
+        <PurchaseForm signupId={signup.id} />
+      </div>
+    </main>
+  );
+}

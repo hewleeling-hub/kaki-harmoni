@@ -1,1 +1,20 @@
 @import "tailwindcss";
+
+:root {
+  --lagoon: #2e7d7b;
+  --lagoon-dark: #1f5654;
+  --aqua: #a8d5d0;
+  --clay: #c97c5d;
+  --cream: #f4ede2;
+  --blush: #e8a5b8;
+  --ink: #1c2b2a;
+}
+
+body {
+  background: var(--cream);
+  color: var(--ink);
+}
+
+.font-display {
+  font-family: "Fraunces", ui-serif, Georgia, serif;
+}

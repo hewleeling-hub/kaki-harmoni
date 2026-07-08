@@ -13,6 +13,8 @@ create table if not exists signups (
   lead_score_review_status text default 'unreviewed'
 );
 
+create unique index if not exists signups_email_unique_idx on signups (lower(email));
+
 alter table signups enable row level security;
 drop policy if exists "signups_v1_read" on signups;
 create policy "signups_v1_read" on signups for select using (true);
@@ -87,4 +89,4 @@ insert into activities (entity_type, entity_id, action, actor, metadata) values
   ('purchase', 'b1000000-0000-0000-0000-000000000001', 'purchase_confirmed', 'public_form', '{"amount_myr":199}'),
   ('signup', 'a1000000-0000-0000-0000-000000000002', 'signup_created', 'public_form', '{"referral_source":"Friend Referral"}'),
   ('signup', 'a1000000-0000-0000-0000-000000000004', 'signup_created', 'public_form', '{"referral_source":"TikTok"}'),
-  ('purchase', 'b1000000-0000-0000-0000-000000000002', 'purchase_confirmed', 'public_form', '{"amount_myr":199)');
+  ('purchase', 'b1000000-0000-0000-0000-000000000002', 'purchase_confirmed', 'public_form', '{"amount_myr":199}');
