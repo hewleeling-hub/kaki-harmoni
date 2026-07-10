@@ -21,6 +21,12 @@ export default function SignupForm() {
     setBannerError(null);
     setSubmitting(true);
 
+    if (!phone.trim()) {
+      setFieldError({ field: "phone", message: "Phone number is required." });
+      setSubmitting(false);
+      return;
+    }
+
     try {
       const res = await fetch("/api/signups", {
         method: "POST",
@@ -91,7 +97,7 @@ export default function SignupForm() {
 
       <div>
         <label htmlFor="phone" className="block text-sm font-medium mb-1">
-          Phone <span className="text-black/40 font-normal">(optional)</span>
+          Phone
         </label>
         <input
           id="phone"
@@ -101,6 +107,9 @@ export default function SignupForm() {
           style={{ ["--tw-ring-color" as string]: "var(--lagoon)" }}
           placeholder="012-345 6789"
         />
+        {fieldError?.field === "phone" && (
+          <p className="text-sm text-red-700 mt-1">{fieldError.message}</p>
+        )}
       </div>
 
       <div>

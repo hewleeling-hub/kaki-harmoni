@@ -8,14 +8,14 @@ export default function Home() {
         <div className="space-y-4">
           <Logo />
           <p className="uppercase tracking-widest text-xs font-medium" style={{ color: "var(--clay)" }}>
-            Desa Cindaimas Clubhouse
+            @ Desa Cindaimas Condominium Clubhouse
           </p>
           <h1 className="font-display text-4xl md:text-5xl font-semibold leading-tight" style={{ color: "var(--lagoon-dark)" }}>
-            Twenty minutes. A whole lot lighter.
+            Fifteen minutes. A whole lot lighter.
           </h1>
           <p className="text-black/70 max-w-md">
-            Reserve your spot at Kaki Harmoni — foot hydrotherapy and a slow coffee,
-            in the same twenty minutes. Sign up below and we&apos;ll hold your place.
+            Reserve your spot at Kaki Harmoni — foot hydrotherapy and a good coffee,
+            in the same fifteen minutes. Sign up and we&apos;ll hold your place.
           </p>
         </div>
 

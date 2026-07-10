@@ -18,7 +18,7 @@ export default async function ConfirmationPage({ params }: { params: Promise<{ i
   return (
     <main className="min-h-screen flex items-center justify-center p-6">
       <div className="w-full max-w-md bg-white/80 rounded-2xl shadow-sm border border-black/5 p-8 text-center space-y-4">
-        <Logo className="justify-center flex" />
+        <Logo />
         <div
           className="mx-auto h-12 w-12 rounded-full flex items-center justify-center text-white text-xl"
           style={{ background: "var(--lagoon)" }}

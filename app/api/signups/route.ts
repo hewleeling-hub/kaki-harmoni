@@ -40,6 +40,9 @@ export async function POST(request: NextRequest) {
   if (!email || !emailPattern.test(email)) {
     return NextResponse.json({ error: "A valid email is required.", field: "email" }, { status: 400 });
   }
+  if (!phone) {
+    return NextResponse.json({ error: "Phone number is required.", field: "phone" }, { status: 400 });
+  }
 
   const supabase = await createClient();
 
