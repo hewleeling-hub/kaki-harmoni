@@ -93,7 +93,10 @@ export default function PurchaseForm({ signupId }: { signupId: string }) {
       </button>
 
       <p className="text-center">
-        <Link href="/" className="text-sm text-black/50 hover:text-black/70 underline underline-offset-2">
+        <Link
+          href="/"
+          className="block w-full rounded-lg px-4 py-2.5 font-medium border border-black/15 text-black/70 hover:bg-black/5"
+        >
           Not right now — I&apos;ll decide later
         </Link>
       </p>

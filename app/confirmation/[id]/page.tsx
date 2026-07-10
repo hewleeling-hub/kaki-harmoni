@@ -46,16 +46,17 @@ export default async function ConfirmationPage({ params }: { params: Promise<{ i
           <div className="space-y-2">
             <Link
               href={`/purchase/${signup.id}`}
-              className="inline-block rounded-lg px-4 py-2.5 font-medium text-white"
+              className="block rounded-lg px-4 py-2.5 font-medium text-white"
               style={{ background: "var(--clay)" }}
             >
               Complete purchase
             </Link>
-            <p>
-              <Link href="/" className="text-sm text-black/50 hover:text-black/70 underline underline-offset-2">
-                Not right now — I&apos;ll decide later
-              </Link>
-            </p>
+            <Link
+              href="/"
+              className="block rounded-lg px-4 py-2.5 font-medium border border-black/15 text-black/70 hover:bg-black/5"
+            >
+              Not right now — I&apos;ll decide later
+            </Link>
           </div>
         )}
       </div>
