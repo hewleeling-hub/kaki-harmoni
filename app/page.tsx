@@ -10,7 +10,7 @@ export default function Home() {
           <p className="uppercase tracking-widest text-xs font-medium" style={{ color: "var(--clay)" }}>
             @ Desa Cindaimas Condominium Clubhouse
           </p>
-          <h1 className="font-display text-4xl md:text-5xl font-semibold leading-tight" style={{ color: "var(--lagoon-dark)" }}>
+          <h1 className="font-display text-3xl md:text-4xl font-semibold leading-tight" style={{ color: "var(--lagoon-dark)" }}>
             Fifteen minutes. A whole lot lighter.
           </h1>
           <p className="text-black/70 max-w-md">
