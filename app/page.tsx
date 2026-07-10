@@ -14,8 +14,8 @@ export default function Home() {
             Fifteen minutes. A whole lot lighter.
           </h1>
           <p className="text-black/70 max-w-md">
-            Reserve your spot at Kaki Harmoni — foot hydrotherapy and a good coffee,
-            in the same fifteen minutes. Sign up and we&apos;ll hold your place.
+            Foot soak + coffee, together for RM25 — your first visit at Kaki Harmoni
+            (normal price RM40). Sign up and we&apos;ll hold your place.
           </p>
         </div>
 

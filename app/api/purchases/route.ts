@@ -3,8 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 import { logActivity, logAudit } from "@/lib/activity";
 import { scoreLead } from "@/lib/scoring";
 
-const PRODUCT_NAME = "Kaki Harmoni Starter Pack";
-const PRODUCT_PRICE_MYR = 199.0;
+const PRODUCT_NAME = "First Visit — Foot Soak + Coffee";
+const PRODUCT_PRICE_MYR = 25.0;
 
 export async function POST(request: NextRequest) {
   let body: { signup_id?: string; payment_method?: string };

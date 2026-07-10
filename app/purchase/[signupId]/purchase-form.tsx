@@ -50,12 +50,14 @@ export default function PurchaseForm({ signupId }: { signupId: string }) {
       )}
 
       <div>
-        <label className="block text-sm font-medium mb-1">Product</label>
-        <input
-          disabled
-          value="Kaki Harmoni Starter Pack — RM199.00"
-          className="w-full rounded-lg border border-black/10 bg-black/5 px-3 py-2 text-black/60"
-        />
+        <label className="block text-sm font-medium mb-1">Your order</label>
+        <div className="w-full rounded-lg border border-black/10 bg-black/5 px-3 py-2.5">
+          <p className="text-black/80 text-sm font-medium">First Visit — Foot Soak + Coffee</p>
+          <p className="text-black/50 text-xs mt-0.5">
+            <span className="font-semibold" style={{ color: "var(--clay)" }}>RM25.00</span>{" "}
+            <span className="line-through">RM40.00</span> — first-visit price
+          </p>
+        </div>
       </div>
 
       <div>
