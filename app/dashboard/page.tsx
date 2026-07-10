@@ -6,7 +6,7 @@ export default function DashboardPage() {
     <main className="min-h-screen p-6 md:p-10">
       <div className="max-w-5xl mx-auto space-y-8">
         <div>
-          <Logo className="mb-1" />
+          <Logo size="sm" className="mb-1" />
           <h1 className="font-display text-3xl font-semibold" style={{ color: "var(--lagoon-dark)" }}>
             Sales dashboard
           </h1>

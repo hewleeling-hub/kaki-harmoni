@@ -5,7 +5,7 @@ export default function PurchaseSuccessPage() {
   return (
     <main className="min-h-screen flex items-center justify-center p-6">
       <div className="w-full max-w-md bg-white/80 rounded-2xl shadow-sm border border-black/5 p-8 text-center space-y-4">
-        <Logo />
+        <Logo size="sm" />
         <div
           className="mx-auto h-12 w-12 rounded-full flex items-center justify-center text-white text-xl"
           style={{ background: "var(--clay)" }}
