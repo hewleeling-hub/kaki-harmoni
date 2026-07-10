@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { whatsAppLink } from "@/lib/whatsapp";
 
 interface Signup {
   id: string;
@@ -96,6 +97,7 @@ export default function DashboardClient() {
   const totalSignups = signups?.length ?? 0;
   const totalPurchases = purchases.length;
   const conversionPct = totalSignups > 0 ? Math.round((totalPurchases / totalSignups) * 100) : 0;
+  const awaitingFollowUp = signups?.filter((s) => s.status !== "converted").length ?? 0;
 
   return (
     <div className="space-y-6">
@@ -105,10 +107,11 @@ export default function DashboardClient() {
         </div>
       )}
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Counter label="Total signups" value={totalSignups} />
         <Counter label="Total purchases" value={totalPurchases} />
         <Counter label="Conversion" value={`${conversionPct}%`} />
+        <Counter label="Awaiting follow-up" value={awaitingFollowUp} accent="clay" />
       </div>
 
       <div className="bg-white/80 rounded-2xl border border-black/5 overflow-hidden">
@@ -178,6 +181,7 @@ export default function DashboardClient() {
                     <td className="px-4 py-3 text-black/70">{s.lead_score ?? "—"}</td>
                     <td className="px-4 py-3 text-black/50 text-xs">
                       {new Date(s.created_at).toLocaleDateString()}
+                      <div className="text-black/35">{daysAgo(s.created_at)}</div>
                     </td>
                     <td className="px-4 py-3 text-right space-x-2 whitespace-nowrap">
                       {isEditing ? (
@@ -199,6 +203,20 @@ export default function DashboardClient() {
                         </>
                       ) : (
                         <>
+                          {s.status !== "converted" && s.phone && (
+                            <a
+                              href={whatsAppLink(
+                                s.phone,
+                                `Hi ${s.name.split(" ")[0]}! This is Kaki Harmoni — just checking in on your RM25 first-visit foot soak + coffee. Want us to save you a slot this week?`,
+                              )}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs font-medium px-2 py-1 rounded text-white"
+                              style={{ background: "#25D366" }}
+                            >
+                              Follow up
+                            </a>
+                          )}
                           <button
                             onClick={() => startEdit(s)}
                             className="text-xs font-medium px-2 py-1 rounded border border-black/10"
@@ -252,11 +270,29 @@ export default function DashboardClient() {
   );
 }
 
-function Counter({ label, value }: { label: string; value: string | number }) {
+function daysAgo(dateStr: string): string {
+  const days = Math.floor((Date.now() - new Date(dateStr).getTime()) / (1000 * 60 * 60 * 24));
+  if (days <= 0) return "today";
+  if (days === 1) return "1 day ago";
+  return `${days} days ago`;
+}
+
+function Counter({
+  label,
+  value,
+  accent = "lagoon",
+}: {
+  label: string;
+  value: string | number;
+  accent?: "lagoon" | "clay";
+}) {
   return (
     <div className="bg-white/80 rounded-2xl border border-black/5 p-5">
       <p className="text-xs uppercase tracking-wide text-black/40">{label}</p>
-      <p className="font-display text-3xl font-semibold mt-1" style={{ color: "var(--lagoon-dark)" }}>
+      <p
+        className="font-display text-3xl font-semibold mt-1"
+        style={{ color: accent === "clay" ? "var(--clay)" : "var(--lagoon-dark)" }}
+      >
         {value}
       </p>
     </div>

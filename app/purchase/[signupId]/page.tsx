@@ -40,7 +40,7 @@ export default async function PurchasePage({ params }: { params: Promise<{ signu
           </h1>
           <p className="text-black/60 text-sm">Hi {signup.name.split(" ")[0]}, lock in your spot.</p>
         </div>
-        <PurchaseForm signupId={signup.id} />
+        <PurchaseForm signupId={signup.id} signupName={signup.name} signupPhone={signup.phone ?? ""} />
       </div>
     </main>
   );
