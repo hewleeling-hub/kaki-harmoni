@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { whatsAppLink } from "@/lib/whatsapp";
+import { whatsAppLink, BUSINESS_WHATSAPP_NUMBER } from "@/lib/whatsapp";
 
 const PAYMENT_METHODS = [
   { value: "online_transfer", label: "Online transfer" },
@@ -104,7 +104,7 @@ export default function PurchaseForm({
       <p className="text-center">
         <a
           href={whatsAppLink(
-            signupPhone,
+            BUSINESS_WHATSAPP_NUMBER,
             `Hi Kaki Harmoni! This is ${signupName}. I signed up for the RM25 first-visit offer but need a bit more time before purchasing — please remind me!`,
           )}
           target="_blank"

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import Logo from "@/app/logo";
-import { whatsAppLink } from "@/lib/whatsapp";
+import { whatsAppLink, BUSINESS_WHATSAPP_NUMBER } from "@/lib/whatsapp";
 
 export default async function ConfirmationPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -17,7 +17,7 @@ export default async function ConfirmationPage({ params }: { params: Promise<{ i
   const alreadyConverted = signup.status === "converted";
   const firstName = signup.name.split(" ")[0];
   const waLink = whatsAppLink(
-    signup.phone ?? "",
+    BUSINESS_WHATSAPP_NUMBER,
     `Hi Kaki Harmoni! This is ${signup.name}. I signed up for the RM25 first-visit offer but need a bit more time before purchasing — please remind me!`,
   );
 
