@@ -48,13 +48,18 @@ export async function POST(request: NextRequest) {
 
   const { data: existing } = await supabase
     .from("signups")
-    .select("id")
+    .select("id, status")
     .ilike("email", email)
     .maybeSingle();
 
   if (existing) {
     return NextResponse.json(
-      { error: "This email is already registered.", field: "email" },
+      {
+        error: "You're already signed up with this email.",
+        field: "email",
+        signup_id: existing.id,
+        already_converted: existing.status === "converted",
+      },
       { status: 409 },
     );
   }
@@ -80,8 +85,18 @@ export async function POST(request: NextRequest) {
   if (error || !signup) {
     // Unique index race condition -> treat as duplicate
     if (error?.code === "23505") {
+      const { data: raced } = await supabase
+        .from("signups")
+        .select("id, status")
+        .ilike("email", email)
+        .maybeSingle();
       return NextResponse.json(
-        { error: "This email is already registered.", field: "email" },
+        {
+          error: "You're already signed up with this email.",
+          field: "email",
+          signup_id: raced?.id ?? null,
+          already_converted: raced?.status === "converted",
+        },
         { status: 409 },
       );
     }

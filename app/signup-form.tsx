@@ -36,6 +36,11 @@ export default function SignupForm() {
       const data = await res.json();
 
       if (!res.ok) {
+        if (res.status === 409 && data.signup_id) {
+          // Returning visitor with the same email — take them straight back to their spot.
+          router.push(`/confirmation/${data.signup_id}`);
+          return;
+        }
         if (data.field) {
           setFieldError({ field: data.field, message: data.error });
         } else {
