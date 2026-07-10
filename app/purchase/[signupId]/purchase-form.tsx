@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const PAYMENT_METHODS = [
   { value: "online_transfer", label: "Online transfer" },
@@ -90,6 +91,12 @@ export default function PurchaseForm({ signupId }: { signupId: string }) {
         )}
         {submitting ? "Confirming…" : "Confirm purchase"}
       </button>
+
+      <p className="text-center">
+        <Link href="/" className="text-sm text-black/50 hover:text-black/70 underline underline-offset-2">
+          Not right now — I&apos;ll decide later
+        </Link>
+      </p>
     </form>
   );
 }
