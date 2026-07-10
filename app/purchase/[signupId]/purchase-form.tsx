@@ -44,7 +44,7 @@ export default function PurchaseForm({
         return;
       }
 
-      router.push(`/purchase/${signupId}/success`);
+      router.push(`/purchase/${signupId}/book`);
     } catch {
       setError("Something went wrong. Please try again.");
       setSubmitting(false);

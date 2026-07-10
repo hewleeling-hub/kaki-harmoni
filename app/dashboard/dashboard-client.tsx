@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { whatsAppLink } from "@/lib/whatsapp";
+import { formatSlotTime } from "@/lib/slots";
 
 interface Signup {
   id: string;
@@ -20,6 +21,8 @@ interface Purchase {
   signup_id: string;
   amount_myr: number;
   status: string;
+  booking_date: string | null;
+  booking_time: string | null;
 }
 
 export default function DashboardClient() {
@@ -133,6 +136,7 @@ export default function DashboardClient() {
                 <th className="px-4 py-3 font-medium">Email</th>
                 <th className="px-4 py-3 font-medium">Source</th>
                 <th className="px-4 py-3 font-medium">Status</th>
+                <th className="px-4 py-3 font-medium">Visit</th>
                 <th className="px-4 py-3 font-medium">Score</th>
                 <th className="px-4 py-3 font-medium">Signed up</th>
                 <th className="px-4 py-3 font-medium text-right">Actions</th>
@@ -177,6 +181,21 @@ export default function DashboardClient() {
                           className="mt-1 rounded border border-black/10 px-2 py-1 w-full text-xs"
                         />
                       )}
+                    </td>
+                    <td className="px-4 py-3 text-black/70 text-xs">
+                      {(() => {
+                        const p = purchases.find((pu) => pu.signup_id === s.id);
+                        if (!p?.booking_date || !p?.booking_time) return "—";
+                        return (
+                          <>
+                            {new Date(p.booking_date + "T00:00:00").toLocaleDateString(undefined, {
+                              month: "short",
+                              day: "numeric",
+                            })}
+                            <div className="text-black/50">{formatSlotTime(p.booking_time)}</div>
+                          </>
+                        );
+                      })()}
                     </td>
                     <td className="px-4 py-3 text-black/70">{s.lead_score ?? "—"}</td>
                     <td className="px-4 py-3 text-black/50 text-xs">
