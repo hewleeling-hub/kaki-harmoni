@@ -8,7 +8,7 @@ import { whatsAppLink, BUSINESS_WHATSAPP_NUMBER } from "@/lib/whatsapp";
 const PAYMENT_METHODS = [
   { value: "online_transfer", label: "Online transfer" },
   { value: "cash", label: "Cash on arrival" },
-  { value: "card", label: "Card" },
+  { value: "ewallet", label: "E-Wallet" },
 ];
 
 export default function PurchaseForm({
