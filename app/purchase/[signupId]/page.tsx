@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import PurchaseForm from "./purchase-form";
@@ -6,7 +6,7 @@ import Logo from "@/app/logo";
 
 export default async function PurchasePage({ params }: { params: Promise<{ signupId: string }> }) {
   const { signupId } = await params;
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   const { data: signup } = await supabase.from("signups").select("*").eq("id", signupId).maybeSingle();
 

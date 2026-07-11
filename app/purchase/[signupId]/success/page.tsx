@@ -1,11 +1,11 @@
 import Link from "next/link";
 import Logo from "@/app/logo";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { formatSlotTime } from "@/lib/slots";
 
 export default async function PurchaseSuccessPage({ params }: { params: Promise<{ signupId: string }> }) {
   const { signupId } = await params;
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   const { data: purchase } = await supabase
     .from("purchases")

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { logActivity, logAudit } from "@/lib/activity";
 import { MAX_CAPACITY_PER_SLOT } from "@/lib/slots";
 
@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Please choose a date and time." }, { status: 400 });
   }
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   const { data: purchase } = await supabase.from("purchases").select("*").eq("id", purchase_id).maybeSingle();
   if (!purchase) {

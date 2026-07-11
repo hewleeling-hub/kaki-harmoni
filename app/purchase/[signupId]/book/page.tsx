@@ -1,11 +1,11 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { notFound, redirect } from "next/navigation";
 import Logo from "@/app/logo";
 import BookingForm from "./booking-form";
 
 export default async function BookPage({ params }: { params: Promise<{ signupId: string }> }) {
   const { signupId } = await params;
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   const { data: signup } = await supabase.from("signups").select("*").eq("id", signupId).maybeSingle();
   if (!signup) {
