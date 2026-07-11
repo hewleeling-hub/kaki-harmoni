@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { logActivity, logAudit } from "@/lib/activity";
+import { requireStaff } from "@/lib/auth";
 
 export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  const user = await requireStaff();
+  if (!user) {
+    return NextResponse.json({ error: "Please sign in." }, { status: 401 });
+  }
+
   const supabase = await createClient();
 
   const { data: signup, error } = await supabase.from("signups").select("*").eq("id", id).maybeSingle();
@@ -23,6 +29,11 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  const user = await requireStaff();
+  if (!user) {
+    return NextResponse.json({ error: "Please sign in." }, { status: 401 });
+  }
+
   let body: { name?: string; phone?: string; status?: string };
   try {
     body = await request.json();
@@ -79,6 +90,11 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
 export async function DELETE(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  const user = await requireStaff();
+  if (!user) {
+    return NextResponse.json({ error: "Please sign in." }, { status: 401 });
+  }
+
   const supabase = await createClient();
 
   const { data: before } = await supabase.from("signups").select("*").eq("id", id).maybeSingle();
