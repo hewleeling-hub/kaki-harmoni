@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { logActivity, logAudit } from "@/lib/activity";
 import { scoreLead } from "@/lib/scoring";
 import { requireStaff } from "@/lib/auth";
+import { sendSalesAlert, newSignupEmail } from "@/lib/email";
 
 export async function GET() {
   const user = await requireStaff();
@@ -124,6 +125,9 @@ export async function POST(request: NextRequest) {
     new_data: signup,
     actor: "public_form",
   });
+
+  const alert = newSignupEmail({ name, email, phone, referral_source });
+  sendSalesAlert(alert.subject, alert.html); // fire-and-forget, never blocks the response
 
   return NextResponse.json({ signup }, { status: 201 });
 }

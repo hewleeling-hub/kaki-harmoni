@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { logActivity, logAudit } from "@/lib/activity";
 import { scoreLead } from "@/lib/scoring";
+import { sendSalesAlert, purchaseConfirmedEmail } from "@/lib/email";
 
 const PRODUCT_NAME = "First Visit — Foot Soak + Coffee";
 const PRODUCT_PRICE_MYR = 25.0;
@@ -115,6 +116,14 @@ export async function POST(request: NextRequest) {
     new_data: updatedSignup,
     actor: "score_lead",
   });
+
+  const alert = purchaseConfirmedEmail({
+    name: signup.name,
+    email: signup.email,
+    amount: PRODUCT_PRICE_MYR,
+    paymentMethod: payment_method,
+  });
+  sendSalesAlert(alert.subject, alert.html); // fire-and-forget, never blocks the response
 
   return NextResponse.json({ purchase, signup: updatedSignup }, { status: 201 });
 }

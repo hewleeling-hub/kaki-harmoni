@@ -133,6 +133,16 @@ export default function DashboardClient() {
         </div>
       )}
 
+      <div className="flex justify-end">
+        <a
+          href="/api/export/csv"
+          className="text-sm font-medium px-3 py-1.5 rounded-lg border border-black/10 hover:bg-black/5 inline-flex items-center gap-1.5"
+        >
+          <DownloadIcon />
+          Export CSV
+        </a>
+      </div>
+
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Counter label="Total signups" value={totalSignups} />
         <Counter label="Total purchases" value={totalPurchases} />
@@ -143,6 +153,8 @@ export default function DashboardClient() {
         <Counter label="Pending payment" value={pendingPayments} accent="clay" />
         <Counter label="No-shows" value={noShows} accent="clay" />
       </div>
+
+      <FunnelChart totalSignups={totalSignups} totalPurchases={totalPurchases} />
 
       <div className="bg-white/80 rounded-2xl border border-black/5 overflow-hidden">
         {signups === null ? (
@@ -384,6 +396,49 @@ function daysAgo(dateStr: string): string {
   if (days <= 0) return "today";
   if (days === 1) return "1 day ago";
   return `${days} days ago`;
+}
+
+function FunnelChart({ totalSignups, totalPurchases }: { totalSignups: number; totalPurchases: number }) {
+  const maxVal = Math.max(totalSignups, 1);
+  const signupPct = 100;
+  const purchasePct = Math.round((totalPurchases / maxVal) * 100);
+
+  return (
+    <div className="bg-white/80 rounded-2xl border border-black/5 p-5">
+      <p className="text-xs uppercase tracking-wide text-black/40 mb-4">Conversion funnel</p>
+      <div className="space-y-3">
+        <FunnelBar label="Signups" value={totalSignups} pct={signupPct} color="var(--lagoon)" />
+        <FunnelBar label="Purchases" value={totalPurchases} pct={purchasePct} color="var(--clay)" />
+      </div>
+    </div>
+  );
+}
+
+function FunnelBar({ label, value, pct, color }: { label: string; value: number; pct: number; color: string }) {
+  return (
+    <div>
+      <div className="flex justify-between text-xs text-black/50 mb-1">
+        <span>{label}</span>
+        <span>{value}</span>
+      </div>
+      <div className="h-6 rounded-full bg-black/5 overflow-hidden">
+        <div
+          className="h-full rounded-full transition-all"
+          style={{ width: `${Math.max(pct, 3)}%`, background: color }}
+        />
+      </div>
+    </div>
+  );
+}
+
+function DownloadIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 3v12" />
+      <path d="M7 10l5 5 5-5" />
+      <path d="M4 19h16" />
+    </svg>
+  );
 }
 
 function Counter({
