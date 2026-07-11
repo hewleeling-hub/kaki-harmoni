@@ -40,7 +40,10 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const paymentStatus = payment_method === "cash" ? "confirmed" : "pending_payment";
+  // Nothing is actually collected at the moment of checkout — cash is paid in person at the
+  // visit, and transfer/e-wallet need staff to verify receipt. Everything starts pending;
+  // staff flips it to 'confirmed' via the dashboard once money is actually in hand.
+  const paymentStatus = "pending_payment";
 
   const { data: purchase, error: purchaseError } = await supabase
     .from("purchases")
