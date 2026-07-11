@@ -40,6 +40,8 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const paymentStatus = payment_method === "cash" ? "confirmed" : "pending_payment";
+
   const { data: purchase, error: purchaseError } = await supabase
     .from("purchases")
     .insert({
@@ -47,7 +49,7 @@ export async function POST(request: NextRequest) {
       product_name: PRODUCT_NAME,
       amount_myr: PRODUCT_PRICE_MYR,
       payment_method,
-      status: "confirmed",
+      status: paymentStatus,
     })
     .select()
     .single();

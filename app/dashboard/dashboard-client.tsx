@@ -21,6 +21,7 @@ interface Purchase {
   signup_id: string;
   amount_myr: number;
   status: string;
+  visit_status: string;
   booking_date: string | null;
   booking_time: string | null;
 }
@@ -97,10 +98,32 @@ export default function DashboardClient() {
     }
   }
 
+  const [updatingPurchaseId, setUpdatingPurchaseId] = useState<string | null>(null);
+
+  async function updatePurchase(purchaseId: string, updates: { status?: string; visit_status?: string }) {
+    setUpdatingPurchaseId(purchaseId);
+    try {
+      const res = await fetch(`/api/purchases/${purchaseId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updates),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setPurchases((prev) => prev.map((p) => (p.id === purchaseId ? data.purchase : p)));
+    } catch {
+      setError("Could not update this purchase. Please try again.");
+    } finally {
+      setUpdatingPurchaseId(null);
+    }
+  }
+
   const totalSignups = signups?.length ?? 0;
   const totalPurchases = purchases.length;
   const conversionPct = totalSignups > 0 ? Math.round((totalPurchases / totalSignups) * 100) : 0;
   const awaitingFollowUp = signups?.filter((s) => s.status !== "converted").length ?? 0;
+  const pendingPayments = purchases.filter((p) => p.status === "pending_payment").length;
+  const noShows = purchases.filter((p) => p.visit_status === "no_show").length;
 
   return (
     <div className="space-y-6">
@@ -115,6 +138,10 @@ export default function DashboardClient() {
         <Counter label="Total purchases" value={totalPurchases} />
         <Counter label="Conversion" value={`${conversionPct}%`} />
         <Counter label="Awaiting follow-up" value={awaitingFollowUp} accent="clay" />
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <Counter label="Pending payment" value={pendingPayments} accent="clay" />
+        <Counter label="No-shows" value={noShows} accent="clay" />
       </div>
 
       <div className="bg-white/80 rounded-2xl border border-black/5 overflow-hidden">
@@ -185,15 +212,42 @@ export default function DashboardClient() {
                     <td className="px-4 py-3 text-black/70 text-xs">
                       {(() => {
                         const p = purchases.find((pu) => pu.signup_id === s.id);
-                        if (!p?.booking_date || !p?.booking_time) return "—";
+                        if (!p) return "—";
                         return (
-                          <>
-                            {new Date(p.booking_date + "T00:00:00").toLocaleDateString(undefined, {
-                              month: "short",
-                              day: "numeric",
-                            })}
-                            <div className="text-black/50">{formatSlotTime(p.booking_time)}</div>
-                          </>
+                          <div className="space-y-1">
+                            {p.booking_date && p.booking_time ? (
+                              <div>
+                                {new Date(p.booking_date + "T00:00:00").toLocaleDateString(undefined, {
+                                  month: "short",
+                                  day: "numeric",
+                                })}
+                                <span className="text-black/50"> · {formatSlotTime(p.booking_time)}</span>
+                              </div>
+                            ) : (
+                              <div className="text-black/40">No slot picked yet</div>
+                            )}
+                            <div className="flex flex-wrap gap-1">
+                              {p.status === "pending_payment" ? (
+                                <span className="inline-block text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-800">
+                                  Pending payment
+                                </span>
+                              ) : (
+                                <span className="inline-block text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-green-100 text-green-800">
+                                  Paid
+                                </span>
+                              )}
+                              {p.visit_status === "no_show" && (
+                                <span className="inline-block text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-red-100 text-red-800">
+                                  No-show
+                                </span>
+                              )}
+                              {p.visit_status === "attended" && (
+                                <span className="inline-block text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-green-100 text-green-800">
+                                  Attended
+                                </span>
+                              )}
+                            </div>
+                          </div>
                         );
                       })()}
                     </td>
@@ -222,6 +276,42 @@ export default function DashboardClient() {
                         </>
                       ) : (
                         <>
+                          {(() => {
+                            const p = purchases.find((pu) => pu.signup_id === s.id);
+                            const busy = updatingPurchaseId === p?.id;
+                            return (
+                              <>
+                                {p && p.status === "pending_payment" && (
+                                  <button
+                                    onClick={() => updatePurchase(p.id, { status: "confirmed" })}
+                                    disabled={busy}
+                                    className="text-xs font-medium px-2 py-1 rounded text-white disabled:opacity-60"
+                                    style={{ background: "var(--lagoon)" }}
+                                  >
+                                    {busy ? "…" : "Mark paid"}
+                                  </button>
+                                )}
+                                {p && p.visit_status === "upcoming" && (
+                                  <>
+                                    <button
+                                      onClick={() => updatePurchase(p.id, { visit_status: "attended" })}
+                                      disabled={busy}
+                                      className="text-xs font-medium px-2 py-1 rounded border border-green-200 text-green-700 disabled:opacity-60"
+                                    >
+                                      Attended
+                                    </button>
+                                    <button
+                                      onClick={() => updatePurchase(p.id, { visit_status: "no_show" })}
+                                      disabled={busy}
+                                      className="text-xs font-medium px-2 py-1 rounded border border-red-200 text-red-700 disabled:opacity-60"
+                                    >
+                                      No-show
+                                    </button>
+                                  </>
+                                )}
+                              </>
+                            );
+                          })()}
                           {s.status !== "converted" && s.phone && (
                             <a
                               href={whatsAppLink(
