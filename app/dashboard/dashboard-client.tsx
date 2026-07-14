@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { whatsAppLink } from "@/lib/whatsapp";
 import { formatSlotTime } from "@/lib/slots";
+import { draftFollowup } from "@/lib/followup";
 
 interface Signup {
   id: string;
@@ -26,6 +27,15 @@ interface Purchase {
   booking_time: string | null;
 }
 
+type ReviewFilter = "all" | "unreviewed" | "approved" | "flagged";
+
+const REVIEW_FILTERS: { value: ReviewFilter; label: string }[] = [
+  { value: "all", label: "All" },
+  { value: "unreviewed", label: "Unreviewed" },
+  { value: "approved", label: "Approved" },
+  { value: "flagged", label: "Flagged" },
+];
+
 export default function DashboardClient() {
   const [signups, setSignups] = useState<Signup[] | null>(null);
   const [purchases, setPurchases] = useState<Purchase[]>([]);
@@ -39,6 +49,13 @@ export default function DashboardClient() {
   const [savingId, setSavingId] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Signup | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [reviewFilter, setReviewFilter] = useState<ReviewFilter>("all");
+  const [updatingReviewId, setUpdatingReviewId] = useState<string | null>(null);
+
+  // Draft follow-up (Sprint 5): generate text, let staff edit, human approves before any send.
+  const [followupTarget, setFollowupTarget] = useState<Signup | null>(null);
+  const [followupText, setFollowupText] = useState("");
+  const [copied, setCopied] = useState(false);
 
   async function load() {
     setError(null);
@@ -82,6 +99,24 @@ export default function DashboardClient() {
     }
   }
 
+  async function updateReview(id: string, review_status: string) {
+    setUpdatingReviewId(id);
+    try {
+      const res = await fetch(`/api/signups/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ review_status }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setSignups((prev) => prev!.map((s) => (s.id === id ? data.signup : s)));
+    } catch {
+      setError("Could not update the review status. Please try again.");
+    } finally {
+      setUpdatingReviewId(null);
+    }
+  }
+
   async function confirmDelete() {
     if (!deleteTarget) return;
     setDeleting(true);
@@ -118,12 +153,43 @@ export default function DashboardClient() {
     }
   }
 
+  function openFollowup(s: Signup) {
+    const p = purchases.find((pu) => pu.signup_id === s.id);
+    const text = draftFollowup({
+      name: s.name,
+      referral_source: s.referral_source,
+      status: s.status,
+      lead_score: s.lead_score,
+      has_booking: !!(p?.booking_date && p?.booking_time),
+      pending_payment: p?.status === "pending_payment",
+    });
+    setFollowupTarget(s);
+    setFollowupText(text);
+    setCopied(false);
+  }
+
+  async function copyFollowup() {
+    try {
+      await navigator.clipboard.writeText(followupText);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(false);
+    }
+  }
+
   const totalSignups = signups?.length ?? 0;
   const totalPurchases = purchases.length;
   const conversionPct = totalSignups > 0 ? Math.round((totalPurchases / totalSignups) * 100) : 0;
   const awaitingFollowUp = signups?.filter((s) => s.status !== "converted").length ?? 0;
   const pendingPayments = purchases.filter((p) => p.status === "pending_payment").length;
   const noShows = purchases.filter((p) => p.visit_status === "no_show").length;
+
+  const visibleSignups = useMemo(() => {
+    if (!signups) return [];
+    if (reviewFilter === "all") return signups;
+    return signups.filter((s) => (s.lead_score_review_status ?? "unreviewed") === reviewFilter);
+  }, [signups, reviewFilter]);
 
   return (
     <div className="space-y-6">
@@ -133,7 +199,28 @@ export default function DashboardClient() {
         </div>
       )}
 
-      <div className="flex justify-end">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="inline-flex rounded-lg border border-black/10 overflow-hidden text-sm">
+          {REVIEW_FILTERS.map((f) => {
+            const active = reviewFilter === f.value;
+            const count =
+              f.value === "all"
+                ? signups?.length ?? 0
+                : signups?.filter((s) => (s.lead_score_review_status ?? "unreviewed") === f.value).length ?? 0;
+            return (
+              <button
+                key={f.value}
+                onClick={() => setReviewFilter(f.value)}
+                className="px-3 py-1.5 font-medium transition border-r border-black/10 last:border-r-0"
+                style={active ? { background: "var(--lagoon)", color: "white" } : { color: "rgba(0,0,0,0.6)" }}
+              >
+                {f.label}
+                <span className={active ? "ml-1 opacity-80" : "ml-1 text-black/35"}>{count}</span>
+              </button>
+            );
+          })}
+        </div>
+
         <a
           href="/api/export/csv"
           className="text-sm font-medium px-3 py-1.5 rounded-lg border border-black/10 hover:bg-black/5 inline-flex items-center gap-1.5"
@@ -167,6 +254,10 @@ export default function DashboardClient() {
           <div className="p-10 text-center text-black/50">
             No signups yet. Once someone signs up on the landing page, they&apos;ll show up here.
           </div>
+        ) : visibleSignups.length === 0 ? (
+          <div className="p-10 text-center text-black/50">
+            No {reviewFilter} leads. Try a different filter.
+          </div>
         ) : (
           <table className="w-full text-sm">
             <thead>
@@ -176,14 +267,16 @@ export default function DashboardClient() {
                 <th className="px-4 py-3 font-medium">Source</th>
                 <th className="px-4 py-3 font-medium">Status</th>
                 <th className="px-4 py-3 font-medium">Visit</th>
-                <th className="px-4 py-3 font-medium">Score</th>
+                <th className="px-4 py-3 font-medium">Lead score</th>
                 <th className="px-4 py-3 font-medium">Signed up</th>
                 <th className="px-4 py-3 font-medium text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {signups.map((s) => {
+              {visibleSignups.map((s) => {
                 const isEditing = editingId === s.id;
+                const reviewStatus = s.lead_score_review_status ?? "unreviewed";
+                const reviewBusy = updatingReviewId === s.id;
                 return (
                   <tr key={s.id} className="border-b border-black/5 last:border-0">
                     <td className="px-4 py-3">
@@ -263,7 +356,48 @@ export default function DashboardClient() {
                         );
                       })()}
                     </td>
-                    <td className="px-4 py-3 text-black/70">{s.lead_score ?? "—"}</td>
+                    <td className="px-4 py-3">
+                      <div className="space-y-1.5">
+                        <ScoreBadge score={s.lead_score} />
+                        <div className="flex items-center gap-1">
+                          <ReviewBadge status={reviewStatus} />
+                          {!isEditing && (
+                            <div className="flex gap-0.5">
+                              {reviewStatus !== "approved" && (
+                                <button
+                                  onClick={() => updateReview(s.id, "approved")}
+                                  disabled={reviewBusy}
+                                  title="Approve lead"
+                                  className="text-[11px] leading-none px-1.5 py-1 rounded border border-green-200 text-green-700 disabled:opacity-50"
+                                >
+                                  ✓
+                                </button>
+                              )}
+                              {reviewStatus !== "flagged" && (
+                                <button
+                                  onClick={() => updateReview(s.id, "flagged")}
+                                  disabled={reviewBusy}
+                                  title="Flag lead"
+                                  className="text-[11px] leading-none px-1.5 py-1 rounded border border-amber-200 text-amber-700 disabled:opacity-50"
+                                >
+                                  ⚑
+                                </button>
+                              )}
+                              {reviewStatus !== "unreviewed" && (
+                                <button
+                                  onClick={() => updateReview(s.id, "unreviewed")}
+                                  disabled={reviewBusy}
+                                  title="Reset to unreviewed"
+                                  className="text-[11px] leading-none px-1.5 py-1 rounded border border-black/10 text-black/50 disabled:opacity-50"
+                                >
+                                  ↺
+                                </button>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </td>
                     <td className="px-4 py-3 text-black/50 text-xs">
                       {new Date(s.created_at).toLocaleDateString()}
                       <div className="text-black/35">{daysAgo(s.created_at)}</div>
@@ -324,19 +458,14 @@ export default function DashboardClient() {
                               </>
                             );
                           })()}
-                          {s.status !== "converted" && s.phone && (
-                            <a
-                              href={whatsAppLink(
-                                s.phone,
-                                `Hi ${s.name.split(" ")[0]}! This is Kaki Harmoni — just checking in on your RM25 first-visit foot soak + coffee. Want us to save you a slot this week?`,
-                              )}
-                              target="_blank"
-                              rel="noopener noreferrer"
+                          {s.status !== "converted" && (
+                            <button
+                              onClick={() => openFollowup(s)}
                               className="text-xs font-medium px-2 py-1 rounded text-white"
                               style={{ background: "#25D366" }}
                             >
-                              Follow up
-                            </a>
+                              Draft follow-up
+                            </button>
                           )}
                           <button
                             onClick={() => startEdit(s)}
@@ -360,6 +489,63 @@ export default function DashboardClient() {
           </table>
         )}
       </div>
+
+      {followupTarget && (
+        <div className="fixed inset-0 bg-black/30 flex items-center justify-center p-6 z-50">
+          <div className="bg-white rounded-2xl p-6 max-w-lg w-full space-y-4">
+            <div>
+              <h2 className="font-display text-lg font-semibold">
+                Draft follow-up · {followupTarget.name}
+              </h2>
+              <p className="text-sm text-black/55 mt-1">
+                Review and edit before sending. Nothing goes out until you approve it — this just
+                opens WhatsApp with your message ready to send.
+              </p>
+            </div>
+
+            <textarea
+              value={followupText}
+              onChange={(e) => setFollowupText(e.target.value)}
+              rows={5}
+              className="w-full rounded-lg border border-black/10 px-3 py-2 text-sm focus:outline-none focus:ring-2"
+              style={{ ["--tw-ring-color" as string]: "var(--lagoon)" }}
+            />
+
+            {!followupTarget.phone && (
+              <div className="rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-xs px-3 py-2">
+                No phone number on file for this lead — copy the message and send it another way.
+              </div>
+            )}
+
+            <div className="flex flex-wrap justify-end gap-2">
+              <button
+                onClick={() => setFollowupTarget(null)}
+                className="text-sm px-3 py-1.5 rounded border border-black/10"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={copyFollowup}
+                className="text-sm px-3 py-1.5 rounded border border-black/10 hover:bg-black/5"
+              >
+                {copied ? "Copied!" : "Copy"}
+              </button>
+              {followupTarget.phone && (
+                <a
+                  href={whatsAppLink(followupTarget.phone, followupText)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setFollowupTarget(null)}
+                  className="text-sm px-3 py-1.5 rounded text-white font-medium inline-flex items-center gap-1.5"
+                  style={{ background: "#25D366" }}
+                >
+                  Approve &amp; open WhatsApp
+                </a>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {deleteTarget && (
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center p-6 z-50">
@@ -475,6 +661,49 @@ function StatusBadge({ status }: { status: string }) {
       }
     >
       {converted ? "Converted" : "Signed up"}
+    </span>
+  );
+}
+
+// Sprint 5: colour-coded lead score. Hot (>=70) / Warm (40-69) / Cool (<40).
+function ScoreBadge({ score }: { score: number | null }) {
+  if (score === null || score === undefined) {
+    return <span className="text-black/40 text-xs">Not scored</span>;
+  }
+  let bg = "rgba(0,0,0,0.06)";
+  let color = "rgba(0,0,0,0.6)";
+  let tier = "Cool";
+  if (score >= 70) {
+    bg = "rgba(193,102,72,0.15)";
+    color = "var(--clay)";
+    tier = "Hot";
+  } else if (score >= 40) {
+    bg = "rgba(46,125,123,0.12)";
+    color = "var(--lagoon-dark)";
+    tier = "Warm";
+  }
+  return (
+    <span
+      className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full"
+      style={{ background: bg, color }}
+      title={`${tier} lead`}
+    >
+      {score}
+      <span className="font-normal opacity-70">{tier}</span>
+    </span>
+  );
+}
+
+function ReviewBadge({ status }: { status: string }) {
+  const map: Record<string, { label: string; className: string }> = {
+    approved: { label: "Approved", className: "bg-green-100 text-green-800" },
+    flagged: { label: "Flagged", className: "bg-amber-100 text-amber-800" },
+    unreviewed: { label: "Unreviewed", className: "bg-black/5 text-black/50" },
+  };
+  const v = map[status] ?? map.unreviewed;
+  return (
+    <span className={`inline-block text-[10px] font-medium px-1.5 py-0.5 rounded-full ${v.className}`}>
+      {v.label}
     </span>
   );
 }

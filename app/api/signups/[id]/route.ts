@@ -27,6 +27,8 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
   return NextResponse.json({ signup, purchase: purchase ?? null });
 }
 
+const REVIEW_STATUSES = ["unreviewed", "approved", "flagged"];
+
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const user = await requireStaff();
@@ -34,7 +36,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     return NextResponse.json({ error: "Please sign in." }, { status: 401 });
   }
 
-  let body: { name?: string; phone?: string; status?: string };
+  let body: { name?: string; phone?: string; status?: string; review_status?: string };
   try {
     body = await request.json();
   } catch {
@@ -53,10 +55,16 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   if (typeof body.status === "string" && ["signed_up", "converted"].includes(body.status)) {
     updates.status = body.status;
   }
+  // Sprint 5: staff move a scored lead through review (unreviewed -> approved / flagged).
+  if (typeof body.review_status === "string" && REVIEW_STATUSES.includes(body.review_status)) {
+    updates.lead_score_review_status = body.review_status;
+  }
 
   if (Object.keys(updates).length === 0) {
     return NextResponse.json({ error: "Nothing to update." }, { status: 400 });
   }
+
+  const isReviewChange = "lead_score_review_status" in updates;
 
   const { data: signup, error } = await supabase
     .from("signups")
@@ -72,7 +80,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   await logActivity(supabase, {
     entity_type: "signup",
     entity_id: id,
-    action: "signup_updated",
+    action: isReviewChange ? "lead_review_updated" : "signup_updated",
     actor: "sales_dashboard",
     metadata: updates,
   });
