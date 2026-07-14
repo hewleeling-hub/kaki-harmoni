@@ -1,9 +1,13 @@
 import SignupForm from "./signup-form";
 import Logo from "./logo";
+import SiteNav from "./site-nav";
+import SiteFooter from "./site-footer";
 
 export default function Home() {
   return (
-    <main className="min-h-screen flex items-center justify-center p-6">
+    <>
+      <SiteNav />
+      <main className="flex items-center justify-center p-6 py-16 md:py-24">
       <div className="w-full max-w-4xl grid md:grid-cols-2 gap-10 items-center">
         <div className="space-y-4">
           <Logo />
@@ -23,6 +27,8 @@ export default function Home() {
           <SignupForm />
         </div>
       </div>
-    </main>
+      </main>
+      <SiteFooter />
+    </>
   );
 }
