@@ -36,7 +36,7 @@ const REVIEW_FILTERS: { value: ReviewFilter; label: string }[] = [
   { value: "flagged", label: "Flagged" },
 ];
 
-export default function DashboardClient() {
+export default function DashboardClient({ canDelete = false }: { canDelete?: boolean }) {
   const [signups, setSignups] = useState<Signup[] | null>(null);
   const [purchases, setPurchases] = useState<Purchase[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -473,12 +473,14 @@ export default function DashboardClient() {
                           >
                             Edit
                           </button>
-                          <button
-                            onClick={() => setDeleteTarget(s)}
-                            className="text-xs font-medium px-2 py-1 rounded border border-red-200 text-red-700"
-                          >
-                            Delete
-                          </button>
+                          {canDelete && (
+                            <button
+                              onClick={() => setDeleteTarget(s)}
+                              className="text-xs font-medium px-2 py-1 rounded border border-red-200 text-red-700"
+                            >
+                              Delete
+                            </button>
+                          )}
                         </>
                       )}
                     </td>

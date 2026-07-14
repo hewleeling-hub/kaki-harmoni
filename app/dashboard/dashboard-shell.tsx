@@ -5,22 +5,28 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Logo from "@/app/logo";
 import { createClient } from "@/lib/supabase/client";
-
-const NAV_ITEMS = [
-  { href: "/dashboard", label: "Dashboard", icon: DashboardIcon },
-  { href: "/", label: "View site", icon: SiteIcon },
-];
+import type { Role } from "@/lib/auth";
 
 export default function DashboardShell({
   email,
+  role,
   children,
 }: {
   email: string;
+  role: Role;
   children: React.ReactNode;
 }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
+
+  const navItems = [
+    { href: "/dashboard", label: "Dashboard", icon: DashboardIcon },
+    ...(role === "owner" || role === "manager"
+      ? [{ href: "/dashboard/team", label: "Team", icon: TeamIcon }]
+      : []),
+    { href: "/", label: "View site", icon: SiteIcon },
+  ];
 
   async function signOut() {
     const supabase = createClient();
@@ -36,7 +42,7 @@ export default function DashboardShell({
       </div>
 
       <div className="flex-1 px-3 space-y-1">
-        {NAV_ITEMS.map((item) => {
+        {navItems.map((item) => {
           const active = pathname === item.href;
           const Icon = item.icon;
           return (
@@ -130,6 +136,17 @@ function DashboardIcon() {
       <rect x="14" y="3" width="7" height="5" rx="1" />
       <rect x="14" y="12" width="7" height="9" rx="1" />
       <rect x="3" y="16" width="7" height="5" rx="1" />
+    </svg>
+  );
+}
+
+function TeamIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="9" cy="8" r="3" />
+      <path d="M3 20a6 6 0 0 1 12 0" />
+      <path d="M16 6a3 3 0 0 1 0 6" />
+      <path d="M18.5 20a6 6 0 0 0-3-5.2" />
     </svg>
   );
 }

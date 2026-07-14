@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { logActivity, logAudit } from "@/lib/activity";
-import { requireStaff } from "@/lib/auth";
+import { requireStaff, requireManager } from "@/lib/auth";
 
 export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -98,9 +98,10 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
 export async function DELETE(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const user = await requireStaff();
-  if (!user) {
-    return NextResponse.json({ error: "Please sign in." }, { status: 401 });
+  // Deleting a lead is a manager/owner-only action (Sprint 6 role-based access).
+  const manager = await requireManager();
+  if (!manager) {
+    return NextResponse.json({ error: "Only a manager or owner can delete leads." }, { status: 403 });
   }
 
   const supabase = await createClient();

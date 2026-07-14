@@ -10,8 +10,14 @@ Current baseline (from applied migrations `0001`–`0004`):
 
 ---
 
-## Sprint 6 — Team accounts + role-based access
+## Sprint 6 — Team accounts + role-based access  ✅ BUILT (pending migration apply + push)
 **Goal:** More than one teammate can log in, and what they can do depends on their role.
+
+**Shipped:** `profiles` table + roles (migration `0005`), `handle_new_user` trigger,
+`current_user_role()` helper, RLS delete restricted to owner/manager, `lib/auth.ts`
+role helpers, `/api/team` + `/api/team/[id]` (invite/change-role/remove, manager-guarded),
+`/dashboard/team` page, Team nav + delete button gated by role. Existing users are
+backfilled as `owner`.
 
 **Why first:** it gates who can manage the catalogue (Sprint 7) and see revenue/retention
 (Sprint 8), so the admin surfaces built later are protected from day one.
