@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { BUSINESS_WHATSAPP_NUMBER, whatsAppLink } from "@/lib/whatsapp";
 
-const IG_URL = "https://instagram.com/kakiharmoni";
-const FB_URL = "https://facebook.com/kakiharmoni";
+const IG_URL = "https://www.instagram.com/kakiharmoni/";
+const FB_URL = "https://facebook.com/KakiHarmoni";
 const EMAIL = "kakiharmoni@gmail.com";
 
 export default function SiteFooter() {

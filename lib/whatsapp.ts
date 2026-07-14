@@ -1,5 +1,4 @@
-// TODO: replace with the real Kaki Harmoni business WhatsApp number (Malaysian format, with country code, no + or spaces)
-// Example: if the business number is 012-345 6789, this should be "60123456789"
+// Kaki Harmoni business WhatsApp number: 012-376 3081 (Malaysian format, country-code prefixed, no + or spaces).
 export const BUSINESS_WHATSAPP_NUMBER = "60123763081";
 
 // Normalises a Malaysian-style phone number (e.g. "012-345 6789") into

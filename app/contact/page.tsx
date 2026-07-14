@@ -11,8 +11,8 @@ export const metadata: Metadata = {
 };
 
 const EMAIL = "kakiharmoni@gmail.com";
-const IG_URL = "https://instagram.com/kakiharmoni";
-const FB_URL = "https://facebook.com/kakiharmoni";
+const IG_URL = "https://www.instagram.com/kakiharmoni/";
+const FB_URL = "https://facebook.com/KakiHarmoni";
 
 export default function ContactPage() {
   const wa = whatsAppLink(
