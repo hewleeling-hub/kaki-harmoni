@@ -38,3 +38,12 @@ export function draftFollowup(input: DraftFollowupInput): string {
   // Default nudge for a signed-up-but-not-converted lead.
   return `Hi ${who}! This is Kaki Harmoni — just checking in on your RM25 first-visit foot soak + coffee. No rush at all, but we'd love to have you. Want us to save you a slot this week?`;
 }
+
+// Win-back draft for a lapsed customer (Sprint 8). Warm, in Lotti's voice.
+// Draft only — staff review + approve before anything is sent.
+export function draftWinBack(name: string, daysSinceLastVisit: number | null): string {
+  const who = firstName(name);
+  const gap =
+    daysSinceLastVisit && daysSinceLastVisit >= 60 ? "a little while" : "a few weeks";
+  return `Hi ${who}! It's Lotti from Kaki Harmoni 🌸 It's been ${gap} since your last soak — your feet must be missing the bubbles! Come back for a warm foot soak + coffee, no rush. Want me to save you a spot this week? 💛`;
+}

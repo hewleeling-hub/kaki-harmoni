@@ -77,8 +77,16 @@ and staff see the itemised order on the dashboard.
 
 ---
 
-## Sprint 8 — Retention + repeat-purchase tracking
+## Sprint 8 — Retention + repeat-purchase tracking  ✅ BUILT (pending migration apply + push)
 **Goal:** See who comes back, who's slipping away, and act on it.
+
+**Shipped:** `customer_stats` view (migration `0007`, security-invoker, seeded with a
+returning + a lapsed customer); `GET /api/retention` (manager) with repeat-rate/returning/
+new/lapsed summary; `POST /api/signups/[id]/visit` to log a repeat visit (creates a
+confirmed/attended order so retention data can grow); `/dashboard/retention` page with
+metric cards, a lapsed win-back list (draft in Lotti's voice → edit → copy / open WhatsApp),
+and an active-customers list with a record-visit action; a Retention nav item for managers;
+`draftWinBack()` added to `lib/followup.ts`. Degrades gracefully if `0007` isn't applied.
 
 **Schema — migration `0007_retention.sql`:**
 - DB view `customer_stats`: per signup/customer — `visit_count`, `total_spend_myr`,
