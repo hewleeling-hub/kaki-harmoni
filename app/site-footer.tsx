@@ -1,5 +1,10 @@
 import Link from "next/link";
-import { BUSINESS_WHATSAPP_NUMBER, whatsAppLink } from "@/lib/whatsapp";
+import {
+  BUSINESS_WHATSAPP_NUMBER,
+  BUSINESS_CALL_NUMBER,
+  BUSINESS_CALL_DISPLAY,
+  whatsAppLink,
+} from "@/lib/whatsapp";
 
 const IG_URL = "https://www.instagram.com/kakiharmoni/";
 const FB_URL = "https://facebook.com/KakiHarmoni";
@@ -58,6 +63,9 @@ export default function SiteFooter() {
           <p className="uppercase tracking-widest text-xs font-semibold text-white/60">Connect</p>
           <a href={wa} target="_blank" rel="noopener noreferrer" className="block text-sm hover:text-white">
             WhatsApp us
+          </a>
+          <a href={`tel:+${BUSINESS_CALL_NUMBER}`} className="block text-sm hover:text-white">
+            Call {BUSINESS_CALL_DISPLAY}
           </a>
           <a href={`mailto:${EMAIL}`} className="block text-sm hover:text-white">
             {EMAIL}

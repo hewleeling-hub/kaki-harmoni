@@ -59,6 +59,78 @@ export default function AboutPage() {
             Find us
           </Link>
         </div>
+
+        <section className="mt-16 border-t border-black/5 pt-12">
+          <h2 className="font-display text-3xl md:text-4xl font-semibold" style={{ color: "var(--lagoon-dark)" }}>
+            More than a bucket of warm water
+          </h2>
+          <p className="mt-3 text-lg text-black/75 max-w-2xl">
+            Hi again! 🌸 People ask what makes a Kaki Harmoni soak different from
+            filling a basin at home. Quite a lot, actually — ours is a proper
+            hydrosonic spa, not just warm water sitting there.
+          </p>
+
+          <div className="mt-8 grid gap-4 sm:grid-cols-2">
+            <div className="rounded-2xl border border-black/5 bg-white/70 p-6">
+              <p className="font-display text-lg font-semibold" style={{ color: "var(--lagoon)" }}>
+                Warmth that sinks in
+              </p>
+              <p className="mt-1 text-black/70">
+                Ultrasonic heat warms you all the way through in about fifteen
+                minutes — not a warm surface that cools off in two.
+              </p>
+            </div>
+            <div className="rounded-2xl border border-black/5 bg-white/70 p-6">
+              <p className="font-display text-lg font-semibold" style={{ color: "var(--lagoon)" }}>
+                A real bubble massage
+              </p>
+              <p className="mt-1 text-black/70">
+                Thousands of tiny bubbles a second gently massage your soles and
+                pressure points. Still water can&apos;t do that.
+              </p>
+            </div>
+            <div className="rounded-2xl border border-black/5 bg-white/70 p-6">
+              <p className="font-display text-lg font-semibold" style={{ color: "var(--lagoon)" }}>
+                Clean, fresh water
+              </p>
+              <p className="mt-1 text-black/70">
+                Ozone keeps the soak hygienic and leaves tired feet feeling
+                genuinely fresh.
+              </p>
+            </div>
+            <div className="rounded-2xl border border-black/5 bg-white/70 p-6">
+              <p className="font-display text-lg font-semibold" style={{ color: "var(--lagoon)" }}>
+                Forest-fresh calm
+              </p>
+              <p className="mt-1 text-black/70">
+                Negative ions and gentle far-infrared warmth add to the unwind —
+                like the air beside a waterfall.
+              </p>
+            </div>
+            <div className="rounded-2xl border border-black/5 bg-white/70 p-6 sm:col-span-2">
+              <p className="font-display text-lg font-semibold" style={{ color: "var(--lagoon)" }}>
+                Your choice of aroma
+              </p>
+              <p className="mt-1 text-black/70">
+                Add a herbal oil to match your mood — lavender to wind down,
+                something zesty to refresh.
+              </p>
+            </div>
+          </div>
+
+          <p className="mt-8 text-lg text-black/75 max-w-2xl">
+            The result? Relaxed, warmed-through feet, easier circulation, and a
+            quiet fifteen minutes a basin at home just can&apos;t give you.
+          </p>
+
+          <Link
+            href="/"
+            className="mt-6 inline-block rounded-full px-6 py-3 text-white font-semibold transition-opacity hover:opacity-90"
+            style={{ backgroundColor: "var(--clay)" }}
+          >
+            Book your first visit — RM25
+          </Link>
+        </section>
       </main>
       <SiteFooter />
       </div>

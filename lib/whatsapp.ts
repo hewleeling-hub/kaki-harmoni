@@ -1,5 +1,9 @@
-// Kaki Harmoni business WhatsApp number: 012-376 3081 (Malaysian format, country-code prefixed, no + or spaces).
-export const BUSINESS_WHATSAPP_NUMBER = "60123763081";
+// Kaki Harmoni main business WhatsApp number: 019-287 1799 (country-code prefixed, no + or spaces).
+export const BUSINESS_WHATSAPP_NUMBER = "60192871799";
+
+// Secondary line for voice calls: 019-623 1799.
+export const BUSINESS_CALL_NUMBER = "60196231799";
+export const BUSINESS_CALL_DISPLAY = "019-623 1799";
 
 // Normalises a Malaysian-style phone number (e.g. "012-345 6789") into
 // the digits-only, country-code-prefixed format WhatsApp's click-to-chat API expects.

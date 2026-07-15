@@ -2,7 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import SiteNav from "../site-nav";
 import SiteFooter from "../site-footer";
-import { BUSINESS_WHATSAPP_NUMBER, whatsAppLink } from "@/lib/whatsapp";
+import {
+  BUSINESS_WHATSAPP_NUMBER,
+  BUSINESS_CALL_NUMBER,
+  BUSINESS_CALL_DISPLAY,
+  whatsAppLink,
+} from "@/lib/whatsapp";
 
 export const metadata: Metadata = {
   title: "Contact — Kaki Harmoni",
@@ -28,6 +33,14 @@ export default function ContactPage() {
       external: true,
       cta: "Open WhatsApp",
       accent: "var(--lagoon)",
+    },
+    {
+      label: "Call us",
+      value: BUSINESS_CALL_DISPLAY,
+      href: `tel:+${BUSINESS_CALL_NUMBER}`,
+      external: false,
+      cta: "Call now",
+      accent: "var(--clay)",
     },
     {
       label: "Email",
