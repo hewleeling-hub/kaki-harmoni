@@ -15,6 +15,12 @@ export default function AboutPage() {
       <SiteNav />
       <div className="md:pl-60">
       <main className="mx-auto max-w-3xl px-6 py-10 md:py-14">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/lotti.png"
+          alt="Lotti, the Kaki Harmoni lotus mascot, soaking her feet with a coffee"
+          className="w-28 h-28 md:w-36 md:h-36 object-contain mb-2"
+        />
         <p className="uppercase tracking-widest text-xs font-semibold" style={{ color: "var(--clay)" }}>
           About us
         </p>
