@@ -7,6 +7,7 @@ export default function Home() {
   return (
     <>
       <SiteNav />
+      <div className="md:pl-60">
       <main className="flex items-center justify-center p-6 py-16 md:py-24">
       <div className="w-full max-w-4xl grid md:grid-cols-2 gap-10 items-center">
         <div className="space-y-4">
@@ -29,6 +30,7 @@ export default function Home() {
       </div>
       </main>
       <SiteFooter />
+      </div>
     </>
   );
 }

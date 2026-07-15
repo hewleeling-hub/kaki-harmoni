@@ -7,10 +7,10 @@ import { BUSINESS_WHATSAPP_NUMBER, whatsAppLink } from "@/lib/whatsapp";
 export const metadata: Metadata = {
   title: "Contact — Kaki Harmoni",
   description:
-    "Get in touch with Kaki Harmoni — message us on WhatsApp, email kakiharmoni@gmail.com, or follow along on Instagram and Facebook.",
+    "Get in touch with Kaki Harmoni — message us on WhatsApp, email hello@kakiharmoni.com, or follow along on Instagram and Facebook.",
 };
 
-const EMAIL = "kakiharmoni@gmail.com";
+const EMAIL = "hello@kakiharmoni.com";
 const IG_URL = "https://www.instagram.com/kakiharmoni/";
 const FB_URL = "https://facebook.com/KakiHarmoni";
 
@@ -58,6 +58,7 @@ export default function ContactPage() {
   return (
     <>
       <SiteNav />
+      <div className="md:pl-60">
       <main className="mx-auto max-w-3xl px-6 py-16">
         <p className="uppercase tracking-widest text-xs font-semibold" style={{ color: "var(--clay)" }}>
           Contact

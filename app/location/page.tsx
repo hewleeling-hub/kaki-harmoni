@@ -28,6 +28,7 @@ export default function LocationPage() {
   return (
     <>
       <SiteNav />
+      <div className="md:pl-60">
       <main className="mx-auto max-w-5xl px-6 py-16">
         <p className="uppercase tracking-widest text-xs font-semibold" style={{ color: "var(--clay)" }}>
           Location &amp; hours
@@ -106,6 +107,7 @@ export default function LocationPage() {
         </div>
       </main>
       <SiteFooter />
+      </div>
     </>
   );
 }
