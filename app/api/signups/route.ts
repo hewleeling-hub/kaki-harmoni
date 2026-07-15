@@ -25,7 +25,16 @@ export async function GET() {
 
   const { data: purchases } = await supabase.from("purchases").select("*");
 
-  return NextResponse.json({ signups: signups ?? [], purchases: purchases ?? [] });
+  // Line items per order (Sprint 7). Tolerate the table not existing yet.
+  const { data: orderItems } = await supabase
+    .from("order_items")
+    .select("purchase_id, product_name, quantity, unit_price_myr, line_total_myr");
+
+  return NextResponse.json({
+    signups: signups ?? [],
+    purchases: purchases ?? [],
+    order_items: orderItems ?? [],
+  });
 }
 
 export async function POST(request: NextRequest) {

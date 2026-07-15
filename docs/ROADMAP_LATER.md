@@ -45,8 +45,16 @@ controls are hidden for a `staff` account and present for a `manager`.
 
 ---
 
-## Sprint 7 — Product catalogue + multi-item orders
+## Sprint 7 — Product catalogue + multi-item orders  ✅ BUILT (pending migration apply + push)
 **Goal:** Sell more than the single first-visit offer; an order can hold several items.
+
+**Shipped:** `products` + `order_items` tables (migration `0006`, seeded catalogue,
+existing purchases backfilled as single-line orders); `POST /api/purchases` now accepts
+an items array and prices every line from the DB; the public purchase page is a catalogue
+picker with quantity steppers and a live total; `/api/products` + `/api/products/[id]` CRUD
+(manager-guarded); `/dashboard/products` admin page (add/edit/archive/price); a Catalogue
+nav item for managers; and the dashboard shows itemised line items per order. Backward
+compatible — if `0006` isn't applied, the flow falls back to the single first-visit item.
 
 **Schema — migration `0006_catalogue.sql`:**
 - `products` table: `id`, `name`, `description`, `price_myr`, `category`

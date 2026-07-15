@@ -27,6 +27,14 @@ interface Purchase {
   booking_time: string | null;
 }
 
+interface OrderItem {
+  purchase_id: string;
+  product_name: string;
+  quantity: number;
+  unit_price_myr: number;
+  line_total_myr: number;
+}
+
 type ReviewFilter = "all" | "unreviewed" | "approved" | "flagged";
 
 const REVIEW_FILTERS: { value: ReviewFilter; label: string }[] = [
@@ -39,6 +47,7 @@ const REVIEW_FILTERS: { value: ReviewFilter; label: string }[] = [
 export default function DashboardClient({ canDelete = false }: { canDelete?: boolean }) {
   const [signups, setSignups] = useState<Signup[] | null>(null);
   const [purchases, setPurchases] = useState<Purchase[]>([]);
+  const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState<{ name: string; phone: string; status: string }>({
@@ -65,6 +74,7 @@ export default function DashboardClient({ canDelete = false }: { canDelete?: boo
       if (!res.ok) throw new Error(data.error || "Could not load signups.");
       setSignups(data.signups);
       setPurchases(data.purchases);
+      setOrderItems(data.order_items ?? []);
     } catch {
       setError("Could not load the dashboard. Please refresh.");
       setSignups([]);
@@ -352,6 +362,32 @@ export default function DashboardClient({ canDelete = false }: { canDelete?: boo
                                 </span>
                               )}
                             </div>
+                            {(() => {
+                              const items = orderItems.filter((oi) => oi.purchase_id === p.id);
+                              if (items.length === 0) {
+                                return (
+                                  <div className="font-medium text-black/70">
+                                    RM{Number(p.amount_myr).toFixed(2)}
+                                  </div>
+                                );
+                              }
+                              return (
+                                <ul className="space-y-0.5 pt-0.5">
+                                  {items.map((oi, idx) => (
+                                    <li key={idx}>
+                                      {oi.quantity}× {oi.product_name}
+                                      <span className="text-black/35">
+                                        {" "}
+                                        · RM{Number(oi.line_total_myr).toFixed(2)}
+                                      </span>
+                                    </li>
+                                  ))}
+                                  <li className="font-medium text-black/70">
+                                    Total RM{Number(p.amount_myr).toFixed(2)}
+                                  </li>
+                                </ul>
+                              );
+                            })()}
                           </div>
                         );
                       })()}

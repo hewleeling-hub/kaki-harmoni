@@ -14,6 +14,15 @@ export default async function PurchasePage({ params }: { params: Promise<{ signu
     notFound();
   }
 
+  // Active catalogue for the order picker. If the products table doesn't exist yet
+  // (migration 0006 not applied), fall back to an empty list — the form then shows
+  // the legacy single first-visit item.
+  const { data: products } = await supabase
+    .from("products")
+    .select("id, name, description, price_myr, category")
+    .eq("active", true)
+    .order("sort_order", { ascending: true });
+
   if (signup.status === "converted") {
     return (
       <main className="min-h-screen flex items-center justify-center p-6">
@@ -40,7 +49,12 @@ export default async function PurchasePage({ params }: { params: Promise<{ signu
           </h1>
           <p className="text-black/60 text-sm">Hi {signup.name.split(" ")[0]}, lock in your spot.</p>
         </div>
-        <PurchaseForm signupId={signup.id} signupName={signup.name} signupPhone={signup.phone ?? ""} />
+        <PurchaseForm
+          signupId={signup.id}
+          signupName={signup.name}
+          signupPhone={signup.phone ?? ""}
+          products={products ?? []}
+        />
       </div>
     </main>
   );

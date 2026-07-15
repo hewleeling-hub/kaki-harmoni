@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { whatsAppLink, BUSINESS_WHATSAPP_NUMBER } from "@/lib/whatsapp";
@@ -11,30 +11,70 @@ const PAYMENT_METHODS = [
   { value: "ewallet", label: "E-Wallet" },
 ];
 
+type Product = {
+  id: string;
+  name: string;
+  description: string | null;
+  price_myr: number;
+  category: string;
+};
+
+const money = (n: number) => `RM${n.toFixed(2)}`;
+
 export default function PurchaseForm({
   signupId,
   signupName,
-  signupPhone,
+  products,
 }: {
   signupId: string;
   signupName: string;
   signupPhone: string;
+  products: Product[];
 }) {
   const router = useRouter();
   const [paymentMethod, setPaymentMethod] = useState("online_transfer");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Default: pre-select the first catalogue item (the first-visit offer) at qty 1.
+  const [qty, setQty] = useState<Record<string, number>>(() =>
+    products.length > 0 ? { [products[0].id]: 1 } : {},
+  );
+
+  const setQuantity = (id: string, next: number) =>
+    setQty((prev) => ({ ...prev, [id]: Math.max(0, Math.min(20, next)) }));
+
+  const total = useMemo(
+    () =>
+      products.reduce((sum, p) => sum + (qty[p.id] ?? 0) * Number(p.price_myr), 0),
+    [products, qty],
+  );
+
+  const hasCatalogue = products.length > 0;
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setSubmitting(true);
     setError(null);
 
+    const items = products
+      .filter((p) => (qty[p.id] ?? 0) > 0)
+      .map((p) => ({ product_id: p.id, quantity: qty[p.id] }));
+
+    if (hasCatalogue && items.length === 0) {
+      setError("Please add at least one item to your order.");
+      return;
+    }
+
+    setSubmitting(true);
     try {
       const res = await fetch("/api/purchases", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ signup_id: signupId, payment_method: paymentMethod }),
+        body: JSON.stringify({
+          signup_id: signupId,
+          payment_method: paymentMethod,
+          items,
+        }),
       });
       const data = await res.json();
 
@@ -61,13 +101,61 @@ export default function PurchaseForm({
 
       <div>
         <label className="block text-sm font-medium mb-1">Your order</label>
-        <div className="w-full rounded-lg border border-black/10 bg-black/5 px-3 py-2.5">
-          <p className="text-black/80 text-sm font-medium">First Visit — Foot Soak + Coffee</p>
-          <p className="text-black/50 text-xs mt-0.5">
-            <span className="font-semibold" style={{ color: "var(--clay)" }}>RM25.00</span>{" "}
-            <span className="line-through">RM40.00</span> — first-visit price
-          </p>
-        </div>
+
+        {hasCatalogue ? (
+          <div className="rounded-lg border border-black/10 divide-y divide-black/5">
+            {products.map((p) => {
+              const q = qty[p.id] ?? 0;
+              return (
+                <div key={p.id} className="flex items-center gap-3 px-3 py-2.5">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-black/80">{p.name}</p>
+                    {p.description && (
+                      <p className="text-xs text-black/45 mt-0.5">{p.description}</p>
+                    )}
+                    <p className="text-xs font-semibold mt-0.5" style={{ color: "var(--clay)" }}>
+                      {money(Number(p.price_myr))}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      type="button"
+                      aria-label={`Remove one ${p.name}`}
+                      onClick={() => setQuantity(p.id, q - 1)}
+                      className="w-7 h-7 rounded-full border border-black/15 text-black/70 disabled:opacity-40"
+                      disabled={q === 0}
+                    >
+                      −
+                    </button>
+                    <span className="w-5 text-center text-sm tabular-nums">{q}</span>
+                    <button
+                      type="button"
+                      aria-label={`Add one ${p.name}`}
+                      onClick={() => setQuantity(p.id, q + 1)}
+                      className="w-7 h-7 rounded-full border border-black/15 text-black/70"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+            <div className="flex items-center justify-between px-3 py-2.5">
+              <span className="text-sm font-medium">Total</span>
+              <span className="text-base font-semibold" style={{ color: "var(--lagoon-dark)" }}>
+                {money(total)}
+              </span>
+            </div>
+          </div>
+        ) : (
+          <div className="w-full rounded-lg border border-black/10 bg-black/5 px-3 py-2.5">
+            <p className="text-black/80 text-sm font-medium">First Visit — Foot Soak + Coffee</p>
+            <p className="text-black/50 text-xs mt-0.5">
+              <span className="font-semibold" style={{ color: "var(--clay)" }}>RM25.00</span>{" "}
+              <span className="line-through">RM40.00</span> — first-visit price
+            </p>
+          </div>
+        )}
       </div>
 
       <div>
@@ -98,14 +186,14 @@ export default function PurchaseForm({
         {submitting && (
           <span className="h-4 w-4 rounded-full border-2 border-white/40 border-t-white animate-spin" />
         )}
-        {submitting ? "Confirming…" : "Confirm purchase"}
+        {submitting ? "Confirming…" : hasCatalogue ? `Confirm — ${money(total)}` : "Confirm purchase"}
       </button>
 
       <p className="text-center">
         <a
           href={whatsAppLink(
             BUSINESS_WHATSAPP_NUMBER,
-            `Hi Kaki Harmoni! This is ${signupName}. I signed up for the RM25 first-visit offer but need a bit more time before purchasing — please remind me!`,
+            `Hi Kaki Harmoni! This is ${signupName}. I signed up but need a bit more time before purchasing — please remind me!`,
           )}
           target="_blank"
           rel="noopener noreferrer"
@@ -117,7 +205,7 @@ export default function PurchaseForm({
         </a>
       </p>
       <p className="text-xs text-center text-black/45">
-        No rush — we&apos;ll hold your spot at the RM25 first-visit price for 48 hours.
+        No rush — we&apos;ll hold your spot for 48 hours.
       </p>
       <p className="text-center">
         <Link href="/" className="text-sm text-black/45 hover:text-black/65 underline underline-offset-2">
