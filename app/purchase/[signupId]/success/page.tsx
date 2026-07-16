@@ -2,7 +2,7 @@ import Link from "next/link";
 import Logo from "@/app/logo";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { formatSlotTime } from "@/lib/slots";
-import { PRELAUNCH_MODE, PAYMENT_LINK } from "@/lib/config";
+import { PRELAUNCH_MODE, PAYMENT_QR } from "@/lib/config";
 
 const money = (n: number) => `RM${Number(n).toFixed(2)}`;
 
@@ -61,20 +61,19 @@ export default async function PurchaseSuccessPage({ params }: { params: Promise<
 
         {isPending && isPrepay && (
           <div className="rounded-lg px-4 py-4 space-y-3" style={{ background: "rgba(46,125,123,0.08)" }}>
-            <p className="text-sm" style={{ color: "var(--lagoon-dark)" }}>
-              Lock your spot now — pay {money(amount)} by e-wallet. Your place is only
-              held once payment is received.
+            <p className="text-sm font-medium" style={{ color: "var(--lagoon-dark)" }}>
+              Scan to pay {money(amount)} · DuitNow
             </p>
-            <a
-              href={PAYMENT_LINK}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block rounded-lg px-4 py-2.5 font-semibold text-white"
-              style={{ background: "var(--lagoon)" }}
-            >
-              Pay {money(amount)} now
-            </a>
-            <p className="text-xs text-black/50">Fully refundable until your slot is confirmed.</p>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={PAYMENT_QR}
+              alt={`DuitNow QR to pay ${money(amount)} to Kaki Harmoni`}
+              className="mx-auto w-56 rounded-lg bg-white"
+            />
+            <p className="text-xs text-black/55">
+              Open any bank or e-wallet app, scan, and pay {money(amount)}. Your spot is
+              locked once we receive it — fully refundable until your slot is confirmed.
+            </p>
           </div>
         )}
 

@@ -176,8 +176,8 @@ export default function PurchaseForm({
         </div>
         {payTiming === "prepay" && (
           <p className="text-xs mt-2 rounded-lg px-3 py-2" style={{ background: "rgba(46,125,123,0.08)", color: "var(--lagoon-dark)" }}>
-            Your spot is only locked once payment is received — we&apos;ll show you the
-            e-wallet link on the next step. Fully refundable until your slot is confirmed.
+            Your spot is only locked once payment is received — we&apos;ll show you a
+            DuitNow QR to scan on the next step. Fully refundable until your slot is confirmed.
           </p>
         )}
       </div>
