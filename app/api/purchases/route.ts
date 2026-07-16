@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { logActivity, logAudit } from "@/lib/activity";
 import { scoreLead } from "@/lib/scoring";
 import { sendSalesAlert, purchaseConfirmedEmail } from "@/lib/email";
+import { DOOR_SURCHARGE_MYR } from "@/lib/config";
 
 // Legacy default used when no items are sent or the catalogue isn't available yet.
 const DEFAULT_ITEM_NAME = "First Visit — Foot Soak + Coffee";
@@ -77,6 +78,7 @@ export async function POST(request: NextRequest) {
   let body: {
     signup_id?: string;
     payment_method?: string;
+    pay_timing?: string;
     items?: { product_id?: string; quantity?: number }[];
   };
   try {
@@ -86,6 +88,7 @@ export async function POST(request: NextRequest) {
   }
 
   const signup_id = body.signup_id;
+  const payTiming = body.pay_timing === "door" ? "door" : "prepay";
   const payment_method = body.payment_method?.trim() || "online_transfer";
 
   if (!signup_id) {
@@ -112,7 +115,10 @@ export async function POST(request: NextRequest) {
   }
 
   const lines = await resolveLines(supabase, body.items);
-  const orderTotal = Math.round(lines.reduce((sum, l) => sum + l.line_total_myr, 0) * 100) / 100;
+  const subtotal = lines.reduce((sum, l) => sum + l.line_total_myr, 0);
+  // Pay-at-the-door adds a small surcharge; prepaying is the cheaper option.
+  const surcharge = payTiming === "door" ? DOOR_SURCHARGE_MYR : 0;
+  const orderTotal = Math.round((subtotal + surcharge) * 100) / 100;
 
   // Nothing is actually collected at the moment of checkout — cash is paid in person at the
   // visit, and transfer/e-wallet need staff to verify receipt. Everything starts pending;
@@ -181,7 +187,7 @@ export async function POST(request: NextRequest) {
     entity_id: purchase.id,
     action: "purchase_confirmed",
     actor: "public_form",
-    metadata: { amount_myr: orderTotal, items: lines.length, signup_id },
+    metadata: { amount_myr: orderTotal, items: lines.length, pay_timing: payTiming, signup_id },
   });
   await logAudit(supabase, {
     table_name: "purchases",

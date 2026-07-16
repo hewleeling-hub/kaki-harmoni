@@ -4,12 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { whatsAppLink, BUSINESS_WHATSAPP_NUMBER } from "@/lib/whatsapp";
-
-const PAYMENT_METHODS = [
-  { value: "online_transfer", label: "Online transfer" },
-  { value: "cash", label: "Cash on arrival" },
-  { value: "ewallet", label: "E-Wallet" },
-];
+import { PRELAUNCH_MODE, DOOR_SURCHARGE_MYR } from "@/lib/config";
 
 type Product = {
   id: string;
@@ -18,6 +13,8 @@ type Product = {
   price_myr: number;
   category: string;
 };
+
+type PayTiming = "prepay" | "door";
 
 const money = (n: number) => `RM${n.toFixed(2)}`;
 
@@ -32,7 +29,7 @@ export default function PurchaseForm({
   products: Product[];
 }) {
   const router = useRouter();
-  const [paymentMethod, setPaymentMethod] = useState("online_transfer");
+  const [payTiming, setPayTiming] = useState<PayTiming>("prepay");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -44,13 +41,15 @@ export default function PurchaseForm({
   const setQuantity = (id: string, next: number) =>
     setQty((prev) => ({ ...prev, [id]: Math.max(0, Math.min(20, next)) }));
 
-  const total = useMemo(
-    () =>
-      products.reduce((sum, p) => sum + (qty[p.id] ?? 0) * Number(p.price_myr), 0),
+  const subtotal = useMemo(
+    () => products.reduce((sum, p) => sum + (qty[p.id] ?? 0) * Number(p.price_myr), 0),
     [products, qty],
   );
 
   const hasCatalogue = products.length > 0;
+  const prepayTotal = subtotal;
+  const doorTotal = subtotal + DOOR_SURCHARGE_MYR;
+  const total = payTiming === "door" ? doorTotal : prepayTotal;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -72,7 +71,8 @@ export default function PurchaseForm({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           signup_id: signupId,
-          payment_method: paymentMethod,
+          pay_timing: payTiming,
+          payment_method: payTiming === "prepay" ? "ewallet" : "cash",
           items,
         }),
       });
@@ -84,12 +84,46 @@ export default function PurchaseForm({
         return;
       }
 
-      router.push(`/purchase/${signupId}/book`);
+      // Pre-launch: no slots yet — go straight to the reservation confirmation.
+      // Live: continue to slot booking.
+      router.push(
+        PRELAUNCH_MODE ? `/purchase/${signupId}/success` : `/purchase/${signupId}/book`,
+      );
     } catch {
       setError("Something went wrong. Please try again.");
       setSubmitting(false);
     }
   }
+
+  const timingOption = (value: PayTiming, title: string, price: number, note: string, recommended?: boolean) => {
+    const active = payTiming === value;
+    return (
+      <button
+        type="button"
+        onClick={() => setPayTiming(value)}
+        className="w-full text-left rounded-lg border px-3 py-2.5 transition"
+        style={{
+          borderColor: active ? "var(--lagoon)" : "rgba(0,0,0,0.1)",
+          background: active ? "rgba(46,125,123,0.06)" : "white",
+        }}
+      >
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-sm font-medium">{title}</span>
+          <span className="text-sm font-semibold" style={{ color: "var(--lagoon-dark)" }}>
+            {money(price)}
+          </span>
+        </div>
+        <div className="flex items-center gap-2 mt-0.5">
+          <span className="text-xs text-black/50">{note}</span>
+          {recommended && (
+            <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full" style={{ background: "var(--clay)", color: "white" }}>
+              Best price
+            </span>
+          )}
+        </div>
+      </button>
+    );
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -101,7 +135,6 @@ export default function PurchaseForm({
 
       <div>
         <label className="block text-sm font-medium mb-1">Your order</label>
-
         {hasCatalogue ? (
           <div className="rounded-lg border border-black/10 divide-y divide-black/5">
             {products.map((p) => {
@@ -110,71 +143,43 @@ export default function PurchaseForm({
                 <div key={p.id} className="flex items-center gap-3 px-3 py-2.5">
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-black/80">{p.name}</p>
-                    {p.description && (
-                      <p className="text-xs text-black/45 mt-0.5">{p.description}</p>
-                    )}
+                    {p.description && <p className="text-xs text-black/45 mt-0.5">{p.description}</p>}
                     <p className="text-xs font-semibold mt-0.5" style={{ color: "var(--clay)" }}>
                       {money(Number(p.price_myr))}
                     </p>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <button
-                      type="button"
-                      aria-label={`Remove one ${p.name}`}
-                      onClick={() => setQuantity(p.id, q - 1)}
-                      className="w-7 h-7 rounded-full border border-black/15 text-black/70 disabled:opacity-40"
-                      disabled={q === 0}
-                    >
+                    <button type="button" aria-label={`Remove one ${p.name}`} onClick={() => setQuantity(p.id, q - 1)} className="w-7 h-7 rounded-full border border-black/15 text-black/70 disabled:opacity-40" disabled={q === 0}>
                       −
                     </button>
                     <span className="w-5 text-center text-sm tabular-nums">{q}</span>
-                    <button
-                      type="button"
-                      aria-label={`Add one ${p.name}`}
-                      onClick={() => setQuantity(p.id, q + 1)}
-                      className="w-7 h-7 rounded-full border border-black/15 text-black/70"
-                    >
+                    <button type="button" aria-label={`Add one ${p.name}`} onClick={() => setQuantity(p.id, q + 1)} className="w-7 h-7 rounded-full border border-black/15 text-black/70">
                       +
                     </button>
                   </div>
                 </div>
               );
             })}
-            <div className="flex items-center justify-between px-3 py-2.5">
-              <span className="text-sm font-medium">Total</span>
-              <span className="text-base font-semibold" style={{ color: "var(--lagoon-dark)" }}>
-                {money(total)}
-              </span>
-            </div>
           </div>
         ) : (
           <div className="w-full rounded-lg border border-black/10 bg-black/5 px-3 py-2.5">
             <p className="text-black/80 text-sm font-medium">First Visit — Foot Soak + Coffee</p>
-            <p className="text-black/50 text-xs mt-0.5">
-              <span className="font-semibold" style={{ color: "var(--clay)" }}>RM25.00</span>{" "}
-              <span className="line-through">RM40.00</span> — first-visit price
-            </p>
           </div>
         )}
       </div>
 
       <div>
-        <label htmlFor="payment" className="block text-sm font-medium mb-1">
-          Payment method
-        </label>
-        <select
-          id="payment"
-          value={paymentMethod}
-          onChange={(e) => setPaymentMethod(e.target.value)}
-          className="w-full rounded-lg border border-black/10 bg-white px-3 py-2 focus:outline-none focus:ring-2"
-          style={{ ["--tw-ring-color" as string]: "var(--lagoon)" }}
-        >
-          {PAYMENT_METHODS.map((m) => (
-            <option key={m.value} value={m.value}>
-              {m.label}
-            </option>
-          ))}
-        </select>
+        <label className="block text-sm font-medium mb-1">When would you like to pay?</label>
+        <div className="grid gap-2">
+          {timingOption("prepay", "Pay now to reserve", prepayTotal, `Save ${money(DOOR_SURCHARGE_MYR)} · locks your spot`, true)}
+          {timingOption("door", "Pay at the door", doorTotal, "Settle when you visit")}
+        </div>
+        {payTiming === "prepay" && (
+          <p className="text-xs mt-2 rounded-lg px-3 py-2" style={{ background: "rgba(46,125,123,0.08)", color: "var(--lagoon-dark)" }}>
+            Your spot is only locked once payment is received — we&apos;ll show you the
+            e-wallet link on the next step. Fully refundable until your slot is confirmed.
+          </p>
+        )}
       </div>
 
       <button
@@ -183,17 +188,19 @@ export default function PurchaseForm({
         className="w-full rounded-lg px-4 py-2.5 font-medium text-white transition disabled:opacity-60 flex items-center justify-center gap-2"
         style={{ background: "var(--clay)" }}
       >
-        {submitting && (
-          <span className="h-4 w-4 rounded-full border-2 border-white/40 border-t-white animate-spin" />
-        )}
-        {submitting ? "Confirming…" : hasCatalogue ? `Confirm — ${money(total)}` : "Confirm purchase"}
+        {submitting && <span className="h-4 w-4 rounded-full border-2 border-white/40 border-t-white animate-spin" />}
+        {submitting
+          ? "Confirming…"
+          : PRELAUNCH_MODE
+          ? `Reserve my spot — ${money(total)}`
+          : `Confirm — ${money(total)}`}
       </button>
 
       <p className="text-center">
         <a
           href={whatsAppLink(
             BUSINESS_WHATSAPP_NUMBER,
-            `Hi Kaki Harmoni! This is ${signupName}. I signed up but need a bit more time before purchasing — please remind me!`,
+            `Hi Kaki Harmoni! This is ${signupName}. I signed up but need a bit more time before reserving — please remind me!`,
           )}
           target="_blank"
           rel="noopener noreferrer"
@@ -203,9 +210,6 @@ export default function PurchaseForm({
           <WhatsAppIcon />
           Remind me on WhatsApp instead
         </a>
-      </p>
-      <p className="text-xs text-center text-black/45">
-        No rush — we&apos;ll hold your spot for 48 hours.
       </p>
       <p className="text-center">
         <Link href="/" className="text-sm text-black/45 hover:text-black/65 underline underline-offset-2">

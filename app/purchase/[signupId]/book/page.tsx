@@ -2,9 +2,16 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { notFound, redirect } from "next/navigation";
 import Logo from "@/app/logo";
 import BookingForm from "./booking-form";
+import { PRELAUNCH_MODE } from "@/lib/config";
 
 export default async function BookPage({ params }: { params: Promise<{ signupId: string }> }) {
   const { signupId } = await params;
+
+  // Pre-launch: slots aren't open yet — reservations skip straight to confirmation.
+  if (PRELAUNCH_MODE) {
+    redirect(`/purchase/${signupId}/success`);
+  }
+
   const supabase = createAdminClient();
 
   const { data: signup } = await supabase.from("signups").select("*").eq("id", signupId).maybeSingle();
