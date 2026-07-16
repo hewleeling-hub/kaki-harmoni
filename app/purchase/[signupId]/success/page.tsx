@@ -3,6 +3,7 @@ import Logo from "@/app/logo";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { formatSlotTime } from "@/lib/slots";
 import { PRELAUNCH_MODE, PAYMENT_QR, LAUNCH_WINDOW } from "@/lib/config";
+import { whatsAppLink, BUSINESS_WHATSAPP_NUMBER } from "@/lib/whatsapp";
 
 const money = (n: number) => `RM${Number(n).toFixed(2)}`;
 
@@ -16,10 +17,23 @@ export default async function PurchaseSuccessPage({ params }: { params: Promise<
     .eq("signup_id", signupId)
     .maybeSingle();
 
+  const { data: signup } = await supabase
+    .from("signups")
+    .select("name")
+    .eq("id", signupId)
+    .maybeSingle();
+
   const hasBooking = !!purchase?.booking_date && !!purchase?.booking_time;
   const isPending = purchase?.status === "pending_payment";
   const isPrepay = purchase?.payment_method === "ewallet";
   const amount = Number(purchase?.amount_myr ?? 0);
+
+  // Lets a customer tell us they've paid, with name + amount pre-filled, so we
+  // can match it against the DuitNow transfer and mark the reservation paid.
+  const paidWa = whatsAppLink(
+    BUSINESS_WHATSAPP_NUMBER,
+    `Hi Kaki Harmoni! I've just paid ${money(amount)} for my launch reservation via DuitNow. My name is ${signup?.name ?? ""}.`,
+  );
 
   const heading = hasBooking
     ? "You're all booked!"
@@ -73,6 +87,18 @@ export default async function PurchaseSuccessPage({ params }: { params: Promise<
             <p className="text-xs text-black/55">
               Open any bank or e-wallet app, scan, and pay {money(amount)}. Your spot is
               locked once we receive it — fully refundable until your slot is confirmed.
+            </p>
+            <a
+              href={paidWa}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 font-semibold text-white"
+              style={{ background: "#25D366" }}
+            >
+              I&apos;ve paid — tell us
+            </a>
+            <p className="text-xs text-black/45">
+              Tap after paying and we&apos;ll confirm your spot within the day.
             </p>
           </div>
         )}
