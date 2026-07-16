@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Kaki Harmoni — Sales Signups",
-  description: "Kaki Harmoni foot spa & café — signup and purchase tracking",
+  title: "Kaki Harmoni — Foot Hydrotherapy & Coffee · Opening early August",
+  description:
+    "A warm foot hydrotherapy soak paired with good coffee at Desa Cindaimas Condominium Clubhouse. Opening early August — reserve your first visit and lock the launch price.",
 };
 
 export default function RootLayout({
