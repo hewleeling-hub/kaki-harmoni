@@ -21,12 +21,21 @@ export default function Home() {
           <p className="uppercase tracking-widest text-xs font-medium" style={{ color: "var(--clay)" }}>
             @ Desa Cindaimas Condominium Clubhouse
           </p>
+          <div>
+            <span
+              className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold"
+              style={{ background: "var(--aqua)", color: "var(--lagoon-dark)" }}
+            >
+              🌸 Opening early August · reserve your spot
+            </span>
+          </div>
           <h1 className="font-display text-3xl md:text-4xl font-semibold leading-tight" style={{ color: "var(--lagoon-dark)" }}>
             Fifteen minutes. A whole lot lighter.
           </h1>
           <p className="text-black/70 max-w-md">
-            Foot soak + coffee, together for RM25 — your first visit at Kaki Harmoni
-            (normal price RM40). Sign up and we&apos;ll hold your place.
+            Foot soak + coffee for RM25 — your first visit (normally RM40). Reserve
+            your spot now to lock the launch price, and we&apos;ll message you to
+            schedule once we open.
           </p>
         </div>
 
