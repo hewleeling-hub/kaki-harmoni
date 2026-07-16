@@ -112,9 +112,10 @@ export default function AboutPage() {
                 Your choice of aroma
               </p>
               <p className="mt-1 text-black/70">
-                Add a herbal oil to match your mood — lavender to wind down and
-                sleep easy, rosemary to invigorate and get the blood moving, or
-                eucalyptus for a fresh, clearing lift. Seven to choose from in all.
+                Choose an essential oil to match your mood — lavender to wind down
+                and sleep easy, rosemary to invigorate and get the blood moving, or
+                eucalyptus for a fresh, clearing lift. Seven to choose from, and
+                we&apos;ll personalise the blend just for you.
               </p>
             </div>
           </div>

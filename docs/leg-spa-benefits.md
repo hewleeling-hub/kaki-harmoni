@@ -22,8 +22,9 @@ optional herbal bath oils.
   tired feet. Tap water at home doesn't.
 - **Negative ions + far-infrared.** "Forest waterfall" freshness and a gentle deep
   heat that add to the relaxation and circulation effect.
-- **Herbal aromatherapy oils** (rosemary, lavender, eucalyptus, pine, chamomile,
-  juniper…) tailored to a mood — calm/sleep, sore muscles, refresh.
+- **Essential aromatherapy oils** (rosemary, lavender, eucalyptus, pine, chamomile,
+  juniper, hayseed — seven in all) tailored to a mood — calm/sleep, sore muscles,
+  refresh. Staff personalise the blend per customer.
 
 ## Benefits (framed for tired feet & legs — safe, defensible)
 - Relaxes and relieves tension after a long day on your feet.
