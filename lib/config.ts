@@ -4,6 +4,10 @@
 // pick a time slot yet — you schedule them once you announce the opening date.
 export const PRELAUNCH_MODE = true;
 
+// When you expect to open — shown in the reservation messaging so people know
+// roughly when their visit will be. Update to an exact date once you have one.
+export const LAUNCH_WINDOW = "early August";
+
 // First-visit two-tier pricing (MYR): cheaper to prepay, small surcharge to
 // pay at the door. Prepaying is the better deal, which nudges people to pay now.
 export const PREPAY_PRICE_MYR = 25;

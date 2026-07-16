@@ -2,7 +2,7 @@ import Link from "next/link";
 import Logo from "@/app/logo";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { formatSlotTime } from "@/lib/slots";
-import { PRELAUNCH_MODE, PAYMENT_QR } from "@/lib/config";
+import { PRELAUNCH_MODE, PAYMENT_QR, LAUNCH_WINDOW } from "@/lib/config";
 
 const money = (n: number) => `RM${Number(n).toFixed(2)}`;
 
@@ -52,8 +52,8 @@ export default async function PurchaseSuccessPage({ params }: { params: Promise<
           </div>
         ) : PRELAUNCH_MODE ? (
           <p className="text-black/70">
-            We&apos;ll message you to pick your time the moment we open. Your launch price
-            is locked in.
+            We open in {LAUNCH_WINDOW} — we&apos;ll message you then to pick your time.
+            Your launch price is locked in.
           </p>
         ) : (
           <p className="text-black/70">Thanks — we&apos;ll see you at Kaki Harmoni soon.</p>

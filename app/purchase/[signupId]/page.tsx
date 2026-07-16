@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import PurchaseForm from "./purchase-form";
 import Logo from "@/app/logo";
-import { PRELAUNCH_MODE } from "@/lib/config";
+import { PRELAUNCH_MODE, LAUNCH_WINDOW } from "@/lib/config";
 
 export default async function PurchasePage({ params }: { params: Promise<{ signupId: string }> }) {
   const { signupId } = await params;
@@ -50,7 +50,7 @@ export default async function PurchasePage({ params }: { params: Promise<{ signu
           </h1>
           <p className="text-black/60 text-sm">
             {PRELAUNCH_MODE
-              ? `Hi ${signup.name.split(" ")[0]}, lock in the launch price — we'll schedule your visit when we open.`
+              ? `Hi ${signup.name.split(" ")[0]}, lock in the launch price — we open in ${LAUNCH_WINDOW} and we'll message you to schedule your visit.`
               : `Hi ${signup.name.split(" ")[0]}, lock in your spot.`}
           </p>
         </div>
