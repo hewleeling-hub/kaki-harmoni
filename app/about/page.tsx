@@ -17,9 +17,9 @@ export default function AboutPage() {
       <main className="mx-auto max-w-3xl px-6 py-10 md:py-14">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/lotti.png"
-          alt="Lotti, the Kaki Harmoni lotus mascot, soaking her feet with a coffee"
-          className="w-28 h-28 md:w-36 md:h-36 object-contain mb-2"
+          src="/kaki-welcome.png"
+          alt="Welcome to Kaki Harmoni — Relax. Refresh. Reconnect."
+          className="w-full max-w-sm object-contain mb-4"
         />
         <p className="uppercase tracking-widest text-xs font-semibold" style={{ color: "var(--clay)" }}>
           About us
@@ -65,9 +65,9 @@ export default function AboutPage() {
             More than a bucket of warm water
           </h2>
           <p className="mt-3 text-lg text-black/75 max-w-2xl">
-            Hi again! 🌸 People ask what makes a Kaki Harmoni soak different from
-            filling a basin at home. Quite a lot, actually — ours is a proper
-            hydrosonic spa, not just warm water sitting there.
+            People ask what makes a Kaki Harmoni soak different from filling a
+            basin at home. Quite a lot, actually — ours is a proper hydrosonic
+            spa, not just warm water sitting there.
           </p>
 
           <div className="mt-8 grid gap-4 sm:grid-cols-2">
@@ -112,8 +112,9 @@ export default function AboutPage() {
                 Your choice of aroma
               </p>
               <p className="mt-1 text-black/70">
-                Add a herbal oil to match your mood — lavender to wind down,
-                something zesty to refresh.
+                Add a herbal oil to match your mood — lavender to wind down and
+                sleep easy, rosemary to invigorate and get the blood moving, or
+                eucalyptus for a fresh, clearing lift. Seven to choose from in all.
               </p>
             </div>
           </div>
