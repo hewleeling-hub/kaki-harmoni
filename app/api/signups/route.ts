@@ -46,16 +46,22 @@ export async function POST(request: NextRequest) {
   }
 
   const name = body.name?.trim();
-  const email = body.email?.trim().toLowerCase();
+  const email = body.email?.trim().toLowerCase() || null; // blank -> null (email optional)
   const phone = body.phone?.trim() || null;
   const referral_source = body.referral_source?.trim() || null;
 
   if (!name) {
     return NextResponse.json({ error: "Name is required.", field: "name" }, { status: 400 });
   }
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!email || !emailPattern.test(email)) {
-    return NextResponse.json({ error: "A valid email is required.", field: "email" }, { status: 400 });
+  // Email is optional. Only check the format when one is actually provided.
+  if (email) {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(email)) {
+      return NextResponse.json(
+        { error: "Please enter a valid email, or leave it blank.", field: "email" },
+        { status: 400 },
+      );
+    }
   }
   if (!phone) {
     return NextResponse.json({ error: "Phone number is required.", field: "phone" }, { status: 400 });
@@ -63,22 +69,25 @@ export async function POST(request: NextRequest) {
 
   const supabase = createAdminClient();
 
-  const { data: existing } = await supabase
-    .from("signups")
-    .select("id, status")
-    .ilike("email", email)
-    .maybeSingle();
+  // Dedupe by email only when the visitor actually provided one.
+  if (email) {
+    const { data: existing } = await supabase
+      .from("signups")
+      .select("id, status")
+      .ilike("email", email)
+      .maybeSingle();
 
-  if (existing) {
-    return NextResponse.json(
-      {
-        error: "You're already signed up with this email.",
-        field: "email",
-        signup_id: existing.id,
-        already_converted: existing.status === "converted",
-      },
-      { status: 409 },
-    );
+    if (existing) {
+      return NextResponse.json(
+        {
+          error: "You're already signed up with this email.",
+          field: "email",
+          signup_id: existing.id,
+          already_converted: existing.status === "converted",
+        },
+        { status: 409 },
+      );
+    }
   }
 
   const score = scoreLead({ referralSource: referral_source, hasPhone: !!phone, hoursToPurchase: null });
