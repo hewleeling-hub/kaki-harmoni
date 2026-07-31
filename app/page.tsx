@@ -2,7 +2,7 @@ import Image from "next/image";
 import SignupForm from "./signup-form";
 import { PublicShell } from "@/components/layout/PublicShell";
 import { Button, Card, SectionHeading } from "@/components/ui/primitives";
-import { StepCard, PromotionCard, OpeningBadge } from "@/components/ui/cards";
+import { StepCard, PromotionCard } from "@/components/ui/cards";
 import { Lotti } from "@/components/ui/Lotti";
 import {
   CalendarIcon,
@@ -31,8 +31,7 @@ export default function Home() {
       {/* Hero */}
       <section className="fade-up grid items-center gap-8 py-8 sm:py-10 lg:grid-cols-2 lg:gap-12 lg:py-14">
         <div className="order-1">
-          <OpeningBadge when={launchWindow} />
-          <p className="mt-4 text-sm font-semibold uppercase tracking-[0.2em] text-olive">
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-olive">
             {businessConfig.tagline}
           </p>
           <h1 className="mt-3 text-[34px] leading-[1.1] text-olive-dark sm:text-[44px] lg:text-[50px]">
