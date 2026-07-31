@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Kaki Harmoni — Foot Hydrotherapy & Coffee · Opening early August",
+  title: "Kaki Harmoni | Relax, Refresh & Reconnect · Opening early August",
   description:
-    "A warm foot hydrotherapy soak paired with good coffee at Desa Cindaimas Condominium Clubhouse. Opening early August — reserve your first visit and lock the launch price.",
+    "A warm leg soak paired with good coffee at Desa Cindaimas Condominium Clubhouse, Kuala Lumpur. Opening early August — reserve your first visit and lock the launch price.",
 };
 
 export default function RootLayout({
@@ -15,8 +15,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap"
+          href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap"
           rel="stylesheet"
         />
       </head>

@@ -1,141 +1,107 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import SiteNav from "../site-nav";
-import SiteFooter from "../site-footer";
+import Image from "next/image";
+import { PublicShell } from "@/components/layout/PublicShell";
+import { Button, Card } from "@/components/ui/primitives";
+import { CalendarIcon, MapPinIcon } from "@/components/ui/icons";
+import { businessConfig } from "@/config/business";
 
 export const metadata: Metadata = {
   title: "About — Kaki Harmoni",
   description:
-    "Kaki Harmoni pairs warm foot hydrotherapy with freshly brewed coffee at Desa Cindaimas Condominium Clubhouse. Fifteen quiet minutes to relax, refresh, and reconnect.",
+    "Kaki Harmoni pairs a warm leg soak with freshly brewed coffee at Desa Cindaimas Condominium Clubhouse. Fifteen quiet minutes to relax, refresh and reconnect.",
 };
 
+// A few gentle reasons a Kaki Harmoni soak feels different from a basin at home.
+// NOTE: softened from the original medical/technical copy per brand guidelines —
+// please review the wording.
+const FEATURES = [
+  {
+    title: "Warmth that sinks in",
+    text: "Gentle, steady warmth eases through in about fifteen minutes — not a warm surface that cools off in two.",
+  },
+  {
+    title: "A soft bubble soak",
+    text: "Thousands of tiny bubbles gently swirl around tired feet. A basin of still water just can't do that.",
+  },
+  {
+    title: "Clean, fresh water",
+    text: "Fresh, clean water for every guest, so tired feet feel genuinely refreshed.",
+  },
+  {
+    title: "A calm little corner",
+    text: "A quiet, unhurried atmosphere — a gentle place to switch off for a while.",
+  },
+  {
+    title: "Your choice of aroma",
+    text: "Pick a scent to match your mood — lavender to wind down, rosemary for a fresh lift, or eucalyptus for a clean, clearing note. Seven to choose from, blended just for you.",
+    wide: true,
+  },
+];
+
 export default function AboutPage() {
+  const { pricing } = businessConfig;
   return (
-    <>
-      <SiteNav />
-      <div className="md:pl-60">
-      <main className="mx-auto max-w-3xl px-6 py-10 md:py-14">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+    <PublicShell>
+      <div className="mx-auto max-w-3xl py-8 md:py-12">
+        <Image
           src="/kaki-welcome.png"
           alt="Welcome to Kaki Harmoni — Relax. Refresh. Reconnect."
-          className="w-full max-w-sm object-contain mb-4"
+          width={420}
+          height={315}
+          className="mb-6 w-full max-w-sm rounded-[22px] object-contain"
         />
-        <p className="uppercase tracking-widest text-xs font-semibold" style={{ color: "var(--clay)" }}>
-          About us
-        </p>
-        <h1
-          className="font-display text-4xl md:text-5xl font-semibold leading-tight mt-3"
-          style={{ color: "var(--lagoon-dark)" }}
-        >
-          Come rest those feet.
-        </h1>
+        <p className="text-xs font-semibold uppercase tracking-widest text-olive">About us</p>
+        <h1 className="mt-3 text-[34px] leading-tight text-olive-dark sm:text-[44px]">Come rest those feet.</h1>
 
-        <div className="mt-6 space-y-5 text-lg leading-relaxed text-black/75">
+        <div className="mt-6 space-y-5 text-[18px] leading-relaxed text-muted">
           <p>
-            Hi, I&apos;m Lotti! 🌸 The little lotus who runs the warmest corner of Desa
-            Cindaimas — warm foot soaks and good coffee.
+            Hi, I&apos;m Lotti! 🌸 The little lotus who looks after the warmest corner of Desa
+            Cindaimas — warm leg soaks and good coffee.
           </p>
           <p>
-            The idea&apos;s small on purpose: fifteen minutes with your feet in warm,
-            bubbly water. Come as you are, bring a friend or don&apos;t — I saved you a
-            spot. Relax, refresh, reconnect. 💛
+            The idea&apos;s small on purpose: fifteen quiet minutes with your feet in warm, bubbly
+            water. Come as you are, bring a friend or don&apos;t — I&apos;ve saved you a spot. Relax,
+            refresh, reconnect. 💛
           </p>
         </div>
 
-        <div className="mt-8 flex flex-wrap gap-4">
-          <Link
-            href="/"
-            className="rounded-full px-6 py-3 text-white font-semibold transition-opacity hover:opacity-90"
-            style={{ backgroundColor: "var(--lagoon)" }}
-          >
-            Book your first visit — RM25
-          </Link>
-          <Link
-            href="/location"
-            className="rounded-full px-6 py-3 font-semibold border transition-colors hover:bg-white"
-            style={{ color: "var(--lagoon-dark)", borderColor: "var(--lagoon)" }}
-          >
-            Find us
-          </Link>
+        <div className="mt-8 flex flex-wrap gap-3">
+          <Button href="/#reserve" icon={<CalendarIcon size={20} />}>
+            Reserve your first visit — RM{pricing.prepay}
+          </Button>
+          <Button href="/location" variant="secondary" icon={<MapPinIcon size={20} />}>
+            Find Us
+          </Button>
         </div>
 
-        <section className="mt-16 border-t border-black/5 pt-12">
-          <h2 className="font-display text-3xl md:text-4xl font-semibold" style={{ color: "var(--lagoon-dark)" }}>
-            More than a bucket of warm water
-          </h2>
-          <p className="mt-3 text-lg text-black/75 max-w-2xl">
-            People ask what makes a Kaki Harmoni soak different from filling a
-            basin at home. Quite a lot, actually — ours is a proper hydrosonic
-            spa, not just warm water sitting there.
+        <section className="mt-14 border-t border-line pt-12">
+          <h2 className="text-[28px] text-olive-dark sm:text-[32px]">More than a bucket of warm water</h2>
+          <p className="mt-3 max-w-2xl text-[18px] leading-relaxed text-muted">
+            People ask what makes a Kaki Harmoni soak different from filling a basin at home. Quite a
+            lot, actually — it&apos;s a proper warm soak, made to help you unwind.
           </p>
 
           <div className="mt-8 grid gap-4 sm:grid-cols-2">
-            <div className="rounded-2xl border border-black/5 bg-white/70 p-6">
-              <p className="font-display text-lg font-semibold" style={{ color: "var(--lagoon)" }}>
-                Warmth that sinks in
-              </p>
-              <p className="mt-1 text-black/70">
-                Ultrasonic heat warms you all the way through in about fifteen
-                minutes — not a warm surface that cools off in two.
-              </p>
-            </div>
-            <div className="rounded-2xl border border-black/5 bg-white/70 p-6">
-              <p className="font-display text-lg font-semibold" style={{ color: "var(--lagoon)" }}>
-                A real bubble massage
-              </p>
-              <p className="mt-1 text-black/70">
-                Thousands of tiny bubbles a second gently massage your soles and
-                pressure points. Still water can&apos;t do that.
-              </p>
-            </div>
-            <div className="rounded-2xl border border-black/5 bg-white/70 p-6">
-              <p className="font-display text-lg font-semibold" style={{ color: "var(--lagoon)" }}>
-                Clean, fresh water
-              </p>
-              <p className="mt-1 text-black/70">
-                Ozone keeps the soak hygienic and leaves tired feet feeling
-                genuinely fresh.
-              </p>
-            </div>
-            <div className="rounded-2xl border border-black/5 bg-white/70 p-6">
-              <p className="font-display text-lg font-semibold" style={{ color: "var(--lagoon)" }}>
-                Forest-fresh calm
-              </p>
-              <p className="mt-1 text-black/70">
-                Negative ions and gentle far-infrared warmth add to the unwind —
-                like the air beside a waterfall.
-              </p>
-            </div>
-            <div className="rounded-2xl border border-black/5 bg-white/70 p-6 sm:col-span-2">
-              <p className="font-display text-lg font-semibold" style={{ color: "var(--lagoon)" }}>
-                Your choice of aroma
-              </p>
-              <p className="mt-1 text-black/70">
-                Choose an essential oil to match your mood — lavender to wind down
-                and sleep easy, rosemary to invigorate and get the blood moving, or
-                eucalyptus for a fresh, clearing lift. Seven to choose from, and
-                we&apos;ll personalise the blend just for you.
-              </p>
-            </div>
+            {FEATURES.map((f) => (
+              <Card key={f.title} className={`bg-cream/60 ${f.wide ? "sm:col-span-2" : ""}`}>
+                <p className="text-[18px] text-olive" style={{ fontFamily: "var(--font-heading)" }}>
+                  {f.title}
+                </p>
+                <p className="mt-1 text-[16px] leading-relaxed text-muted">{f.text}</p>
+              </Card>
+            ))}
           </div>
 
-          <p className="mt-8 text-lg text-black/75 max-w-2xl">
-            The result? Relaxed, warmed-through feet, easier circulation, and a
-            quiet fifteen minutes a basin at home just can&apos;t give you.
+          <p className="mt-8 max-w-2xl text-[18px] leading-relaxed text-muted">
+            The result? Relaxed, warmed-through feet and a quiet fifteen minutes a basin at home just
+            can&apos;t give you.
           </p>
 
-          <Link
-            href="/"
-            className="mt-6 inline-block rounded-full px-6 py-3 text-white font-semibold transition-opacity hover:opacity-90"
-            style={{ backgroundColor: "var(--clay)" }}
-          >
-            Book your first visit — RM25
-          </Link>
+          <Button href="/#reserve" className="mt-6" icon={<CalendarIcon size={20} />}>
+            Reserve your first visit — RM{pricing.prepay}
+          </Button>
         </section>
-      </main>
-      <SiteFooter />
       </div>
-    </>
+    </PublicShell>
   );
 }

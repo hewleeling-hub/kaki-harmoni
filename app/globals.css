@@ -1,13 +1,37 @@
 @import "tailwindcss";
 
+/* Existing brand vars kept so staff/dashboard/purchase screens don't break. */
 :root {
   --lagoon: #2e7d7b;
   --lagoon-dark: #1f5654;
   --aqua: #a8d5d0;
   --clay: #c97c5d;
-  --cream: #f4ede2;
+  --cream: #f7f0e3;
   --blush: #e8a5b8;
-  --ink: #1c2b2a;
+  --ink: #3e392f;
+}
+
+/* ── Warm & Friendly brand tokens (customer site) ─────────────────────── */
+@theme {
+  --color-cream: #f7f0e3;
+  --color-ivory: #fffdf8;
+  --color-olive: #667a55;
+  --color-olive-dark: #3f4938;
+  --color-beige: #e8d7bb;
+  --color-sage: #c9d2b8;
+  --color-peach: #efd6bd;
+  --color-brown: #7a5e45;
+  --color-ink: #3e392f;
+  --color-muted: #716a5e;
+  --color-line: #ddd0bb;
+  --color-success: #6f875c;
+  --color-gold: #d3a85b;
+
+  --font-heading: "DM Serif Display", Georgia, "Times New Roman", serif;
+  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  --shadow-warm: 0 8px 24px rgba(92, 73, 48, 0.08);
+  --shadow-warm-lg: 0 14px 40px rgba(92, 73, 48, 0.12);
 }
 
 body {
@@ -16,5 +40,49 @@ body {
 }
 
 .font-display {
-  font-family: "Fraunces", ui-serif, Georgia, serif;
+  font-family: var(--font-heading);
+}
+
+/* Customer-site styling is scoped under .warm so staff pages are untouched. */
+.warm {
+  font-family: var(--font-body);
+  color: var(--color-ink);
+  line-height: 1.5;
+}
+.warm :where(h1, h2, h3, h4) {
+  font-family: var(--font-heading);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.12;
+}
+.warm :where(a, button, [role="button"], input, select, textarea, summary):focus-visible {
+  outline: 3px solid var(--color-olive);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+@keyframes warm-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.warm .fade-up {
+  animation: warm-fade-up 320ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .warm .fade-up {
+    animation: none;
+  }
+  .warm *,
+  .warm *::before,
+  .warm *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
 }

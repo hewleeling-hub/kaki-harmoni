@@ -1,113 +1,133 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import SiteNav from "../site-nav";
-import SiteFooter from "../site-footer";
+import { PublicShell } from "@/components/layout/PublicShell";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { Card, Button, SectionHeading } from "@/components/ui/primitives";
+import { OpeningBadge } from "@/components/ui/cards";
+import {
+  MapPinIcon,
+  NavigationIcon,
+  MessageIcon,
+  PhoneIcon,
+  ClockIcon,
+  InfoIcon,
+} from "@/components/ui/icons";
+import {
+  businessConfig,
+  directionsLink,
+  mapEmbedSrc,
+  telLink,
+  whatsappLink,
+} from "@/config/business";
 
 export const metadata: Metadata = {
-  title: "Location & Hours — Kaki Harmoni",
+  title: "Find Us — Location & Hours | Kaki Harmoni",
   description:
-    "Find Kaki Harmoni at Desa Cindaimas Condominium Clubhouse. Open daily 10:00am to 8:00pm. Directions and parking info.",
+    "Find Kaki Harmoni at Desa Cindaimas Condominium Clubhouse, Kuala Lumpur. Directions, opening hours and contact details for a warm leg soak and a friendly coffee.",
 };
 
-const ADDRESS = "Desa Cindaimas Condominium Clubhouse";
-const MAPS_QUERY = encodeURIComponent("Desa Cindaimas Condominium, Kuala Lumpur");
-const MAPS_LINK = `https://www.google.com/maps/search/?api=1&query=${MAPS_QUERY}`;
-const MAPS_EMBED = `https://maps.google.com/maps?q=${MAPS_QUERY}&output=embed`;
-
-const hours = [
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-  "Sunday",
+const VISIT_INFO = [
+  { label: "Parking", value: "Free parking available on site at the clubhouse." },
+  { label: "Entrance", value: "Inside the residents' clubhouse — visitors and walk-ins welcome." },
+  { label: "Accessibility", value: "Ground-floor access. Let our team know if you'd like a hand getting settled." },
+  { label: "Booking", value: "Reserve online to lock the launch price, or message us on WhatsApp." },
 ];
 
-export default function LocationPage() {
+export default function FindUsPage() {
+  const { address, hours, callDisplay, launchWindow } = businessConfig;
+
   return (
-    <>
-      <SiteNav />
-      <div className="md:pl-60">
-      <main className="mx-auto max-w-5xl px-6 py-16">
-        <p className="uppercase tracking-widest text-xs font-semibold" style={{ color: "var(--clay)" }}>
-          Location &amp; hours
-        </p>
-        <h1
-          className="font-display text-4xl md:text-5xl font-semibold leading-tight mt-3"
-          style={{ color: "var(--lagoon-dark)" }}
-        >
-          Come find us at the clubhouse.
-        </h1>
+    <PublicShell>
+      <PageHeader
+        title="Find Us"
+        subtitle="Come by for a warm soak, a quiet break and a friendly cup of coffee."
+      />
 
-        <div className="mt-10 grid gap-10 md:grid-cols-2 items-start">
-          <div className="space-y-8">
+      <div className="mt-8 grid gap-6 lg:grid-cols-2">
+        <Card className="flex flex-col">
+          <div className="flex items-start gap-3">
+            <span className="mt-1 text-olive">
+              <MapPinIcon size={26} />
+            </span>
             <div>
-              <h2 className="font-display text-2xl font-semibold" style={{ color: "var(--lagoon)" }}>
-                Where we are
-              </h2>
-              <p className="mt-2 text-lg text-black/75">{ADDRESS}</p>
-              <p className="mt-1 text-black/60">
-                Inside the residents&apos; clubhouse — walk-ins and visitors welcome.
-                Free parking available on site.
-              </p>
-              <Link
-                href={MAPS_LINK}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block mt-4 rounded-full px-6 py-3 text-white font-semibold transition-opacity hover:opacity-90"
-                style={{ backgroundColor: "var(--lagoon)" }}
-              >
-                Open in Google Maps
-              </Link>
-            </div>
-
-            <div>
-              <h2 className="font-display text-2xl font-semibold" style={{ color: "var(--lagoon)" }}>
-                Opening hours
-              </h2>
-              <ul className="mt-3 divide-y divide-black/5 rounded-2xl border border-black/5 bg-white/70">
-                {hours.map((day) => (
-                  <li key={day} className="flex justify-between px-5 py-3 text-black/75">
-                    <span>{day}</span>
-                    <span className="font-medium" style={{ color: "var(--lagoon-dark)" }}>
-                      10:00am – 8:00pm
-                    </span>
-                  </li>
+              <h2 className="text-[22px] text-olive-dark">{businessConfig.name}</h2>
+              <address className="mt-1 not-italic text-[16px] leading-relaxed text-muted">
+                {address.lines.map((line) => (
+                  <span key={line} className="block">
+                    {line}
+                  </span>
                 ))}
-              </ul>
-              <p className="mt-3 text-sm text-black/55">
-                Last soak begins at 7:30pm. Booking ahead is recommended — we have
-                four hydrotherapy stations.
-              </p>
+              </address>
             </div>
           </div>
 
-          <div className="overflow-hidden rounded-2xl border border-black/5 shadow-sm">
-            <iframe
-              title="Map to Kaki Harmoni at Desa Cindaimas Condominium Clubhouse"
-              src={MAPS_EMBED}
-              width="100%"
-              height="420"
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              style={{ border: 0 }}
-            />
+          <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <Button href={directionsLink} icon={<NavigationIcon size={20} />} full>
+              Get Directions
+            </Button>
+            <Button
+              href={whatsappLink("Hi Kaki Harmoni! Could you share directions to the clubhouse?")}
+              variant="secondary"
+              icon={<MessageIcon size={20} />}
+              full
+            >
+              WhatsApp Us
+            </Button>
+            <Button href={telLink} variant="secondary" icon={<PhoneIcon size={20} />} full>
+              Call
+            </Button>
           </div>
-        </div>
+          <p className="mt-3 text-[14px] text-muted">{callDisplay}</p>
+        </Card>
 
-        <div className="mt-14">
-          <Link
-            href="/"
-            className="rounded-full px-6 py-3 text-white font-semibold transition-opacity hover:opacity-90"
-            style={{ backgroundColor: "var(--clay)" }}
-          >
-            Book your visit
-          </Link>
-        </div>
-      </main>
-      <SiteFooter />
+        <Card className="flex flex-col bg-cream/60">
+          <div className="flex items-center gap-3">
+            <span className="text-olive">
+              <ClockIcon size={26} />
+            </span>
+            <h2 className="text-[22px] text-olive-dark">Opening hours</h2>
+          </div>
+          <div className="mt-4 flex items-center justify-between rounded-[16px] border border-line bg-ivory px-4 py-3">
+            <div>
+              <p className="text-[17px] font-semibold text-olive-dark">{hours.label}</p>
+              <p className="text-[16px] text-muted">{hours.display}</p>
+            </div>
+            <OpeningBadge when={launchWindow} />
+          </div>
+          <p className="mt-3 text-[14px] text-muted">{hours.lastSoak}</p>
+          <p className="mt-1 text-[14px] text-muted">
+            We&apos;re getting ready to open in {launchWindow} — reserve now to lock the launch price.
+          </p>
+        </Card>
       </div>
-    </>
+
+      <section className="mt-6">
+        <div className="overflow-hidden rounded-[24px] border border-line shadow-[var(--shadow-warm)]">
+          <iframe
+            title={`Map showing ${businessConfig.name} at ${address.name}`}
+            src={mapEmbedSrc}
+            className="h-[320px] w-full sm:h-[380px]"
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+          />
+        </div>
+      </section>
+
+      <section className="mt-12">
+        <SectionHeading eyebrow="Good to know" title="Planning your visit" />
+        <div className="mt-5 grid gap-4 sm:grid-cols-2">
+          {VISIT_INFO.map((info) => (
+            <Card key={info.label} className="flex items-start gap-3 bg-ivory">
+              <span className="mt-0.5 text-olive">
+                <InfoIcon size={22} />
+              </span>
+              <div>
+                <h3 className="text-[17px] font-semibold text-olive-dark">{info.label}</h3>
+                <p className="mt-1 text-[15px] leading-relaxed text-muted">{info.value}</p>
+              </div>
+            </Card>
+          ))}
+        </div>
+      </section>
+    </PublicShell>
   );
 }
