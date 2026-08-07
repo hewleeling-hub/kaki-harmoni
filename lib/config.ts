@@ -1,12 +1,16 @@
 // ── Launch configuration ─────────────────────────────────────────────────
-// Flip PRELAUNCH_MODE to false on launch day to switch on real slot booking.
-// While true, customers reserve + prepay to lock the launch price, but don't
-// pick a time slot yet — you schedule them once you announce the opening date.
-export const PRELAUNCH_MODE = true;
+// PRELAUNCH_MODE off => real slot booking is on: customers reserve, prepay,
+// then pick a time slot. Set back to true to pause slot booking.
+export const PRELAUNCH_MODE = false;
 
-// When you expect to open — shown in the reservation messaging so people know
-// roughly when their visit will be. Update to an exact date once you have one.
+// Legacy pre-launch label (kept for any old references). Booking is now open —
+// see BOOKING_START_* below for the live booking window.
 export const LAUNCH_WINDOW = "early August";
+
+// First date customers can book, and how far ahead the calendar runs.
+export const BOOKING_START_DATE = "2026-09-11"; // ISO (Asia/Kuala_Lumpur)
+export const BOOKING_START_LABEL = "11 September 2026";
+export const BOOKING_WINDOW_DAYS = 30;
 
 // First-visit two-tier pricing (MYR): cheaper to prepay, small surcharge to
 // pay at the door. Prepaying is the better deal, which nudges people to pay now.

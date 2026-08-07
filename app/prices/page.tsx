@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default function PricesPage() {
-  const { pricing, launchWindow } = businessConfig;
+  const { pricing, bookingStartLabel } = businessConfig;
 
   return (
     <PublicShell>
@@ -57,8 +57,8 @@ export default function PricesPage() {
         <PromotionCard
           highlight={`Save RM${pricing.normal - pricing.prepay}`}
           title="Launch price for first visits"
-          description="Prepay online to lock the launch price. We'll WhatsApp you to pick a time once we open."
-          terms={`Launch offer for a first visit. Opening ${launchWindow}.`}
+          description="Prepay online to lock the launch price, then choose a time slot from the calendar."
+          terms={`Launch offer for a first visit. First visits from ${bookingStartLabel}.`}
         />
       </div>
 

@@ -18,6 +18,8 @@ import {
   WALKIN_PRICE_MYR,
   LAUNCH_WINDOW,
   PRELAUNCH_MODE,
+  BOOKING_START_LABEL,
+  BOOKING_START_DATE,
 } from "@/lib/config";
 
 export const businessConfig = {
@@ -63,7 +65,9 @@ export const businessConfig = {
   },
 
   prelaunch: PRELAUNCH_MODE,
-  launchWindow: LAUNCH_WINDOW, // "early August"
+  launchWindow: LAUNCH_WINDOW, // legacy
+  bookingStartLabel: BOOKING_START_LABEL, // "11 September 2026"
+  bookingStartDate: BOOKING_START_DATE, // "2026-09-11"
 } as const;
 
 /** The four-step visit journey (pre-launch reality). */
@@ -84,10 +88,10 @@ export const visitSteps = [
   },
   {
     number: 3,
-    title: "We'll message you",
-    icon: "message",
-    short: "We'll WhatsApp you to pick a time once we open.",
-    long: `Once we open in ${businessConfig.launchWindow}, we'll WhatsApp you to choose a time that suits you.`,
+    title: "Pick your time",
+    icon: "calendar",
+    short: "Choose a slot that suits you.",
+    long: `Choose a time slot from the calendar — first visits are from ${businessConfig.bookingStartLabel}.`,
   },
   {
     number: 4,
@@ -111,8 +115,8 @@ export const goodToKnow = [
 /** FAQ content — editable here, rendered by the accordion. */
 export const faqs = [
   {
-    q: "When are you opening?",
-    a: `We're opening in ${businessConfig.launchWindow}. Reserve now to lock the launch price, and we'll message you to schedule your first visit.`,
+    q: "When can I visit?",
+    a: `Booking is open now — first visits are from ${businessConfig.bookingStartLabel}. Reserve, prepay to lock the launch price, then pick a time slot.`,
   },
   {
     q: "How long is each session?",
@@ -123,8 +127,8 @@ export const faqs = [
     a: `Your first visit is RM${businessConfig.pricing.prepay} when you prepay online (or RM${businessConfig.pricing.walkin} at the door), instead of the usual RM${businessConfig.pricing.normal}.`,
   },
   {
-    q: "Do I need to pick a time now?",
-    a: "Not yet. While we're getting ready to open, you just reserve and prepay. We'll WhatsApp you to choose a time once we're open.",
+    q: "Do I pick a time when I book?",
+    a: `Yes — after you prepay, you'll choose a time slot from the calendar. The first available date is ${businessConfig.bookingStartLabel}.`,
   },
   {
     q: "What should I wear?",

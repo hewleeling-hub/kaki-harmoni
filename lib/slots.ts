@@ -1,3 +1,5 @@
+import { BOOKING_START_DATE, BOOKING_WINDOW_DAYS } from "@/lib/config";
+
 // TODO: adjust to Kaki Harmoni's real operating hours if different.
 export const BUSINESS_HOURS = { openHour: 10, closeHour: 20 }; // 10:00 – 20:00
 
@@ -24,11 +26,19 @@ export function formatSlotTime(time: string): string {
   return `${displayHour}:${mStr} ${period}`;
 }
 
-// Earliest bookable date is today; latest is 14 days out.
+// Earliest bookable date is the later of today or BOOKING_START_DATE; the
+// calendar then runs BOOKING_WINDOW_DAYS ahead of that.
 export function bookableDateRange(): { min: string; max: string } {
+  // Local (not UTC) formatting so a fixed start date doesn't shift a day.
+  const toISODate = (d: Date) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
+      d.getDate(),
+    ).padStart(2, "0")}`;
+
   const today = new Date();
-  const max = new Date();
-  max.setDate(max.getDate() + 14);
-  const toISODate = (d: Date) => d.toISOString().slice(0, 10);
-  return { min: toISODate(today), max: toISODate(max) };
+  const start = new Date(`${BOOKING_START_DATE}T00:00:00`);
+  const min = start > today ? start : today;
+  const max = new Date(min);
+  max.setDate(max.getDate() + BOOKING_WINDOW_DAYS);
+  return { min: toISODate(min), max: toISODate(max) };
 }

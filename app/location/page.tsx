@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { PublicShell } from "@/components/layout/PublicShell";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Card, Button, SectionHeading } from "@/components/ui/primitives";
-import { OpeningBadge } from "@/components/ui/cards";
 import {
   MapPinIcon,
   NavigationIcon,
@@ -33,7 +32,7 @@ const VISIT_INFO = [
 ];
 
 export default function FindUsPage() {
-  const { address, hours, callDisplay, launchWindow } = businessConfig;
+  const { address, hours, callDisplay, bookingStartLabel } = businessConfig;
 
   return (
     <PublicShell>
@@ -91,11 +90,14 @@ export default function FindUsPage() {
               <p className="text-[17px] font-semibold text-olive-dark">{hours.label}</p>
               <p className="text-[16px] text-muted">{hours.display}</p>
             </div>
-            <OpeningBadge when={launchWindow} />
+            <span className="inline-flex items-center gap-2 rounded-full bg-success/15 px-3 py-1 text-sm font-semibold text-[#3c5230]">
+              <span className="h-2.5 w-2.5 rounded-full bg-success" aria-hidden />
+              Now booking
+            </span>
           </div>
           <p className="mt-3 text-[14px] text-muted">{hours.lastSoak}</p>
           <p className="mt-1 text-[14px] text-muted">
-            We&apos;re getting ready to open in {launchWindow} — reserve now to lock the launch price.
+            Booking is open — first visits from {bookingStartLabel}. Reserve now to lock the launch price.
           </p>
         </Card>
       </div>

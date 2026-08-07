@@ -16,7 +16,7 @@ import { faqs, goodToKnow, visitSteps } from "@/config/business";
 export const metadata: Metadata = {
   title: "How It Works — Kaki Harmoni",
   description:
-    "Your simple, relaxing visit to Kaki Harmoni from start to finish — reserve, prepay to lock the launch price, and we'll message you to schedule once we open.",
+    "Your simple, relaxing visit to Kaki Harmoni from start to finish — reserve, prepay to lock the launch price, then pick a time slot.",
 };
 
 const STEP_ICONS = { calendar: CalendarIcon, gift: CoffeeIcon, message: MessageIcon, heart: HeartIcon } as const;

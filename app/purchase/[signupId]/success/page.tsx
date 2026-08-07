@@ -105,7 +105,7 @@ export default async function PurchaseSuccessPage({ params }: { params: Promise<
 
         {isPending && !isPrepay && (
           <p className="text-sm text-black/60">
-            You&apos;ve chosen to pay {money(amount)} at the door — see you when we open!
+            You&apos;ve chosen to pay {money(amount)} at the door — see you soon!
           </p>
         )}
 

@@ -24,7 +24,7 @@ const BENEFITS = [
 ];
 
 export default function Home() {
-  const { pricing, launchWindow } = businessConfig;
+  const { pricing, bookingStartLabel } = businessConfig;
 
   return (
     <PublicShell>
@@ -90,11 +90,11 @@ export default function Home() {
             <p className="mt-4 text-[18px] leading-relaxed text-muted">
               Your first visit is{" "}
               <strong className="text-olive-dark">RM{pricing.prepay} when you prepay</strong> online
-              (or RM{pricing.walkin} at the door), instead of the usual RM{pricing.normal}. Reserve
-              now — we&apos;ll WhatsApp you to pick a time once we open in {launchWindow}.
+              (or RM{pricing.walkin} at the door), instead of the usual RM{pricing.normal}. Reserve,
+              prepay and pick your visit time — first visits from {bookingStartLabel}.
             </p>
             <ul className="mt-5 space-y-2 text-[16px] text-brown">
-              {["No account needed", "Pay online or at the door", "We message you to schedule"].map((t) => (
+              {["No account needed", "Pay online or at the door", "Pick your visit time after prepaying"].map((t) => (
                 <li key={t} className="flex items-center gap-2">
                   <span className="h-1.5 w-1.5 rounded-full bg-olive" aria-hidden />
                   {t}
