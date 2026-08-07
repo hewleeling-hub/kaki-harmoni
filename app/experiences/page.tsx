@@ -18,7 +18,7 @@ import { whatsappLink } from "@/config/business";
 export const metadata: Metadata = {
   title: "Our Signature Experiences — Kaki Harmoni",
   description:
-    "Four warm ways to unwind at Kaki Harmoni — Deep Calm, Gentle Comfort, Light Legs and Warm Restore. A cosy 15-minute leg soak, good coffee and a moment to slow down.",
+    "Four warm ways to unwind at Kaki Harmoni — Deep Calm, Gentle Comfort, Fresh Start and Light Legs. A cosy 15-minute leg soak, good coffee and a moment to slow down.",
 };
 
 const EXPECT = [
