@@ -27,6 +27,14 @@
   --color-success: #6f875c;
   --color-gold: #d3a85b;
 
+  /* Real brand accents (from the logo): teal + coral, plus sand / soft sage. */
+  --color-teal: #17696d;
+  --color-teal-dark: #10565a;
+  --color-coral: #e18464;
+  --color-coral-soft: #f4c4ae;
+  --color-sand: #eadcc5;
+  --color-sage-light: #dde6d6;
+
   --font-heading: "DM Serif Display", Georgia, "Times New Roman", serif;
   --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
 

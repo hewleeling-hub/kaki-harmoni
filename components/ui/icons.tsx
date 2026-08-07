@@ -119,6 +119,26 @@ export const NavigationIcon = (p: IconProps) => (
     <path d="M20 4 4 11l6.5 2.5L13 20 20 4Z" />
   </Base>
 );
+export const SparklesIcon = (p: IconProps) => (
+  <Base {...p}>
+    <path d="M12 3l1.6 4.6L18 9l-4.4 1.4L12 15l-1.6-4.6L6 9l4.4-1.4L12 3Z" />
+    <path d="M18 14l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7.7-2Z" />
+  </Base>
+);
+export const ArmchairIcon = (p: IconProps) => (
+  <Base {...p}>
+    <path d="M5 11V8a3 3 0 0 1 3-3h8a3 3 0 0 1 3 3v3" />
+    <path d="M4 12a2 2 0 0 1 2 2v2h12v-2a2 2 0 1 1 2 0v4H4v-4a2 2 0 0 1 0-4Z" />
+    <path d="M6 20v1M18 20v1" />
+  </Base>
+);
+export const WavesIcon = (p: IconProps) => (
+  <Base {...p}>
+    <path d="M2 8c1.8 0 1.8-1.5 3.6-1.5S7.4 8 9.2 8 11 6.5 12.8 6.5 14.6 8 16.4 8s1.8-1.5 3.6-1.5" />
+    <path d="M2 13c1.8 0 1.8-1.5 3.6-1.5S7.4 13 9.2 13s1.8-1.5 3.6-1.5S14.6 13 16.4 13s1.8-1.5 3.6-1.5" />
+    <path d="M2 18c1.8 0 1.8-1.5 3.6-1.5S7.4 18 9.2 18s1.8-1.5 3.6-1.5S14.6 18 16.4 18s1.8-1.5 3.6-1.5" />
+  </Base>
+);
 
 export const NAV_ICONS: Record<IconName, (p: IconProps) => React.ReactElement> = {
   home: HomeIcon,
@@ -127,4 +147,5 @@ export const NAV_ICONS: Record<IconName, (p: IconProps) => React.ReactElement> =
   mappin: MapPinIcon,
   user: UserIcon,
   calendar: CalendarIcon,
+  sparkles: SparklesIcon,
 };
