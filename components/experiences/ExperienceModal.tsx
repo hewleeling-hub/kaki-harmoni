@@ -222,11 +222,11 @@ export function ExperienceModal({
                   <p className="mt-0.5 text-[12.5px] text-muted">Buy a package and save</p>
                 </div>
                 <Link
-                  href={`/#reserve?experience=${exp.id}`}
+                  href="/#reserve"
                   onClick={onClose}
                   className="inline-flex min-h-[50px] w-full items-center justify-center gap-2 rounded-[16px] bg-olive px-6 font-semibold text-ivory transition hover:-translate-y-0.5 hover:bg-olive-dark sm:w-auto sm:min-w-[220px]"
                 >
-                  Book {exp.name}
+                  Book Now
                   <ArrowRightIcon size={20} />
                 </Link>
               </div>
