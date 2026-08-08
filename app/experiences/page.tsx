@@ -80,9 +80,9 @@ export default function ExperiencesPage() {
         <div className="flex flex-col items-center gap-5 rounded-[24px] border border-line bg-sage-light/60 p-8 text-center sm:p-10">
           <Lotti size={120} alt="Lotti waving hello" className="h-auto w-28" />
           <div>
-            <h2 className="text-[28px] text-olive-dark sm:text-[32px]">Not sure which one is for you?</h2>
+            <h2 className="text-[28px] text-olive-dark sm:text-[32px]">Not sure which one feels right today?</h2>
             <p className="mx-auto mt-2 max-w-md text-[17px] leading-relaxed text-muted">
-              Tell Lotti how your legs are feeling and we&apos;ll point you in the right direction.
+              Tell Lotti how you&apos;re feeling and we&apos;ll help you choose.
             </p>
           </div>
           <Button
