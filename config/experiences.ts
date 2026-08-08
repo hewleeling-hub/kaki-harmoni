@@ -44,6 +44,7 @@ export const experiences: Experience[] = [
     icon: "blossom",
     iconBg: "#c8952f",
     glowRgb: "200,149,47",
+    image: "/experiences/gentle-comfort.png",
   },
   {
     id: "fresh-start",
