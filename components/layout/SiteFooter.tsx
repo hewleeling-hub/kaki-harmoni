@@ -62,8 +62,9 @@ export function SiteFooter() {
           <p>
             © {new Date().getFullYear()} {businessConfig.legalName} (SSM No. {businessConfig.ssm}). All rights reserved.
           </p>
-          <div className="flex gap-4">
+          <div className="flex flex-wrap gap-4">
             <Link href="/about" className="hover:text-ivory/80">About</Link>
+            <Link href="/faq" className="hover:text-ivory/80">FAQ</Link>
             <Link href="/contact" className="hover:text-ivory/80">Contact</Link>
             <Link href="/dashboard" className="hover:text-ivory/80">Staff login</Link>
           </div>
