@@ -63,16 +63,19 @@ export function ExperienceCard({
         <p className="mt-1 max-w-[620px] text-[15px] leading-[1.5] text-muted">{exp.description}</p>
 
         {/* Perfect for */}
-        <div className="mt-3 flex flex-wrap gap-1.5">
-          {exp.perfectFor.map((item) => (
-            <span
-              key={item}
-              className="inline-flex items-center gap-1 rounded-full border border-line bg-ivory px-2.5 py-1 text-[12px] font-medium text-olive-dark"
-            >
-              <CheckIcon size={13} style={{ color: exp.accent }} />
-              {item}
-            </span>
-          ))}
+        <div className="mt-3">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-olive">Perfect for</p>
+          <div className="mt-1.5 flex flex-wrap gap-1.5">
+            {exp.perfectFor.map((item) => (
+              <span
+                key={item}
+                className="inline-flex items-center gap-1 rounded-full border border-line bg-ivory px-2.5 py-1 text-[12px] font-medium text-olive-dark"
+              >
+                <CheckIcon size={13} style={{ color: exp.accent }} />
+                {item}
+              </span>
+            ))}
+          </div>
         </div>
 
         {/* Meta row pinned toward the bottom */}

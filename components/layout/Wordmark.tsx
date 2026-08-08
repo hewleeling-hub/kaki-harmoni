@@ -3,8 +3,8 @@ import Link from "next/link";
 /** Warm "Kaki Harm♥ni" wordmark (olive + brown), with tagline. */
 export function Wordmark({ showTagline = true }: { showTagline?: boolean }) {
   return (
-    <Link href="/" aria-label="Kaki Harmoni — home" className="inline-flex flex-col leading-none">
-      <span className="text-xl font-normal tracking-tight" style={{ fontFamily: "var(--font-heading)" }}>
+    <Link href="/" aria-label="Kaki Harmoni — home" className="inline-flex flex-col items-center leading-none">
+      <span className="text-2xl font-normal tracking-tight" style={{ fontFamily: "var(--font-heading)" }}>
         <span className="text-teal">Kaki</span>{" "}
         <span aria-label="Harmoni" className="text-coral" style={{ whiteSpace: "nowrap" }}>
           Harm
@@ -27,7 +27,7 @@ export function Wordmark({ showTagline = true }: { showTagline?: boolean }) {
         </span>
       </span>
       {showTagline && (
-        <span className="mt-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-teal">
+        <span className="mt-1 block text-center text-[11px] font-semibold uppercase tracking-[0.12em] text-teal">
           Relax · Refresh · Reconnect
         </span>
       )}
