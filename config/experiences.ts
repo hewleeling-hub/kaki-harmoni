@@ -43,6 +43,7 @@ export const experiences: Experience[] = [
     iconBg: "#6b4f9e",
     glowRgb: "107,79,158",
     image: "/experiences/deep-calm.png",
+    productImage: "/experiences/deep-calm-oil.png",
     accent: "#5b3a8e",
     primaryOil: "Lavender",
     headline: "When you need to switch off.",

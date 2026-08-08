@@ -2,20 +2,43 @@ import Image from "next/image";
 import type { Experience } from "@/config/experiences";
 
 /**
- * Left visual for the experience detail modal. Oils + bath salts are the hero;
- * Lotti is small and supporting. Uses a stylised SVG bottle + salt jar tinted
- * to the experience colour. If exp.productImage is provided (a real transparent
- * product photo), it is shown instead of the drawn composition.
+ * Left visual for the experience detail modal. Oils + bath salts are the hero.
+ * If exp.productImage is set (a real product photo), it fills the panel and is
+ * the hero — the icon is overlaid top-left; Lotti stays in the "Lotti says"
+ * box, not on the busy photo. Otherwise a stylised SVG bottle + salt jar (with
+ * a small supporting Lotti) is drawn, tinted to the experience colour.
  */
 export function ProductComposition({ exp }: { exp: Experience }) {
   const glow = `rgba(${exp.glowRgb},0.30)`;
+
+  if (exp.productImage) {
+    return (
+      <div
+        className="relative min-h-[240px] overflow-hidden rounded-[20px] sm:min-h-[300px] lg:min-h-full"
+        style={{ background: `radial-gradient(circle at 50% 42%, ${glow}, transparent 72%)` }}
+      >
+        <Image
+          src={exp.productImage}
+          alt={`${exp.name} — ${exp.primaryOil} bath oil and matching bath salts`}
+          fill
+          sizes="(max-width: 1024px) 100vw, 45vw"
+          className="object-contain"
+          priority
+        />
+        {exp.image && (
+          <div className="absolute left-3 top-3 z-10 rounded-full bg-ivory/85 p-1 shadow-[var(--shadow-warm)] backdrop-blur-sm">
+            <Image src={exp.image} alt="" width={60} height={60} className="h-[54px] w-[54px] object-contain" />
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div
       className="relative flex min-h-[260px] items-center justify-center overflow-hidden rounded-[20px] p-5 lg:min-h-full"
       style={{ background: `radial-gradient(circle at 50% 42%, ${glow}, transparent 72%)` }}
     >
-      {/* experience icon, top-left with soft glow */}
       {exp.image && (
         <div
           className="absolute left-4 top-4 rounded-full"
@@ -25,17 +48,7 @@ export function ProductComposition({ exp }: { exp: Experience }) {
         </div>
       )}
 
-      {exp.productImage ? (
-        <Image
-          src={exp.productImage}
-          alt={`${exp.name} — ${exp.primaryOil} bath oil and bath salts`}
-          width={520}
-          height={480}
-          className="relative z-10 h-auto w-full max-w-[420px] object-contain"
-        />
-      ) : (
-        <Composition exp={exp} />
-      )}
+      <Composition exp={exp} />
 
       {/* small supporting Lotti */}
       <Image
