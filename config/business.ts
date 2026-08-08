@@ -84,7 +84,7 @@ export const visitSteps = [
     title: "Prepay to lock the price",
     icon: "gift",
     short: "Pay online to lock the launch rate.",
-    long: `Prepay RM${businessConfig.pricing.prepay} online to lock the launch rate — or choose to pay RM${businessConfig.pricing.walkin} at the door.`,
+    long: `Prepay RM${businessConfig.pricing.prepay} for your first visit to lock the launch rate — or choose to pay RM${businessConfig.pricing.walkin} at the door.`,
   },
   {
     number: 3,
@@ -104,7 +104,7 @@ export const visitSteps = [
 
 /** “Good to know before you visit” — no medical claims. */
 export const goodToKnow = [
-  "Wear comfortable clothing.",
+  "Wear comfortable clothing you can roll up to the knees.",
   "Each soak lasts about 15 minutes.",
   "Please arrive five minutes early.",
   "Let our team know if you need any assistance.",
@@ -154,6 +154,20 @@ export const faqs = [
     q: "Is coffee included?",
     a: "Yes — a warm drink is part of your relaxing visit.",
   },
+] as const;
+
+/** Per-soak rates (after the first visit). Standard + friendly off-peak. */
+export const sessionRates = [
+  { name: "Standard single", price: 40, detail: "Anytime · per soak" },
+  { name: "Morning wellness", price: 28, detail: "Weekdays, 10am–12pm · per soak" },
+  { name: "Midweek afternoon", price: 32, detail: "Tue–Thu, 2–4pm · per soak" },
+] as const;
+
+/** Packages & passes. `save` is vs the RM40 standard single. */
+export const packages = [
+  { name: "Buy 4, get 1 free", price: 160, detail: "5 soaks for the price of 4.", save: 40 },
+  { name: "Double + bun & coffee", price: 68, detail: "Two soaks, plus a bun & coffee to share." },
+  { name: "Resident pass", price: 198, detail: "8 soaks · proof of residence.", save: 122 },
 ] as const;
 
 /* --------------------------- derived helpers --------------------------- */
