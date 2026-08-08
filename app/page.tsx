@@ -5,6 +5,7 @@ import { Button, Card, SectionHeading } from "@/components/ui/primitives";
 import { StepCard, PromotionCard } from "@/components/ui/cards";
 import { Lotti } from "@/components/ui/Lotti";
 import { ExperienceList } from "@/components/experiences/ExperienceList";
+import { CustomBlendNote } from "@/components/experiences/CustomBlendNote";
 import {
   CalendarIcon,
   MapPinIcon,
@@ -94,7 +95,8 @@ export default function Home() {
         <div className="mt-8">
           <ExperienceList />
         </div>
-        <div className="mt-6 flex justify-center">
+        <CustomBlendNote />
+        <div className="mt-4 flex justify-center">
           <Button href="/experiences" variant="secondary" iconRight={<ArrowRightIcon size={20} />}>
             Explore Experiences
           </Button>

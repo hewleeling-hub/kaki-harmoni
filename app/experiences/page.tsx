@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { PublicShell } from "@/components/layout/PublicShell";
 import { Button } from "@/components/ui/primitives";
 import { ExperienceList } from "@/components/experiences/ExperienceList";
+import { CustomBlendNote } from "@/components/experiences/CustomBlendNote";
 import { Lotti } from "@/components/ui/Lotti";
 import {
   SparklesIcon,
@@ -69,6 +70,9 @@ export default function ExperiencesPage() {
 
       {/* Experience cards + detail modal */}
       <ExperienceList />
+
+      {/* Custom blend callout */}
+      <CustomBlendNote />
 
       {/* Recommendation */}
       <section className="py-8">
