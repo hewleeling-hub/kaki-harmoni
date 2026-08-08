@@ -119,6 +119,32 @@ export function ExperienceModal({
             <p className="mt-3 text-[17px] font-semibold text-brown sm:text-[18px]">{exp.headline}</p>
             <p className="mt-2 max-w-[620px] text-[15px] leading-[1.55] text-muted">{exp.longDescription}</p>
 
+            {/* Why you'll love it (from the product poster) */}
+            {exp.benefits && exp.benefits.length > 0 && (
+              <Section title="Why you'll love it">
+                <ul className="grid gap-x-5 gap-y-3 sm:grid-cols-2">
+                  {exp.benefits.map((b) => (
+                    <li key={b.title} className="flex gap-2.5">
+                      <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full" style={{ background: exp.accent }} />
+                      <span>
+                        <span className="block text-[14px] font-semibold text-olive-dark">{b.title}</span>
+                        <span className="block text-[13.5px] leading-snug text-muted">{b.text}</span>
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+                {exp.naturalNote && (
+                  <p
+                    className="mt-3 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[12.5px] font-semibold"
+                    style={{ background: pale, color: exp.accent }}
+                  >
+                    <CheckIcon size={15} />
+                    {exp.naturalNote}
+                  </p>
+                )}
+              </Section>
+            )}
+
             {/* Perfect for */}
             <Section title="Perfect for">
               <div className="flex flex-wrap gap-2">

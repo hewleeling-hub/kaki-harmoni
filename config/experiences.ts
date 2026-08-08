@@ -28,6 +28,8 @@ export interface Experience {
   perfectFor: readonly string[];
   feels: readonly string[]; // "what it feels like" pills
   lottiQuote: string;
+  benefits?: readonly { readonly title: string; readonly text: string }[]; // from the product poster
+  naturalNote?: string;
 }
 
 export const experiences: Experience[] = [
@@ -46,12 +48,19 @@ export const experiences: Experience[] = [
     productImage: "/experiences/deep-calm-oil.png",
     accent: "#5b3a8e",
     primaryOil: "Lavender",
-    headline: "When you need to switch off.",
+    headline: "Unwind your mind, soothe your body and sleep better.",
     longDescription:
       "A calming aromatic soak created for days when everything feels a little too busy. Settle in, enjoy the warm water and let yourself slow down for 15 minutes.",
     perfectFor: ["After a long day", "Quiet me-time", "Evening wind-down"],
     feels: ["Soft", "Floral", "Comforting", "Calm"],
     lottiQuote: "This is my pick when my brain refuses to clock out!",
+    benefits: [
+      { title: "Relaxes & soothes", text: "Calms the mind and body." },
+      { title: "Promotes restful sleep", text: "Helps you unwind naturally." },
+      { title: "Nourishes & hydrates", text: "Leaves skin soft, smooth and refreshed." },
+      { title: "Perfect anytime", text: "Ideal for a soothing evening routine." },
+    ],
+    naturalNote: "100% natural essential oils & herbal spa salt.",
   },
   {
     id: "gentle-comfort",
