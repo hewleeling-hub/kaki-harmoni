@@ -4,6 +4,7 @@ import { PublicShell } from "@/components/layout/PublicShell";
 import { Button, Card, SectionHeading } from "@/components/ui/primitives";
 import { StepCard, PromotionCard } from "@/components/ui/cards";
 import { Lotti } from "@/components/ui/Lotti";
+import { ExperienceList } from "@/components/experiences/ExperienceList";
 import {
   CalendarIcon,
   MapPinIcon,
@@ -80,6 +81,24 @@ export default function Home() {
             <p className="mt-1.5 text-[16px] leading-relaxed text-muted">{text}</p>
           </Card>
         ))}
+      </section>
+
+      {/* Signature experiences */}
+      <section className="py-10">
+        <SectionHeading
+          center
+          eyebrow="Signature Experiences"
+          title="Find your soak"
+          subtitle="Four warm ways to unwind — pick the mood that suits your day."
+        />
+        <div className="mt-8">
+          <ExperienceList />
+        </div>
+        <div className="mt-6 flex justify-center">
+          <Button href="/experiences" variant="secondary" iconRight={<ArrowRightIcon size={20} />}>
+            Explore Experiences
+          </Button>
+        </div>
       </section>
 
       {/* Reserve (keeps the real signup + prepay flow) */}
