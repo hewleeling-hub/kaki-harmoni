@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { PublicShell } from "@/components/layout/PublicShell";
 import { Button } from "@/components/ui/primitives";
-import { ExperienceCard } from "@/components/experiences/ExperienceCard";
+import { ExperienceList } from "@/components/experiences/ExperienceList";
 import { Lotti } from "@/components/ui/Lotti";
 import {
   SparklesIcon,
@@ -12,7 +12,6 @@ import {
   MessageIcon,
   ArrowRightIcon,
 } from "@/components/ui/icons";
-import { experiences } from "@/config/experiences";
 import { whatsappLink } from "@/config/business";
 
 export const metadata: Metadata = {
@@ -68,12 +67,8 @@ export default function ExperiencesPage() {
         </div>
       </section>
 
-      {/* Experience cards */}
-      <section className="space-y-5 py-6">
-        {experiences.map((exp) => (
-          <ExperienceCard key={exp.id} exp={exp} />
-        ))}
-      </section>
+      {/* Experience cards + detail modal */}
+      <ExperienceList />
 
       {/* Recommendation */}
       <section className="py-8">

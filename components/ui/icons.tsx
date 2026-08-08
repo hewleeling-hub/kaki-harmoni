@@ -140,6 +140,22 @@ export const WavesIcon = (p: IconProps) => (
   </Base>
 );
 
+export const CloseIcon = (p: IconProps) => (
+  <Base {...p}>
+    <path d="M6 6l12 12M18 6 6 18" />
+  </Base>
+);
+export const ArrowLeftIcon = (p: IconProps) => (
+  <Base {...p}>
+    <path d="M20 12H5M11 6l-6 6 6 6" />
+  </Base>
+);
+export const DropletIcon = (p: IconProps) => (
+  <Base {...p}>
+    <path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11Z" />
+  </Base>
+);
+
 export const NAV_ICONS: Record<IconName, (p: IconProps) => React.ReactElement> = {
   home: HomeIcon,
   info: InfoIcon,

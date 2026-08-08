@@ -4,7 +4,21 @@ import { ClockIcon, ArrowRightIcon } from "@/components/ui/icons";
 import { ExperienceIcon } from "./ExperienceIcon";
 import type { Experience } from "@/config/experiences";
 
-export function ExperienceCard({ exp }: { exp: Experience }) {
+export function ExperienceCard({
+  exp,
+  onLearnMore,
+}: {
+  exp: Experience;
+  onLearnMore?: () => void;
+}) {
+  const learnMoreClass =
+    "inline-flex min-h-[44px] items-center gap-1.5 rounded-full px-2 text-[14px] font-semibold text-olive-dark";
+  const learnMoreInner = (
+    <>
+      Learn More
+      <ArrowRightIcon size={17} className="transition-transform duration-200 group-hover:translate-x-1" />
+    </>
+  );
   const [r, g, b] = exp.glowRgb.split(",").map(Number);
   const badgeBg = `rgba(${exp.glowRgb},0.18)`;
   const badgeText = `rgb(${Math.round(r * 0.68)},${Math.round(g * 0.68)},${Math.round(b * 0.68)})`;
@@ -54,14 +68,20 @@ export function ExperienceCard({ exp }: { exp: Experience }) {
             <ClockIcon size={16} />
             {exp.duration}
           </span>
-          <Link
-            href="/#reserve"
-            aria-label={`Learn more and book ${exp.name}`}
-            className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full px-2 text-[14px] font-semibold text-olive-dark"
-          >
-            Learn More
-            <ArrowRightIcon size={17} className="transition-transform duration-200 group-hover:translate-x-1" />
-          </Link>
+          {onLearnMore ? (
+            <button
+              type="button"
+              onClick={onLearnMore}
+              aria-label={`Learn more about ${exp.name}`}
+              className={learnMoreClass}
+            >
+              {learnMoreInner}
+            </button>
+          ) : (
+            <Link href="/#reserve" aria-label={`Learn more and book ${exp.name}`} className={learnMoreClass}>
+              {learnMoreInner}
+            </Link>
+          )}
         </div>
       </div>
     </article>
