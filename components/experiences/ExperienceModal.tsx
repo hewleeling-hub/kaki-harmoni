@@ -69,8 +69,8 @@ export function ExperienceModal({
   const price = `RM${businessConfig.pricing.prepay}`;
 
   const includes = [
-    { icon: DropletIcon, text: `${exp.name} essential oil blend` },
-    { icon: SparklesIcon, text: "Complementary bath salt blend" },
+    { icon: DropletIcon, text: `${exp.name} essential oils` },
+    { icon: SparklesIcon, text: `${exp.name} herbal spa salt` },
     { icon: WavesIcon, text: "Warm foot soak" },
     { icon: ClockIcon, text: `${exp.duration.replace("mins", "minute")} experience` },
   ];
