@@ -171,7 +171,7 @@ export const sessionRates = [
 export const packages = [
   { name: "Buy 4, get 1 free", price: 160, detail: "5 soaks for the price of 4.", save: 40 },
   { name: "Double + bun & coffee", price: 68, detail: "Two soaks, plus a bun & coffee to share." },
-  { name: "Resident pass", price: 198, detail: "8 soaks · proof of residence.", save: 122 },
+  { name: "Resident pass", price: 240, detail: "8 soaks · proof of residence.", save: 80 },
 ] as const;
 
 /* --------------------------- derived helpers --------------------------- */
