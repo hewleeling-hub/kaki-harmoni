@@ -22,7 +22,7 @@ export function ProductComposition({ exp }: { exp: Experience }) {
           alt={`${exp.name} — ${exp.primaryOil} bath oil and matching bath salts`}
           fill
           sizes="(max-width: 1024px) 100vw, 45vw"
-          className="object-cover"
+          className="object-contain p-3 sm:p-4"
           priority
         />
         {exp.image && (
