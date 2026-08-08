@@ -66,7 +66,7 @@ export function ExperienceModal({
 
   const pale = `rgba(${exp.glowRgb},0.16)`;
   const titleId = `exp-title-${exp.id}`;
-  const price = `RM${businessConfig.pricing.prepay}`;
+  const price = `RM${businessConfig.pricing.normal}`;
 
   const includes = [
     { icon: DropletIcon, text: `${exp.name} essential oils` },
@@ -215,9 +215,12 @@ export function ExperienceModal({
             {/* Footer — price + book + see all */}
             <div className="mt-6 border-t border-line pt-5">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <p className="text-[18px] font-semibold text-olive-dark">
-                  {price} <span className="text-muted">• {exp.duration}</span>
-                </p>
+                <div>
+                  <p className="text-[18px] font-semibold text-olive-dark">
+                    {price} <span className="text-muted">• {exp.duration}</span>
+                  </p>
+                  <p className="mt-0.5 text-[12.5px] text-muted">Buy a package and save</p>
+                </div>
                 <Link
                   href={`/#reserve?experience=${exp.id}`}
                   onClick={onClose}
