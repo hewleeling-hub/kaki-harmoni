@@ -8,8 +8,24 @@ export function SiteFooter() {
     <footer className="mt-16 border-t border-line bg-olive-dark text-ivory/85">
       <div className="mx-auto grid max-w-[1200px] gap-10 px-6 py-12 sm:px-8 md:grid-cols-3">
         <div className="space-y-2">
-          <p className="text-2xl text-ivory" style={{ fontFamily: "var(--font-heading)" }}>
-            Kaki Harmoni
+          <p className="text-2xl text-ivory" style={{ fontFamily: "var(--font-heading)" }} aria-label="Kaki Harmoni">
+            Kaki Harm
+            <svg
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              aria-hidden="true"
+              style={{
+                display: "inline-block",
+                width: "0.6em",
+                height: "0.6em",
+                verticalAlign: "baseline",
+                margin: "0 0.02em",
+                color: "#e18464",
+              }}
+            >
+              <path d="M12 21s-7.55-4.87-10.1-9.4C0.35 9.05 1.6 4.9 5.4 4.9c2.05 0 3.45 1.15 4.6 2.75C11.15 6.05 12.55 4.9 14.6 4.9c3.8 0 5.05 4.15 3.5 6.7C19.55 16.13 12 21 12 21z" />
+            </svg>
+            ni
           </p>
           <p className="text-sm text-ivory/70">{businessConfig.tagline}</p>
           <p className="max-w-xs text-sm text-ivory/70">
