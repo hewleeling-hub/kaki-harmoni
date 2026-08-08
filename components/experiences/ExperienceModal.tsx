@@ -246,7 +246,12 @@ export function ExperienceModal({
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="mt-5">
-      <h3 className="mb-2 text-[13px] font-semibold uppercase tracking-wide text-olive">{title}</h3>
+      <h3
+        className="mb-2 text-[12.5px] font-semibold uppercase text-olive"
+        style={{ fontFamily: "var(--font-body)", letterSpacing: "0.13em" }}
+      >
+        {title}
+      </h3>
       {children}
     </div>
   );
