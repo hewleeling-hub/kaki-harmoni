@@ -23,11 +23,11 @@ export function ExperienceIcon({
   if (name === "moon") {
     return (
       <svg {...box} fill="currentColor">
-        {/* bold right-facing crescent */}
-        <path d="M20.6 14.6A8.6 8.6 0 1 1 9.5 3.4 6.9 6.9 0 0 0 20.6 14.6Z" />
-        <path d={star(6.2, 3.6, 2)} />
-        <path d={star(19.1, 5.4, 1.4)} />
-        <path d={star(18.4, 13.9, 1.6)} />
+        {/* bold crescent, opening upper-right, with sparkles nestled in the cup */}
+        <path d="M20.7 13.6A8.7 8.7 0 1 1 10.7 3.4 6.9 6.9 0 0 0 20.7 13.6Z" />
+        <path d={star(15.7, 9.5, 2.2)} />
+        <path d={star(18.9, 6.4, 1.25)} />
+        <path d={star(19.2, 12.7, 1.15)} />
       </svg>
     );
   }
