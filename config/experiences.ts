@@ -70,5 +70,6 @@ export const experiences: Experience[] = [
     icon: "legs",
     iconBg: "#1c8a8d",
     glowRgb: "28,138,141",
+    image: "/experiences/light-legs.png",
   },
 ];
