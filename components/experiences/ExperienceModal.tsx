@@ -219,7 +219,9 @@ export function ExperienceModal({
                   <p className="text-[18px] font-semibold text-olive-dark">
                     {price} <span className="text-muted">• {exp.duration}</span>
                   </p>
-                  <p className="mt-0.5 text-[12.5px] text-muted">Buy a package and save</p>
+                  <p className="mt-0.5 text-[12.5px] text-muted">
+                    First visit RM{businessConfig.pricing.prepay} · save with a package
+                  </p>
                 </div>
                 <Link
                   href="/#reserve"
