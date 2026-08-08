@@ -57,6 +57,7 @@ export const experiences: Experience[] = [
     icon: "leaf",
     iconBg: "#2f7d46",
     glowRgb: "47,125,70",
+    image: "/experiences/fresh-start.png",
   },
   {
     id: "light-legs",
