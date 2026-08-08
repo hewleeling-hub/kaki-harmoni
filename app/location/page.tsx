@@ -28,7 +28,7 @@ const VISIT_INFO = [
   { label: "Parking", value: "Free parking available on site at the clubhouse." },
   { label: "Entrance", value: "Inside the residents' clubhouse — visitors and walk-ins welcome." },
   { label: "Accessibility", value: "Ground-floor access. Let our team know if you'd like a hand getting settled." },
-  { label: "Booking", value: "Reserve online to lock the launch price, or message us on WhatsApp." },
+  { label: "Booking", value: "Walk-ins welcome, but with only four soaking stations, booking ahead is advisable. Reserve online or message us on WhatsApp." },
 ];
 
 export default function FindUsPage() {

@@ -131,6 +131,10 @@ export const faqs = [
     a: `Yes — after you prepay, you'll choose a time slot from the calendar. The first available date is ${businessConfig.bookingStartLabel}.`,
   },
   {
+    q: "Can I just walk in?",
+    a: "Walk-ins are always welcome. That said, we only have four soaking stations, so it can fill up at busier times — booking ahead is advisable to be sure of a spot.",
+  },
+  {
     q: "What should I wear?",
     a: "Comfortable, everyday clothing is perfect. You'll simply roll up for the soak.",
   },
