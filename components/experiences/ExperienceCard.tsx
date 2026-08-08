@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ClockIcon, ArrowRightIcon } from "@/components/ui/icons";
 import { ExperienceIcon } from "./ExperienceIcon";
 import type { Experience } from "@/config/experiences";
@@ -13,12 +14,22 @@ export function ExperienceCard({ exp }: { exp: Experience }) {
           className="pointer-events-none absolute inset-0"
           style={{ background: `radial-gradient(circle at 50% 45%, rgba(${exp.glowRgb},0.16), transparent 70%)` }}
         />
-        <span
-          className="relative flex h-24 w-24 items-center justify-center rounded-full text-white shadow-[var(--shadow-warm)]"
-          style={{ background: exp.iconBg }}
-        >
-          <ExperienceIcon name={exp.icon} size={46} />
-        </span>
+        {exp.image ? (
+          <Image
+            src={exp.image}
+            alt={`${exp.name} icon`}
+            width={104}
+            height={104}
+            className="relative h-24 w-24 object-contain drop-shadow-[0_6px_14px_rgba(83,66,46,0.14)]"
+          />
+        ) : (
+          <span
+            className="relative flex h-24 w-24 items-center justify-center rounded-full text-white shadow-[var(--shadow-warm)]"
+            style={{ background: exp.iconBg }}
+          >
+            <ExperienceIcon name={exp.icon} size={46} />
+          </span>
+        )}
       </div>
 
       <div>

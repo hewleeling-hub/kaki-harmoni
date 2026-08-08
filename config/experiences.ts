@@ -16,6 +16,7 @@ export interface Experience {
   icon: ExperienceIconName;
   iconBg: string; // solid colour of the icon circle (from the poster)
   glowRgb: string; // "r,g,b" for the soft background glow behind the icon
+  image?: string; // optional real icon artwork (overrides the drawn SVG)
 }
 
 export const experiences: Experience[] = [
@@ -30,6 +31,7 @@ export const experiences: Experience[] = [
     icon: "moon",
     iconBg: "#6b4f9e",
     glowRgb: "107,79,158",
+    image: "/experiences/deep-calm.png",
   },
   {
     id: "gentle-comfort",
