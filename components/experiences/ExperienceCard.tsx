@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ClockIcon, ArrowRightIcon } from "@/components/ui/icons";
+import { ClockIcon, ArrowRightIcon, CheckIcon } from "@/components/ui/icons";
 import { ExperienceIcon } from "./ExperienceIcon";
 import type { Experience } from "@/config/experiences";
 
@@ -61,6 +61,19 @@ export function ExperienceCard({
         </span>
         <p className="mt-2.5 text-[16px] font-medium text-brown">{exp.tagline}</p>
         <p className="mt-1 max-w-[620px] text-[15px] leading-[1.5] text-muted">{exp.description}</p>
+
+        {/* Perfect for */}
+        <div className="mt-3 flex flex-wrap gap-1.5">
+          {exp.perfectFor.map((item) => (
+            <span
+              key={item}
+              className="inline-flex items-center gap-1 rounded-full border border-line bg-ivory px-2.5 py-1 text-[12px] font-medium text-olive-dark"
+            >
+              <CheckIcon size={13} style={{ color: exp.accent }} />
+              {item}
+            </span>
+          ))}
+        </div>
 
         {/* Meta row pinned toward the bottom */}
         <div className="mt-auto flex items-center justify-between gap-4 pt-4">

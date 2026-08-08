@@ -145,21 +145,6 @@ export function ExperienceModal({
               </Section>
             )}
 
-            {/* Perfect for */}
-            <Section title="Perfect for">
-              <div className="flex flex-wrap gap-2">
-                {exp.perfectFor.map((item) => (
-                  <span
-                    key={item}
-                    className="inline-flex items-center gap-1.5 rounded-[14px] border border-line bg-ivory px-3 py-2 text-[13.5px] font-medium text-olive-dark"
-                  >
-                    <CheckIcon size={16} style={{ color: exp.accent }} />
-                    {item}
-                  </span>
-                ))}
-              </div>
-            </Section>
-
             {/* Your soak includes */}
             <Section title="Your soak includes">
               <ul className="grid gap-2.5 rounded-[16px] border border-line bg-ivory p-4 sm:grid-cols-2">
