@@ -164,4 +164,5 @@ export const NAV_ICONS: Record<IconName, (p: IconProps) => React.ReactElement> =
   user: UserIcon,
   calendar: CalendarIcon,
   sparkles: SparklesIcon,
+  waves: WavesIcon,
 };
