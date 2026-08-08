@@ -120,7 +120,7 @@ export const faqs = [
   },
   {
     q: "How long is each session?",
-    a: "Each warm leg soak lasts about 15 minutes — a simple break that fits into your day.",
+    a: "Each warm leg soak lasts about 15 minutes — a simple break that fits into your day. Fancy a longer unwind? Many guests enjoy a second soak straight after, or after a coffee break.",
   },
   {
     q: "How much is a visit?",
