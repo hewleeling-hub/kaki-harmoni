@@ -4,7 +4,7 @@ import Link from "next/link";
 export function Wordmark({ showTagline = true }: { showTagline?: boolean }) {
   return (
     <Link href="/" aria-label="Kaki Harmoni — home" className="inline-flex flex-col items-center leading-none">
-      <span className="text-3xl font-normal tracking-tight" style={{ fontFamily: "var(--font-heading)" }}>
+      <span className="text-[31.5px] font-normal tracking-tight" style={{ fontFamily: "var(--font-heading)" }}>
         <span className="text-teal">Kaki</span>{" "}
         <span aria-label="Harmoni" className="text-coral" style={{ whiteSpace: "nowrap" }}>
           Harm
@@ -27,7 +27,7 @@ export function Wordmark({ showTagline = true }: { showTagline?: boolean }) {
         </span>
       </span>
       {showTagline && (
-        <span className="mt-1 block text-center text-[11px] font-semibold uppercase tracking-[0.12em] text-teal">
+        <span className="mt-1 block text-center text-[11px] font-semibold uppercase tracking-[0.09em] text-teal">
           Relax · Refresh · Reconnect
         </span>
       )}
