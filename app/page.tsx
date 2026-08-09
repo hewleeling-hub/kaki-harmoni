@@ -179,7 +179,7 @@ export default function Home() {
           <PromotionCard
             highlight={`Save RM${pricing.normal - pricing.prepay}`}
             title="Launch price for first visits"
-            description={`First visit is RM${pricing.prepay} prepaid, instead of the usual RM${pricing.normal}. A warm leg soak and a coffee, together.`}
+            description={`First visit is RM${pricing.prepay} prepaid, instead of the usual RM${pricing.normal}. A warm leg soak, with a coffee to enjoy before or after.`}
             terms="Launch offer for a first visit. Prepay online to lock the price."
           />
         </div>

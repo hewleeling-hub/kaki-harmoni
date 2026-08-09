@@ -63,7 +63,7 @@ export default function OurSpaPage() {
               <Icon size={26} />
             </span>
             <h2 className="mt-4 text-[20px] text-olive-dark">{title}</h2>
-            <p className="mt-1.5 max-w-2xl text-[16px] leading-relaxed text-muted">{text}</p>
+            <p className="mt-1.5 text-[16px] leading-relaxed text-muted">{text}</p>
           </Card>
         ))}
       </section>
@@ -75,7 +75,7 @@ export default function OurSpaPage() {
           <p className="mt-2 text-[16px] leading-relaxed text-brown">
             Guests often ask! It&apos;s not exactly either — but it can feel a little like both. The
             swirling bubbles give your feet and legs a soft, massage-like feeling, and the gentle
-            warmth leaves you loose and relaxed — all while you simply sit back with a coffee.
+            warmth leaves you loose and relaxed while you simply sit back and unwind.
           </p>
         </div>
       </section>
@@ -93,7 +93,7 @@ export default function OurSpaPage() {
               "Thousands of soft bubbles, not still water",
               "Warmth that stays gentle and even",
               "Fresh, oxygen-rich water each time",
-              "A calm, unhurried place to switch off — with a coffee",
+              "A calm place to switch off — with a coffee before or after",
             ].map((item) => (
               <li key={item} className="flex items-start gap-2.5 text-[15.5px] text-olive-dark">
                 <CheckIcon size={18} className="mt-0.5 shrink-0 text-success" />

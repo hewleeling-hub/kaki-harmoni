@@ -156,7 +156,7 @@ export const faqs = [
   },
   {
     q: "Is coffee included?",
-    a: "Yes — a warm drink is part of your relaxing visit.",
+    a: "Yes — a warm coffee or tea is part of your visit, to enjoy before or after your soak (not during, so everything stays clean and hygienic).",
   },
 ] as const;
 
