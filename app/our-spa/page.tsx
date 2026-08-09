@@ -43,7 +43,7 @@ const FEATURES = [
   {
     icon: SparklesIcon,
     title: "Made your way",
-    text: "Add your favourite blend from our aromatic oils and herbal spa salts to make each soak your own.",
+    text: "Mix and match from our 7 aromatic oils and 3 herbal spa salts to create a blend that's all your own — or ask our team to tailor one just for you.",
     wide: true,
   },
 ];
