@@ -36,14 +36,14 @@ const FEATURES = [
     text: "Oxygen-rich, freshly prepared water for every guest, so your soak always feels clean, light and refreshing.",
   },
   {
-    icon: SparklesIcon,
-    title: "Made your way",
-    text: "Add your favourite blend from our aromatic oils and herbal spa salts to make each soak your own.",
-  },
-  {
     icon: SunIcon,
     title: "A soft far-infrared warmth",
     text: "The spa also gives off a gentle far-infrared warmth — a soft, radiant heat that wraps around you and makes the whole soak feel especially cosy, right down to your toes.",
+  },
+  {
+    icon: SparklesIcon,
+    title: "Made your way",
+    text: "Add your favourite blend from our aromatic oils and herbal spa salts to make each soak your own.",
     wide: true,
   },
 ];
