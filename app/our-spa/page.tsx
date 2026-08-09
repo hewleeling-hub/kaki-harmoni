@@ -68,6 +68,18 @@ export default function OurSpaPage() {
         ))}
       </section>
 
+      {/* Massage / exercise question */}
+      <section className="mt-8">
+        <div className="rounded-[22px] border border-line bg-cream/60 p-6 shadow-[var(--shadow-warm)] sm:p-7">
+          <h2 className="text-[20px] text-olive-dark sm:text-[22px]">Is it like a massage or exercise?</h2>
+          <p className="mt-2 max-w-2xl text-[16px] leading-relaxed text-brown">
+            Guests often ask! It&apos;s not exactly either — but it can feel a little like both. The
+            swirling bubbles give your feet and legs a soft, massage-like feeling, and the gentle
+            warmth leaves you loose and relaxed — all while you simply sit back with a coffee.
+          </p>
+        </div>
+      </section>
+
       {/* Basin-at-home comparison */}
       <section className="mt-10">
         <div className="rounded-[24px] border border-line bg-sage-light/40 p-6 shadow-[var(--shadow-warm)] sm:p-8">
