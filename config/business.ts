@@ -104,7 +104,7 @@ export const visitSteps = [
 
 /** “Good to know before you visit” — no medical claims. */
 export const goodToKnow = [
-  "Wear comfortable clothing you can roll up to the knees.",
+  "Wear comfortable clothing you can roll up past the knees.",
   "Each soak lasts about 15 minutes.",
   "Please arrive five minutes early.",
   "Let our team know if you need any assistance.",
@@ -136,7 +136,7 @@ export const faqs = [
   },
   {
     q: "What should I wear?",
-    a: "Comfortable, everyday clothing is perfect. You'll simply roll up for the soak.",
+    a: "Comfortable, everyday clothing is perfect — ideally something you can roll up past the knee, since it's a leg soak. You'll simply roll up when you arrive.",
   },
   {
     q: "Can I come with a friend?",
