@@ -155,6 +155,12 @@ export const DropletIcon = (p: IconProps) => (
     <path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11Z" />
   </Base>
 );
+export const SunIcon = (p: IconProps) => (
+  <Base {...p}>
+    <circle cx="12" cy="12" r="4.2" />
+    <path d="M12 2.5v2.3M12 19.2v2.3M2.5 12h2.3M19.2 12h2.3M5.1 5.1l1.6 1.6M17.3 17.3l1.6 1.6M18.9 5.1l-1.6 1.6M6.7 17.3l-1.6 1.6" />
+  </Base>
+);
 
 export const NAV_ICONS: Record<IconName, (p: IconProps) => React.ReactElement> = {
   home: HomeIcon,

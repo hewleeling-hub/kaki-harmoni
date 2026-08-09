@@ -7,6 +7,7 @@ import {
   HeartIcon,
   DropletIcon,
   SparklesIcon,
+  SunIcon,
   CheckIcon,
   CalendarIcon,
   ArrowRightIcon,
@@ -39,6 +40,12 @@ const FEATURES = [
     title: "Made your way",
     text: "Add your favourite blend from our aromatic oils and herbal spa salts to make each soak your own.",
   },
+  {
+    icon: SunIcon,
+    title: "A soft far-infrared warmth",
+    text: "The spa also gives off a gentle far-infrared warmth — a soft, radiant heat that wraps around you and makes the whole soak feel especially cosy, right down to your toes.",
+    wide: true,
+  },
 ];
 
 export default function OurSpaPage() {
@@ -50,13 +57,13 @@ export default function OurSpaPage() {
       />
 
       <section className="mt-8 grid gap-4 sm:grid-cols-2 sm:gap-5">
-        {FEATURES.map(({ icon: Icon, title, text }) => (
-          <Card key={title} className="bg-ivory">
+        {FEATURES.map(({ icon: Icon, title, text, wide }) => (
+          <Card key={title} className={`bg-ivory ${wide ? "sm:col-span-2" : ""}`}>
             <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-olive/12 text-olive">
               <Icon size={26} />
             </span>
             <h2 className="mt-4 text-[20px] text-olive-dark">{title}</h2>
-            <p className="mt-1.5 text-[16px] leading-relaxed text-muted">{text}</p>
+            <p className="mt-1.5 max-w-2xl text-[16px] leading-relaxed text-muted">{text}</p>
           </Card>
         ))}
       </section>
