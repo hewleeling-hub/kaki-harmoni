@@ -143,6 +143,10 @@ export const faqs = [
     a: "Of course — bring a friend or a family member. It's a lovely place to sit together and chat.",
   },
   {
+    q: "Can I bring my children?",
+    a: "Little ones are welcome to come along, with a grown-up keeping an eye on them. If you'd like a child to have a soak, please check with our team first so we can make sure it's suitable and comfortable.",
+  },
+  {
     q: "Is the water cleaned between visits?",
     a: "Yes. Fresh water is prepared for every guest and the tubs are cleaned between visits.",
   },
