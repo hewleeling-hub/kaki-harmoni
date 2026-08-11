@@ -190,33 +190,42 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Community */}
-      <section className="grid items-center gap-8 py-10 lg:grid-cols-2">
-        <div className="order-2 lg:order-1">
-          <div className="overflow-hidden rounded-[24px] border border-line shadow-[var(--shadow-warm)]">
+      {/* Inside the shop */}
+      <section className="py-10">
+        <SectionHeading
+          center
+          eyebrow="More than a soak"
+          title="A comfortable place to slow down"
+          subtitle="Bring your parents, meet a friend or simply enjoy a quiet moment — coffee, comfy chairs and a warm, unhurried space."
+        />
+        <div className="mx-auto mt-8 grid max-w-4xl grid-cols-2 gap-3 sm:gap-4 lg:h-[440px] lg:grid-cols-3 lg:grid-rows-2">
+          <figure className="col-span-2 overflow-hidden rounded-[22px] border border-line shadow-[var(--shadow-warm)] lg:row-span-2">
             <Image
-              src="/kaki-welcome.png"
-              alt="A warm welcome at Kaki Harmoni"
-              width={720}
-              height={540}
-              className="h-full w-full object-cover"
+              src="/shop/cafe.png"
+              alt="Inside the Kaki Harmoni café — tables, plants and warm lighting"
+              width={1000}
+              height={750}
+              className="h-56 w-full object-cover sm:h-72 lg:h-full"
             />
-          </div>
-        </div>
-        <div className="order-1 lg:order-2">
-          <SectionHeading eyebrow="More than a soak" title="A comfortable place to slow down" />
-          <p className="mt-4 text-[18px] leading-relaxed text-muted">
-            Kaki Harmoni is a comfortable place to slow down, bring your parents, meet a friend or
-            simply enjoy a quiet moment.
-          </p>
-          <ul className="mt-5 space-y-2 text-[16px] text-brown">
-            {["Freshly brewed coffee & tea", "Comfortable chairs to sink into", "A friendly space to chat", "Warm, welcoming and unhurried"].map((item) => (
-              <li key={item} className="flex items-center gap-2">
-                <UsersIcon size={18} className="text-olive" />
-                {item}
-              </li>
-            ))}
-          </ul>
+          </figure>
+          <figure className="overflow-hidden rounded-[22px] border border-line shadow-[var(--shadow-warm)]">
+            <Image
+              src="/shop/spa.png"
+              alt="The Kaki Harmoni soaking room, with comfy chairs and plants"
+              width={700}
+              height={525}
+              className="h-40 w-full object-cover sm:h-44 lg:h-full"
+            />
+          </figure>
+          <figure className="overflow-hidden rounded-[22px] border border-line shadow-[var(--shadow-warm)]">
+            <Image
+              src="/shop/door.jpg"
+              alt="The Kaki Harmoni entrance"
+              width={500}
+              height={667}
+              className="h-40 w-full object-cover sm:h-44 lg:h-full"
+            />
+          </figure>
         </div>
       </section>
 
