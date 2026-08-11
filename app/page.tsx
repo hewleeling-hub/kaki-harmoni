@@ -59,12 +59,20 @@ export default function Home() {
 
         <div className="order-2 flex justify-center">
           <div className="relative w-full max-w-md">
-            <div className="rounded-[28px] bg-[radial-gradient(circle_at_60%_35%,#EFD6BD_0%,#F7F0E3_70%)] p-6 shadow-[var(--shadow-warm)]">
-              <Lotti size={320} priority className="mx-auto h-auto w-full max-w-[320px]" />
-            </div>
-            <div className="absolute -bottom-3 left-2 max-w-[220px] rotate-[-3deg] rounded-[18px] rounded-bl-sm border border-line bg-ivory px-4 py-2 shadow-[var(--shadow-warm)] sm:left-6">
-              <p className="text-[16px] italic leading-snug text-brown" style={{ fontFamily: "var(--font-heading)" }}>
-                Hi, I&apos;m Lotti! Let&apos;s relax together.
+            <figure className="overflow-hidden rounded-[28px] border border-line shadow-[var(--shadow-warm)]">
+              <Image
+                src="/shop/spa.png"
+                alt="Inside Kaki Harmoni — warm Grand Sun soaking stations, comfy chairs and plants"
+                width={1000}
+                height={1100}
+                priority
+                className="h-[360px] w-full object-cover sm:h-[440px]"
+              />
+            </figure>
+            <div className="absolute -bottom-3 left-2 flex max-w-[240px] items-center gap-2.5 rotate-[-3deg] rounded-[18px] rounded-bl-sm border border-line bg-ivory px-4 py-2.5 shadow-[var(--shadow-warm)] sm:left-6">
+              <Lotti size={40} className="h-10 w-10 shrink-0" />
+              <p className="text-[15px] italic leading-snug text-brown" style={{ fontFamily: "var(--font-heading)" }}>
+                Come soak with us!
               </p>
             </div>
           </div>
