@@ -69,9 +69,9 @@ export default function Home() {
                 className="h-[360px] w-full object-cover object-center sm:h-[440px]"
               />
             </figure>
-            <div className="absolute -bottom-3 left-2 flex max-w-[240px] items-center gap-2.5 rotate-[-3deg] rounded-[18px] rounded-bl-sm border border-line bg-ivory px-4 py-2.5 shadow-[var(--shadow-warm)] sm:left-6">
-              <Lotti size={40} className="h-10 w-10 shrink-0" />
-              <p className="text-[15px] italic leading-snug text-brown" style={{ fontFamily: "var(--font-heading)" }}>
+            <div className="absolute -bottom-5 left-2 flex max-w-[320px] items-center gap-3 rotate-[-3deg] rounded-[22px] rounded-bl-sm border border-line bg-ivory px-5 py-3.5 shadow-[var(--shadow-warm)] sm:left-6">
+              <Lotti size={60} className="h-14 w-14 shrink-0 sm:h-16 sm:w-16" />
+              <p className="text-[19px] italic leading-snug text-brown sm:text-[21px]" style={{ fontFamily: "var(--font-heading)" }}>
                 Soak, sip &amp; unwind with us!
               </p>
             </div>
