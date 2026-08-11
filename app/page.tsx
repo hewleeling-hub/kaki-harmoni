@@ -61,12 +61,12 @@ export default function Home() {
           <div className="relative w-full max-w-md">
             <figure className="overflow-hidden rounded-[28px] border border-line shadow-[var(--shadow-warm)]">
               <Image
-                src="/shop/spa.png"
-                alt="Inside Kaki Harmoni — warm Grand Sun soaking stations, comfy chairs and plants"
-                width={1000}
-                height={1100}
+                src="/shop/shop1.png"
+                alt="Inside Kaki Harmoni — the welcoming café and reception, with the marble table, plants and 'Relax, Refresh, Reconnect' sign"
+                width={1456}
+                height={1092}
                 priority
-                className="h-[360px] w-full object-cover sm:h-[440px]"
+                className="h-[360px] w-full object-cover object-center sm:h-[440px]"
               />
             </figure>
             <div className="absolute -bottom-3 left-2 flex max-w-[240px] items-center gap-2.5 rotate-[-3deg] rounded-[18px] rounded-bl-sm border border-line bg-ivory px-4 py-2.5 shadow-[var(--shadow-warm)] sm:left-6">
