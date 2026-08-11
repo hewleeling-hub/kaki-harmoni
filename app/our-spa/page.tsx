@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { PublicShell } from "@/components/layout/PublicShell";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Card, Button } from "@/components/ui/primitives";
@@ -55,6 +56,17 @@ export default function OurSpaPage() {
         title="More than warm water"
         subtitle="A few gentle things that make a Kaki Harmoni soak feel different."
       />
+
+      <figure className="mt-8 overflow-hidden rounded-[24px] border border-line shadow-[var(--shadow-warm)]">
+        <Image
+          src="/shop/spa.png"
+          alt="Inside the Kaki Harmoni soaking room — Grand Sun spa stations, comfy chairs and plants"
+          width={1400}
+          height={1050}
+          className="h-auto w-full object-cover"
+          priority
+        />
+      </figure>
 
       <section className="mt-8 grid gap-4 sm:grid-cols-2 sm:gap-5">
         {FEATURES.map(({ icon: Icon, title, text, wide }) => (
