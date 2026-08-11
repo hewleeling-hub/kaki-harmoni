@@ -72,7 +72,7 @@ export default function Home() {
             <div className="absolute -bottom-3 left-2 flex max-w-[240px] items-center gap-2.5 rotate-[-3deg] rounded-[18px] rounded-bl-sm border border-line bg-ivory px-4 py-2.5 shadow-[var(--shadow-warm)] sm:left-6">
               <Lotti size={40} className="h-10 w-10 shrink-0" />
               <p className="text-[15px] italic leading-snug text-brown" style={{ fontFamily: "var(--font-heading)" }}>
-                Come soak with us!
+                Soak, sip &amp; unwind with us!
               </p>
             </div>
           </div>
