@@ -289,7 +289,7 @@ export const ctaLabels = {
    * leads to argues these aren't really discounts but the easiest way to build a
    * habit, so the button promises the habit, not the transaction.
    */
-  routine: "Wellness as Part of Your Routine",
+  routine: "Build Your Routine",
   chooseRoutine: "Choose Your Routine",
   /** Returning customer. */
   nextReset: "Book Your Next Reset",
