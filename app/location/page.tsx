@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { PublicShell } from "@/components/layout/PublicShell";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Card, Button, SectionHeading } from "@/components/ui/primitives";
@@ -41,29 +40,21 @@ export default function FindUsPage() {
       <PageHeader
         title="Find Us"
         subtitle="Come by for a warm soak, a quiet break and a friendly cup of coffee."
+        image={{ src: "/shop/entrance.png", alt: "The Kaki Harmoni entrance — the AQUAHARMONI SDN BHD signboard, glass doors with Lotti waving hello, and Open Daily 10am–8pm", width: 1092, height: 1456 }}
       />
+
+      {/* The wayfinding line that used to caption the standalone photo. The photo
+          now sits in the header, so the instruction moves with it. */}
+      <p className="mt-3 text-center text-[15px] text-muted">
+        Look for the <span className="font-semibold text-olive-dark">AQUAHARMONI SDN BHD</span> sign
+        — Lotti will be waving you in.
+      </p>
 
       {/* Removes the single biggest access doubt before anyone reads further. */}
       <p className="mt-6 rounded-[22px] border border-olive/25 bg-sage/25 px-6 py-5 text-center text-[18px] leading-relaxed text-olive-dark">
         <strong>Not a resident? You&rsquo;re welcome too.</strong> Kaki Harmoni is open to
         everyone — you don&rsquo;t need to live at Desa Cindaimas to come and soak.
       </p>
-
-      <figure className="mt-8 flex flex-col items-center gap-3 rounded-[24px] border border-line bg-cream/50 p-4 shadow-[var(--shadow-warm)] sm:p-6">
-        <div className="overflow-hidden rounded-[18px]">
-          <Image
-            src="/shop/entrance.png"
-            alt="The Kaki Harmoni entrance — the AQUAHARMONI SDN BHD signboard, glass doors with Lotti waving hello, and Open Daily 10am–8pm"
-            width={1092}
-            height={1456}
-            priority
-            className="h-auto w-full max-w-[420px] object-contain"
-          />
-        </div>
-        <figcaption className="text-center text-[15px] text-muted">
-          Look for the <span className="font-semibold text-olive-dark">AQUAHARMONI SDN BHD</span> sign — Lotti will be waving you in.
-        </figcaption>
-      </figure>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
         <Card className="flex flex-col">

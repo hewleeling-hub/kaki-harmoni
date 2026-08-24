@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import Image from "next/image";
 import { Lotti } from "@/components/ui/Lotti";
 
 /** Warm page header used across the customer sub-pages. */
@@ -6,11 +7,18 @@ export function PageHeader({
   title,
   subtitle,
   showLotti = true,
+  image,
   children,
 }: {
   title: string;
   subtitle?: string;
   showLotti?: boolean;
+  /**
+   * A real photo in the mascot's slot, for pages where a picture does a job
+   * Lotti can't — Find Us needs the actual door, not a drawing of one. Unlike
+   * Lotti it stays visible on mobile: people use the photo while stood outside.
+   */
+  image?: { src: string; alt: string; width: number; height: number };
   children?: ReactNode;
 }) {
   return (
@@ -20,10 +28,23 @@ export function PageHeader({
           <h1 className="text-[30px] leading-tight text-olive-dark sm:text-[38px]">{title}</h1>
           {subtitle && <p className="mt-2 max-w-xl text-[18px] leading-relaxed text-muted">{subtitle}</p>}
         </div>
-        {showLotti && (
-          <div className="hidden shrink-0 sm:block">
-            <Lotti size={96} className="h-auto w-24" />
+        {image ? (
+          <div className="shrink-0">
+            <Image
+              src={image.src}
+              alt={image.alt}
+              width={image.width}
+              height={image.height}
+              priority
+              className="h-auto w-28 rounded-[16px] border border-line object-contain shadow-[var(--shadow-warm)] sm:w-44"
+            />
           </div>
+        ) : (
+          showLotti && (
+            <div className="hidden shrink-0 sm:block">
+              <Lotti size={96} className="h-auto w-24" />
+            </div>
+          )
         )}
       </div>
       {children && <div className="mt-5">{children}</div>}
