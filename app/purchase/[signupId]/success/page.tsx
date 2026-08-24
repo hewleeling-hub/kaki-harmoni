@@ -73,6 +73,37 @@ export default async function PurchaseSuccessPage({ params }: { params: Promise<
           <p className="text-black/70">Thanks — we&apos;ll see you at Kaki Harmoni soon.</p>
         )}
 
+        {/* Payment, stated plainly. A prepay that staff have not yet verified is
+            NOT called "paid" — the money genuinely hasn't been confirmed, and
+            saying otherwise on a receipt-shaped screen would be a lie. */}
+        {purchase && (
+          <div className="rounded-lg bg-black/5 px-4 py-3 text-left space-y-1.5">
+            {signup?.name && (
+              <p className="text-sm text-black/70">
+                <span className="text-black/45">Name:</span> {signup.name}
+              </p>
+            )}
+            <p className="text-sm text-black/70">
+              <span className="text-black/45">Payment:</span>{" "}
+              <span className="font-medium" style={{ color: "var(--lagoon-dark)" }}>
+                {money(amount)} —{" "}
+                {!isPrepay
+                  ? "pay at the door"
+                  : isPending
+                    ? "prepay online (we'll confirm once received)"
+                    : "paid"}
+              </span>
+            </p>
+            <p className="text-sm text-black/70">
+              <span className="text-black/45">Where:</span> Desa Cindaimas Condominium Clubhouse,
+              Jalan Sekutu, Taman Gembira, 58200 Kuala Lumpur
+            </p>
+            <p className="text-xs text-black/45 pt-0.5">
+              Booking reference: {String(purchase.id).slice(0, 8).toUpperCase()}
+            </p>
+          </div>
+        )}
+
         {isPending && isPrepay && (
           <div className="rounded-lg px-4 py-4 space-y-3" style={{ background: "rgba(46,125,123,0.08)" }}>
             <p className="text-sm font-medium" style={{ color: "var(--lagoon-dark)" }}>
@@ -105,7 +136,7 @@ export default async function PurchaseSuccessPage({ params }: { params: Promise<
 
         {isPending && !isPrepay && (
           <p className="text-sm text-black/60">
-            You&apos;ve chosen to pay {money(amount)} at the door — see you soon!
+            Payment due at the door — {money(amount)}. See you soon!
           </p>
         )}
 

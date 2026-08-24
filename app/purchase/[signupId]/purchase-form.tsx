@@ -107,32 +107,37 @@ export default function PurchaseForm({
     }
   }
 
+  // Two clear cards rather than a compact list: this is the one real decision
+  // on the page. Prepay is visually preferred, but paying at the door is a
+  // proper booking too and must not read as a penalty.
   const timingOption = (value: PayTiming, title: string, price: number, note: string, recommended?: boolean) => {
     const active = payTiming === value;
     return (
       <button
         type="button"
         onClick={() => setPayTiming(value)}
-        className="w-full text-left rounded-lg border px-3 py-2.5 transition"
+        aria-pressed={active}
+        className="w-full min-h-[76px] text-left rounded-xl border-2 px-4 py-3 transition"
         style={{
-          borderColor: active ? "var(--lagoon)" : "rgba(0,0,0,0.1)",
-          background: active ? "rgba(46,125,123,0.06)" : "white",
+          borderColor: active ? "var(--lagoon)" : "rgba(0,0,0,0.12)",
+          background: active ? "rgba(46,125,123,0.07)" : "white",
         }}
       >
-        <div className="flex items-center justify-between gap-2">
-          <span className="text-sm font-medium">{title}</span>
-          <span className="text-sm font-semibold" style={{ color: "var(--lagoon-dark)" }}>
+        <div className="flex items-baseline justify-between gap-2">
+          <span className="text-sm font-semibold">{title}</span>
+          <span className="font-display text-xl font-bold" style={{ color: "var(--lagoon-dark)" }}>
             {money(price)}
           </span>
         </div>
-        <div className="flex items-center gap-2 mt-0.5">
-          <span className="text-xs text-black/50">{note}</span>
-          {recommended && (
-            <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full" style={{ background: "var(--clay)", color: "white" }}>
-              Best price
-            </span>
-          )}
-        </div>
+        {recommended && (
+          <span
+            className="mt-1.5 inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full"
+            style={{ background: "var(--clay)", color: "white" }}
+          >
+            Best value
+          </span>
+        )}
+        <p className="mt-1 text-xs text-black/55">{note}</p>
       </button>
     );
   };
@@ -181,10 +186,10 @@ export default function PurchaseForm({
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1">When would you like to pay?</label>
+        <label className="block text-sm font-medium mb-1.5">How would you like to pay?</label>
         <div className="grid gap-2">
-          {timingOption("prepay", "Pay now to reserve", prepayTotal, `Save ${money(DOOR_SURCHARGE_MYR)} · locks your spot`, true)}
-          {timingOption("door", "Pay at the door", doorTotal, "Settle when you visit")}
+          {timingOption("prepay", "Prepay", prepayTotal, "Secures your slot at the launch rate.", true)}
+          {timingOption("door", "Pay at the door", doorTotal, "Prefer to pay when you arrive? No problem.")}
         </div>
         {payTiming === "prepay" && (
           <p className="text-xs mt-2 rounded-lg px-3 py-2" style={{ background: "rgba(46,125,123,0.08)", color: "var(--lagoon-dark)" }}>

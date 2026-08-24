@@ -84,14 +84,22 @@ export default function YourVisitPage() {
               <UserIcon size={24} />
             </span>
             <h2 className="text-[23px] text-olive-dark">New to Kaki Harmoni?</h2>
-            <p className="text-[16px] leading-relaxed text-muted">
-              Your first step to feeling lighter and refreshed.
-            </p>
+            <p className="text-[16px] leading-relaxed text-muted">Start your first reset with us.</p>
+            {promo && (
+              <p className="text-[16px] leading-relaxed text-brown">
+                <strong className="text-olive-dark">
+                  First soak — RM{businessConfig.pricing.prepay}
+                </strong>{" "}
+                when you prepay.
+                <br />
+                <span className="text-[15px] text-muted">
+                  Or pay RM{businessConfig.pricing.walkin} at the door.
+                </span>
+              </p>
+            )}
             <div className="mt-auto pt-3">
               <Button href="/#reserve" full size="lg" icon={<CalendarIcon size={20} />}>
-                {promo
-                  ? `Book your first soak — RM${businessConfig.pricing.prepay}`
-                  : "Book your first soak"}
+                Book your first soak
               </Button>
             </div>
           </Card>
@@ -104,7 +112,7 @@ export default function YourVisitPage() {
             </span>
             <h2 className="text-[23px] text-olive-dark">Already a Kaki Harmoni regular?</h2>
             <p className="text-[16px] leading-relaxed text-muted">
-              Welcome back! Book your next soak and continue your reset.
+              Welcome back. Your next little reset is just a booking away.
             </p>
             <div className="mt-auto pt-3">
               <Button href="/#reserve" full size="lg" icon={<CalendarIcon size={20} />}>
