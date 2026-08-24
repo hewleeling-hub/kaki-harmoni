@@ -5,7 +5,15 @@ import { SectionHeading, Card, Button, Badge } from "@/components/ui/primitives"
 import { PromotionCard } from "@/components/ui/cards";
 import { RoutineLadder, PackagePicker, NextStep } from "@/components/ui/conversion";
 import { CalendarIcon, CheckIcon } from "@/components/ui/icons";
-import { businessConfig, sessionRates, packages, whatsappLink, ctaLabels } from "@/config/business";
+import {
+  businessConfig,
+  sessionRates,
+  packages,
+  whatsappLink,
+  ctaLabels,
+  launchOfferNote,
+  launchOfferShort,
+} from "@/config/business";
 
 export const metadata: Metadata = {
   title: "Prices & Packages — Kaki Harmoni",
@@ -44,8 +52,9 @@ function PriceTile({
 
 /* The "Buy 4, get 1 free" package is presented on this page as the 5-Day
  * Reset, so it is filtered out of the extras list to avoid showing the same
- * product twice under two different names. */
-const OTHER_PASSES = packages.filter((p) => p.name !== "Buy 4, get 1 free");
+ * product twice under two different names. Matched on id, not name, so the
+ * copy can change without silently un-filtering it. */
+const OTHER_PASSES = packages.filter((p) => p.id !== "five-for-four");
 
 export default function PricesPage() {
   const { pricing, bookingStartLabel } = businessConfig;
@@ -71,6 +80,7 @@ export default function PricesPage() {
               RM{pricing.prepay}
             </p>
             <p className="mt-1 text-[15px] text-muted line-through">Usually RM{pricing.normal}</p>
+            <p className="mt-1 text-[14px] font-semibold text-olive">{launchOfferShort}</p>
             <p className="mt-3 text-[16px] leading-relaxed text-muted">
               A warm 15-minute leg soak and a coffee — an easy way to see whether it suits you.
             </p>
@@ -85,6 +95,7 @@ export default function PricesPage() {
               RM{pricing.walkin}
             </p>
             <p className="mt-1 text-[15px] text-muted">First visit</p>
+            <p className="mt-1 text-[14px] font-semibold text-brown">{launchOfferShort}</p>
             <p className="mt-3 text-[16px] leading-relaxed text-muted">
               Reserve your spot now and settle when you arrive. Same warm soak and coffee.
             </p>
@@ -131,7 +142,11 @@ export default function PricesPage() {
 
       {/* ── Other passes ────────────────────────────────────────────────── */}
       <section className="mt-12">
-        <SectionHeading eyebrow="Also available" title="Other passes" subtitle="A couple of extras, for sharing and for neighbours." />
+        <SectionHeading
+          eyebrow="Also available"
+          title="Other passes"
+          subtitle="Two soaks back to back for a longer sit, and a pass for Desa Cindaimas residents."
+        />
         <div className="mt-6 grid gap-5 sm:grid-cols-2">
           {OTHER_PASSES.map((p) => (
             <PriceTile key={p.name} name={p.name} price={p.price} detail={p.detail} save={"save" in p ? p.save : undefined} />
@@ -165,7 +180,7 @@ export default function PricesPage() {
             highlight={`RM${pricing.prepay}`}
             title="No need to decide today"
             description={`Come once, see how it feels, and think about a routine afterwards. Your first visit is RM${pricing.prepay} prepaid instead of the usual RM${pricing.normal}.`}
-            terms={`First-visit launch offer. First visits from ${bookingStartLabel}.`}
+            terms={`${launchOfferNote} First visits from ${bookingStartLabel}. After the launch period a first visit is the usual RM${pricing.normal}.`}
           />
         </div>
       </section>

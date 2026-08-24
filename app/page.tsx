@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import SignupForm from "./signup-form";
 import { PublicShell } from "@/components/layout/PublicShell";
 import { Button, Card, SectionHeading } from "@/components/ui/primitives";
@@ -23,7 +24,15 @@ import {
   ArrowRightIcon,
   UsersIcon,
 } from "@/components/ui/icons";
-import { businessConfig, visitSteps, whatsappLink, proposition, ctaLabels } from "@/config/business";
+import {
+  businessConfig,
+  visitSteps,
+  whatsappLink,
+  proposition,
+  ctaLabels,
+  doubleSoak,
+  launchOfferNote,
+} from "@/config/business";
 
 const STEP_ICONS = { calendar: CalendarIcon, gift: CoffeeIcon, message: MessageIcon, heart: HeartIcon } as const;
 const BENEFITS = [
@@ -70,7 +79,7 @@ export default function Home() {
           </div>
           <p className="mt-4 text-[15px] text-muted">
             First visits from {bookingStartLabel}. RM{pricing.prepay} when you prepay, instead of
-            the usual RM{pricing.normal}.
+            the usual RM{pricing.normal}. {launchOfferNote}
           </p>
         </div>
 
@@ -152,6 +161,23 @@ export default function Home() {
             <p className="mt-5 text-[18px] leading-relaxed text-brown">
               Just 15 minutes to sit down, soak, relax and reset — then get on with your day.
             </p>
+
+            {/* 15 minutes is the unit that makes the habit easy, not a limit on how
+                long you may stay. Guests who want longer go back to back. */}
+            <div className="mt-6 rounded-[20px] border border-olive/25 bg-sage/20 px-6 py-5">
+              <p className="text-[17px] leading-relaxed text-brown">
+                <strong className="text-olive-dark">Want longer? Stay for two.</strong> You&rsquo;re
+                very welcome to go back to back — two soaks in a row, or one either side of a
+                coffee. Our{" "}
+                <Link
+                  href="/prices"
+                  className="font-semibold text-olive underline underline-offset-4 hover:text-olive-dark"
+                >
+                  {doubleSoak.name}
+                </Link>{" "}
+                is built for exactly that — {doubleSoak.detail.toLowerCase()} RM{doubleSoak.price}.
+              </p>
+            </div>
           </div>
           <Card className="bg-cream/60">
             <p className="text-[19px] leading-relaxed text-brown">
@@ -244,6 +270,9 @@ export default function Home() {
               (or RM{pricing.walkin} at the door), instead of the usual RM{pricing.normal}. Reserve,
               prepay and pick your time — first visits from {bookingStartLabel}.
             </p>
+            <p className="mt-2 text-[15px] text-muted">
+              {launchOfferNote} After it ends, a first visit is the usual RM{pricing.normal}.
+            </p>
             <ul className="mt-5 space-y-2 text-[16px] text-brown">
               {["No account needed", "Pay online or at the door", "Pick your visit time after prepaying"].map((t) => (
                 <li key={t} className="flex items-center gap-2">
@@ -283,7 +312,7 @@ export default function Home() {
             highlight={`RM${pricing.prepay}`}
             title="Start with a single soak"
             description={`There's no need to commit to anything today. Come once for RM${pricing.prepay}, see how it feels, and decide about a routine afterwards.`}
-            terms={`First-visit launch offer, prepaid online. First visits from ${bookingStartLabel}.`}
+            terms={`${launchOfferNote} Prepaid online. First visits from ${bookingStartLabel}. After the launch period a first visit is the usual RM${pricing.normal}.`}
           />
         </div>
       </section>

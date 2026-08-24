@@ -120,7 +120,7 @@ export const faqs = [
   },
   {
     q: "How long is each session?",
-    a: "Each warm leg soak lasts about 15 minutes — a simple break that fits into your day. Fancy a longer unwind? Many guests enjoy a second soak straight after, or after a coffee break.",
+    a: "Each warm leg soak lasts about 15 minutes — a simple break that fits into your day. Fancy a longer unwind? You're very welcome to go back to back: many guests enjoy a second soak straight after, or one either side of a coffee break. Our Double + bun & coffee is built for exactly that.",
   },
   {
     q: "How often should I come?",
@@ -132,7 +132,7 @@ export const faqs = [
   },
   {
     q: "How much is a visit?",
-    a: `Your first visit is RM${businessConfig.pricing.prepay} when you prepay online (or RM${businessConfig.pricing.walkin} at the door), instead of the usual RM${businessConfig.pricing.normal}.`,
+    a: `Your first visit is RM${businessConfig.pricing.prepay} when you prepay online (or RM${businessConfig.pricing.walkin} at the door), instead of the usual RM${businessConfig.pricing.normal}. Both are launch prices for our opening period only — after that a first visit is the usual RM${businessConfig.pricing.normal}.`,
   },
   {
     q: "Do I pick a time when I book?",
@@ -179,11 +179,24 @@ export const sessionRates = [
   { name: "Midweek afternoon", price: 32, detail: "Tue–Thu, 2–4pm · per soak" },
 ] as const;
 
+/**
+ * Two soaks back to back, with a bun & coffee to share. A 15-minute soak is the
+ * unit that makes a daily habit easy — it is NOT a cap, and guests who want a
+ * longer sit simply stay for a second. Exported on its own so the homepage and
+ * the prices page can name it without duplicating the price.
+ */
+export const doubleSoak = {
+  id: "double-bun-coffee",
+  name: "Double + bun & coffee",
+  price: 68,
+  detail: "Two soaks, plus a bun & coffee to share.",
+} as const;
+
 /** Packages & passes. `save` is vs the RM40 standard single. */
 export const packages = [
-  { name: "Buy 4, get 1 free", price: 160, detail: "5 soaks for the price of 4.", save: 40 },
-  { name: "Double + bun & coffee", price: 68, detail: "Two soaks, plus a bun & coffee to share." },
-  { name: "Resident pass", price: 240, detail: "8 soaks · proof of residence.", save: 80 },
+  { id: "five-for-four", name: "Buy 4, get 1 free", price: 160, detail: "5 soaks for the price of 4.", save: 40 },
+  doubleSoak,
+  { id: "resident-pass", name: "Resident pass", price: 240, detail: "8 soaks · proof of residence.", save: 80 },
 ] as const;
 
 /* --------------------------- derived helpers --------------------------- */
@@ -237,6 +250,28 @@ export const ctaLabels = {
 } as const;
 
 /**
+ * LAUNCH OFFER — the RM25 prepay / RM30 at-the-door first visit is an introductory
+ * price, NOT the standing rate. After the launch period a first visit is the usual
+ * RM40, so anywhere the launch price is quoted must say it is time-limited.
+ *
+ * `endsLabel` is null because the business has not fixed an end date yet. Set it to
+ * a human-readable date (e.g. "31 October 2026") and the precise wording switches on
+ * everywhere automatically. Never invent a date here — an unfixed deadline is quoted
+ * as "a limited period", which is true, rather than a made-up one, which is not.
+ */
+export const launchOffer: { endsLabel: string | null } = { endsLabel: null };
+
+/** Full sentence, for body copy and promotion terms. */
+export const launchOfferNote = launchOffer.endsLabel
+  ? `Launch offer — available until ${launchOffer.endsLabel}.`
+  : "Launch offer — available for a limited period only.";
+
+/** Compact form, for price tiles and cards where space is tight. */
+export const launchOfferShort = launchOffer.endsLabel
+  ? `Launch price until ${launchOffer.endsLabel}`
+  : "Launch price — limited period";
+
+/**
  * The routine ladder: TRY → RESET → ROUTINE → RITUAL.
  *
  * Framed by how often someone comes, not by how big the discount is.
@@ -273,7 +308,7 @@ export const routinePackages: readonly RoutinePackage[] = [
     name: "First Soak",
     visits: 1,
     price: businessConfig.pricing.prepay,
-    priceNote: `or RM${businessConfig.pricing.walkin} at the door`,
+    priceNote: `or RM${businessConfig.pricing.walkin} at the door · ${launchOfferShort}`,
     positioning: "For people who are new to Kaki Harmoni.",
     cta: "TRY IT",
     href: "/#reserve",
