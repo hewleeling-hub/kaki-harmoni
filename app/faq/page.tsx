@@ -4,7 +4,7 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { FAQAccordion } from "@/components/ui/FAQAccordion";
 import { Button } from "@/components/ui/primitives";
 import { MessageIcon, CalendarIcon } from "@/components/ui/icons";
-import { faqs, whatsappLink } from "@/config/business";
+import { faqs, whatsappLink, ctaLabels } from "@/config/business";
 
 export const metadata: Metadata = {
   title: "FAQ — Kaki Harmoni",
@@ -36,7 +36,7 @@ export default function FaqPage() {
             WhatsApp Us
           </Button>
           <Button href="/#reserve" variant="secondary" size="lg" icon={<CalendarIcon size={22} />}>
-            Reserve your spot
+            {ctaLabels.firstVisit}
           </Button>
         </div>
       </section>

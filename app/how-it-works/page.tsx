@@ -11,7 +11,7 @@ import {
   HeartIcon,
   MessageIcon,
 } from "@/components/ui/icons";
-import { faqs, goodToKnow, visitSteps } from "@/config/business";
+import { faqs, goodToKnow, visitSteps, ctaLabels } from "@/config/business";
 
 export const metadata: Metadata = {
   title: "How It Works — Kaki Harmoni",
@@ -65,9 +65,11 @@ export default function HowItWorksPage() {
 
       <section className="mt-12 flex flex-col items-center gap-3 rounded-[24px] border border-line bg-beige/50 p-8 text-center">
         <h2 className="text-[26px] text-olive-dark">Ready when you are</h2>
-        <p className="max-w-md text-[17px] text-brown">Reserve your first visit and lock the launch price.</p>
+        <p className="max-w-md text-[17px] text-brown">
+          Come once for RM25, see how it feels, and go from there.
+        </p>
         <Button href="/#reserve" size="lg" icon={<CalendarIcon size={22} />}>
-          Reserve your spot
+          {ctaLabels.firstVisit}
         </Button>
       </section>
     </PublicShell>

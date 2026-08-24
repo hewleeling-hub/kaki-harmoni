@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { desktopNav, mobileNav } from "@/config/navigation";
+import { ctaLabels, businessConfig } from "@/config/business";
 import { Button } from "@/components/ui/primitives";
 import { CalendarIcon, NAV_ICONS } from "@/components/ui/icons";
 import { Wordmark } from "./Wordmark";
@@ -20,9 +21,9 @@ export function DesktopNav() {
   const isActive = useIsActive();
   return (
     <header className="sticky top-0 z-30 hidden border-b border-line bg-cream/90 backdrop-blur lg:block">
-      <div className="mx-auto flex max-w-[1200px] items-center gap-5 px-8 py-3 xl:px-10">
+      <div className="mx-auto flex max-w-[1200px] items-center gap-3 px-6 py-3 xl:gap-5 xl:px-10">
         <Wordmark />
-        <nav className="flex items-center gap-1" aria-label="Main">
+        <nav className="flex shrink-0 items-center gap-0.5 xl:gap-1" aria-label="Main">
           {desktopNav.map((item) => {
             const active = isActive(item.href);
             return (
@@ -30,7 +31,7 @@ export function DesktopNav() {
                 key={item.href}
                 href={item.href}
                 aria-current={active ? "page" : undefined}
-                className={`rounded-full px-3.5 py-2 text-[15px] font-medium transition ${
+                className={`whitespace-nowrap rounded-full px-2 py-2 text-[14px] font-medium transition xl:px-3.5 xl:text-[15px] ${
                   active ? "bg-olive/12 text-olive-dark" : "text-muted hover:bg-beige/50 hover:text-olive-dark"
                 }`}
               >
@@ -40,8 +41,9 @@ export function DesktopNav() {
           })}
         </nav>
         <div className="ml-auto">
-          <Button href="/#reserve" size="md" icon={<CalendarIcon size={20} />}>
-            Reserve your spot
+          <Button href="/#reserve" size="md" icon={<CalendarIcon size={20} />} className="whitespace-nowrap !px-4 xl:!px-5">
+            <span className="xl:hidden">RM{businessConfig.pricing.prepay} Soak</span>
+            <span className="hidden xl:inline">{ctaLabels.firstVisitShort}</span>
           </Button>
         </div>
       </div>
@@ -60,7 +62,7 @@ export function MobileHeader() {
         className="ml-auto !min-h-11 !px-4 text-[15px]"
         icon={<CalendarIcon size={18} />}
       >
-        Reserve
+        <span className="whitespace-nowrap">RM{businessConfig.pricing.prepay} Soak</span>
       </Button>
     </header>
   );

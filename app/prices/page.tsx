@@ -3,13 +3,14 @@ import { PublicShell } from "@/components/layout/PublicShell";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { SectionHeading, Card, Button, Badge } from "@/components/ui/primitives";
 import { PromotionCard } from "@/components/ui/cards";
-import { CalendarIcon, CheckIcon, MessageIcon } from "@/components/ui/icons";
-import { businessConfig, sessionRates, packages, whatsappLink } from "@/config/business";
+import { RoutineLadder, PackagePicker, NextStep } from "@/components/ui/conversion";
+import { CalendarIcon, CheckIcon } from "@/components/ui/icons";
+import { businessConfig, sessionRates, packages, whatsappLink, ctaLabels } from "@/config/business";
 
 export const metadata: Metadata = {
   title: "Prices & Packages — Kaki Harmoni",
   description:
-    "Kaki Harmoni prices: first visit RM25 (prepay) / RM30 at the door, then RM40 per soak with friendly off-peak rates and money-saving packages.",
+    "Try your first 15-minute soak for RM25, then choose how often you come: the 5-Day Reset works out at RM32 a visit, with longer routines available.",
 };
 
 function PriceTile({
@@ -41,6 +42,11 @@ function PriceTile({
   );
 }
 
+/* The "Buy 4, get 1 free" package is presented on this page as the 5-Day
+ * Reset, so it is filtered out of the extras list to avoid showing the same
+ * product twice under two different names. */
+const OTHER_PASSES = packages.filter((p) => p.name !== "Buy 4, get 1 free");
+
 export default function PricesPage() {
   const { pricing, bookingStartLabel } = businessConfig;
 
@@ -48,14 +54,14 @@ export default function PricesPage() {
     <PublicShell>
       <PageHeader
         title="Prices & Packages"
-        subtitle="A special price for your first visit — then simple rates and packages to suit how often you come."
+        subtitle="Start with one soak. If it suits you, choose how often you'd like to come."
       >
         <Button href="/#reserve" size="lg" icon={<CalendarIcon size={22} />} className="hidden sm:inline-flex">
-          Reserve your spot
+          {ctaLabels.firstVisit}
         </Button>
       </PageHeader>
 
-      {/* First visit */}
+      {/* ── Start here ──────────────────────────────────────────────────── */}
       <section className="mt-8">
         <SectionHeading eyebrow="New here?" title="Your first visit" />
         <div className="mt-5 grid gap-5 sm:grid-cols-2">
@@ -66,10 +72,10 @@ export default function PricesPage() {
             </p>
             <p className="mt-1 text-[15px] text-muted line-through">Usually RM{pricing.normal}</p>
             <p className="mt-3 text-[16px] leading-relaxed text-muted">
-              Lock the launch price for your first visit — a warm 15-minute leg soak and a coffee.
+              A warm 15-minute leg soak and a coffee — an easy way to see whether it suits you.
             </p>
             <Button href="/#reserve" full className="mt-5" icon={<CalendarIcon size={20} />}>
-              Reserve your spot
+              {ctaLabels.firstVisit}
             </Button>
           </Card>
 
@@ -87,21 +93,33 @@ export default function PricesPage() {
             </Button>
           </Card>
         </div>
-        <div className="mt-5">
-          <PromotionCard
-            highlight={`Save RM${pricing.normal - pricing.prepay}`}
-            title="Launch price for first visits"
-            description="Prepay online to lock the launch price, then choose a time slot from the calendar."
-            terms={`First-visit launch offer. First visits from ${bookingStartLabel}.`}
-          />
-        </div>
       </section>
 
-      {/* Session rates */}
+      {/* ── The routine ladder ──────────────────────────────────────────── */}
       <section className="mt-12">
         <SectionHeading
-          eyebrow="After your first visit"
-          title="Soak rates"
+          eyebrow="Try → Reset → Routine → Ritual"
+          title="How often would you like to come?"
+          subtitle="These aren't really discounts — they're the easiest way to turn fifteen minutes into a habit."
+        />
+        <RoutineLadder className="mt-6" />
+        <p className="mt-4 text-[15px] text-muted">
+          Prices for the 10-Day Reset and 30-Day Routine are still being finalised — message us
+          and we&rsquo;ll let you know as soon as they&rsquo;re set.
+        </p>
+      </section>
+
+      {/* ── Decision helper ─────────────────────────────────────────────── */}
+      <section className="mt-12">
+        <SectionHeading title="Which one is right for me?" />
+        <PackagePicker className="mt-6" />
+      </section>
+
+      {/* ── Single soaks ────────────────────────────────────────────────── */}
+      <section className="mt-12">
+        <SectionHeading
+          eyebrow="Coming now and then"
+          title="Single soak rates"
           subtitle="RM40 for a standard soak, with friendlier rates at quieter times."
         />
         <div className="mt-6 grid gap-5 sm:grid-cols-3">
@@ -111,11 +129,11 @@ export default function PricesPage() {
         </div>
       </section>
 
-      {/* Packages & passes */}
+      {/* ── Other passes ────────────────────────────────────────────────── */}
       <section className="mt-12">
-        <SectionHeading eyebrow="Save more" title="Packages & passes" subtitle="Come often? These make every soak better value." />
-        <div className="mt-6 grid gap-5 sm:grid-cols-3">
-          {packages.map((p) => (
+        <SectionHeading eyebrow="Also available" title="Other passes" subtitle="A couple of extras, for sharing and for neighbours." />
+        <div className="mt-6 grid gap-5 sm:grid-cols-2">
+          {OTHER_PASSES.map((p) => (
             <PriceTile key={p.name} name={p.name} price={p.price} detail={p.detail} save={"save" in p ? p.save : undefined} />
           ))}
         </div>
@@ -124,7 +142,7 @@ export default function PricesPage() {
         </p>
       </section>
 
-      {/* What's included */}
+      {/* ── What's included ─────────────────────────────────────────────── */}
       <section className="mt-12">
         <SectionHeading title="What's included" />
         <Card className="mt-5 bg-cream/60">
@@ -142,20 +160,23 @@ export default function PricesPage() {
             ))}
           </ul>
         </Card>
+        <div className="mt-5">
+          <PromotionCard
+            highlight={`RM${pricing.prepay}`}
+            title="No need to decide today"
+            description={`Come once, see how it feels, and think about a routine afterwards. Your first visit is RM${pricing.prepay} prepaid instead of the usual RM${pricing.normal}.`}
+            terms={`First-visit launch offer. First visits from ${bookingStartLabel}.`}
+          />
+        </div>
       </section>
 
-      {/* CTA */}
-      <section className="mt-12 flex flex-col items-center gap-3 rounded-[24px] border border-line bg-beige/50 p-8 text-center">
-        <h2 className="text-[26px] text-olive-dark">Questions about pricing?</h2>
-        <p className="max-w-md text-[17px] text-brown">We&apos;re happy to help — message us anytime.</p>
-        <Button
-          href={whatsappLink("Hi Kaki Harmoni! I have a question about prices and packages.")}
-          size="lg"
-          icon={<MessageIcon size={22} />}
-        >
-          WhatsApp Us
-        </Button>
-      </section>
+      <NextStep
+        title="Questions about prices?"
+        body="We're happy to help — message us anytime and we'll talk you through it."
+        cta={ctaLabels.firstVisit}
+        href="/#reserve"
+        secondary={{ label: "Ask us on WhatsApp", href: whatsappLink("Hi Kaki Harmoni! I have a question about prices and packages.") }}
+      />
     </PublicShell>
   );
 }

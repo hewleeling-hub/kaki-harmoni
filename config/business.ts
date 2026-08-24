@@ -123,6 +123,14 @@ export const faqs = [
     a: "Each warm leg soak lasts about 15 minutes — a simple break that fits into your day. Fancy a longer unwind? Many guests enjoy a second soak straight after, or after a coffee break.",
   },
   {
+    q: "How often should I come?",
+    a: "As often as you like — though Kaki Harmoni is really designed around regular visits. It's only fifteen minutes, so many guests find it works best as a small daily habit: a quiet moment before work, or a reset on the way home. Come once first and see how it fits your day.",
+  },
+  {
+    q: "Do I need to live at Desa Cindaimas?",
+    a: "Not at all. Kaki Harmoni is inside the Desa Cindaimas clubhouse, but it's open to everyone — you don't need to be a resident. Visitors and walk-ins are always welcome, and there's free parking on site.",
+  },
+  {
     q: "How much is a visit?",
     a: `Your first visit is RM${businessConfig.pricing.prepay} when you prepay online (or RM${businessConfig.pricing.walkin} at the door), instead of the usual RM${businessConfig.pricing.normal}.`,
   },
@@ -198,3 +206,166 @@ export const directionsLink = `https://www.google.com/maps/dir/?api=1&destinatio
 export const mapsSearchLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
   businessConfig.address.mapQuery,
 )}`;
+
+/* ======================================================================
+ * CONVERSION LAYER — "Your 15-minute daily reset."
+ *
+ * The commercial proposition is the HABIT, not a discounted one-off soak.
+ * Copy here stays experiential/wellness. No medical claims: nothing below
+ * says or implies that a soak treats, cures or prevents any condition.
+ * ====================================================================== */
+
+/** The supporting proposition that sits under RELAX. REFRESH. RECONNECT. */
+export const proposition = "Your 15-minute daily reset." as const;
+
+/**
+ * Stage-appropriate CTA wording. "Book Now" is deliberately NOT the only CTA —
+ * the label should match where the customer is in the journey.
+ */
+export const ctaLabels = {
+  /** New visitor — the dominant acquisition CTA across the site. */
+  firstVisit: `Try Your First Soak — RM${businessConfig.pricing.prepay}`,
+  /** Same promise, short enough for the nav bar. */
+  firstVisitShort: `First Soak — RM${businessConfig.pricing.prepay}`,
+  /** Visitor weighing up frequency. */
+  packages: "Explore Our Packages",
+  chooseRoutine: "Choose Your Routine",
+  /** Returning customer. */
+  nextReset: "Book Your Next Reset",
+  /** Package customer. */
+  makeRoutine: "Make It My Daily Routine",
+} as const;
+
+/**
+ * The routine ladder: TRY → RESET → ROUTINE → RITUAL.
+ *
+ * Framed by how often someone comes, not by how big the discount is.
+ *
+ * PRICING PROVENANCE — do not invent numbers here:
+ *  - First Soak RM25 is the real prepay first-visit price (RM30 at the door).
+ *  - 5-Day Reset RM160 is the existing "Buy 4, get 1 free" package (5 soaks),
+ *    which works out at exactly RM32 per visit.
+ *  - 10-Day and 30-Day prices are NOT yet set by the business. They render as
+ *    "Price to be confirmed" until a real price is supplied. Set `price` to the
+ *    agreed number and the per-visit maths and CTA switch on automatically.
+ */
+export interface RoutinePackage {
+  id: string;
+  stage: "TRY" | "RESET" | "ROUTINE" | "RITUAL";
+  name: string;
+  visits: number;
+  /** MYR. `null` means the business has not set this price yet. */
+  price: number | null;
+  /** Extra pricing nuance shown under the headline price. */
+  priceNote?: string;
+  /** Behaviour-led positioning line — why this tier, not what it costs. */
+  positioning: string;
+  cta: string;
+  href: string;
+  /** Highlighted as the natural next step after a first visit. */
+  featured?: boolean;
+}
+
+export const routinePackages: readonly RoutinePackage[] = [
+  {
+    id: "first-soak",
+    stage: "TRY",
+    name: "First Soak",
+    visits: 1,
+    price: businessConfig.pricing.prepay,
+    priceNote: `or RM${businessConfig.pricing.walkin} at the door`,
+    positioning: "For people who are new to Kaki Harmoni.",
+    cta: "TRY IT",
+    href: "/#reserve",
+  },
+  {
+    id: "five-day-reset",
+    stage: "RESET",
+    name: "5-Day Reset",
+    visits: 5,
+    price: 160,
+    positioning: "Try making Kaki Harmoni part of your daily routine.",
+    cta: "START MY RESET",
+    href: "/#reserve",
+    featured: true,
+  },
+  {
+    id: "ten-day-reset",
+    stage: "ROUTINE",
+    name: "10-Day Reset",
+    visits: 10,
+    price: null, // TBC — awaiting the business's final price
+    positioning: "Build the habit and make your daily reset part of your routine.",
+    cta: "BUILD MY ROUTINE",
+    href: "/#reserve",
+  },
+  {
+    id: "thirty-day-routine",
+    stage: "RITUAL",
+    name: "30-Day Routine",
+    visits: 30,
+    price: null, // TBC — awaiting the business's final price
+    positioning: "Make your 15-minute reset part of your everyday life.",
+    cta: "MAKE IT MY ROUTINE",
+    href: "/#reserve",
+  },
+] as const;
+
+/** Per-visit price, or null while the package price is unconfirmed. */
+export function perVisitPrice(pkg: RoutinePackage): number | null {
+  if (pkg.price === null) return null;
+  return Math.round((pkg.price / pkg.visits) * 100) / 100;
+}
+
+/** "Which package is right for me?" — makes the decision almost effortless. */
+export const packagePicker = [
+  { when: "Have never tried Kaki Harmoni", recommend: "First Soak", id: "first-soak" },
+  { when: "Want to try a daily routine", recommend: "5-Day Reset", id: "five-day-reset" },
+  { when: "Want to build a regular habit", recommend: "10-Day Reset", id: "ten-day-reset" },
+  {
+    when: "Want Kaki Harmoni as part of your everyday routine",
+    recommend: "30-Day Routine",
+    id: "thirty-day-routine",
+  },
+] as const;
+
+/**
+ * "Why not just do this at home?" — the complete experience, not health claims.
+ * Every line below is about comfort, convenience and enjoyment.
+ */
+export const whyNotAtHome = [
+  { title: "Fresh water, every time", text: "Prepared for you, then cleared away. Nothing to fill, nothing to empty." },
+  { title: "Gentle bubbles and warmth", text: "A hydrosonic soak held at a comfortable temperature the whole 15 minutes." },
+  { title: "Oils and mineral salts", text: "Chosen blends of essential oils and salts — not something you'd keep at home." },
+  { title: "Four experiences to pick from", text: "Choose the mood that suits your day, and change it whenever you like." },
+  { title: "A proper coffee", text: "Freshly made, waiting for you before or after your soak." },
+  { title: "Company, if you want it", text: "Comfy chairs and someone to chat to — or a quiet corner if you'd rather not." },
+  { title: "Nothing to clean up", text: "No buckets, no towels, no mopping the floor afterwards." },
+  { title: "Fifteen minutes that are yours", text: "Away from the kitchen, the laundry and the to-do list." },
+] as const;
+
+/**
+ * Genuine guest reviews ONLY. Kaki Harmoni opens for first visits on
+ * 11 September 2026, so at the time of writing there are no real guests yet
+ * and this list is intentionally empty — the section hides itself entirely
+ * rather than render filler. Never add invented testimonials here.
+ */
+export interface Testimonial {
+  quote: string;
+  name: string;
+  /** e.g. "Taman Gembira" — optional, only with the guest's permission. */
+  detail?: string;
+  /** Optional real photo in /public, used only with permission. */
+  photo?: string;
+}
+
+export const testimonials: readonly Testimonial[] = [];
+
+/**
+ * Real footage of a visit, 15–30 seconds. Empty until the business has filmed
+ * it — the section renders nothing rather than showing stock or a placeholder.
+ * Set `src` to a file in /public (e.g. "/video/visit.mp4") to switch it on.
+ */
+export const experienceVideo: { src: string | null; poster?: string; caption?: string } = {
+  src: null,
+};

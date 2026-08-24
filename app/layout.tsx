@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Kaki Harmoni | Relax, Refresh & Reconnect",
+  title: "Kaki Harmoni | Your 15-Minute Daily Reset",
   description:
-    "A warm leg soak paired with good coffee at Desa Cindaimas Condominium Clubhouse, Kuala Lumpur. Booking is open — reserve your first visit, lock the launch price and pick a time from 11 September 2026.",
+    "A warm 15-minute leg soak and a good coffee at Desa Cindaimas Condominium Clubhouse, Kuala Lumpur — short enough to fit into every day. Try your first soak for RM25; first visits from 11 September 2026.",
 };
 
 export default function RootLayout({

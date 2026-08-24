@@ -27,7 +27,8 @@ export const metadata: Metadata = {
 
 const VISIT_INFO = [
   { label: "Parking", value: "Free parking available on site at the clubhouse." },
-  { label: "Entrance", value: "Inside the residents' clubhouse — visitors and walk-ins welcome." },
+  { label: "Who can visit", value: "Everyone is welcome — you do not need to live at Desa Cindaimas. Visitors and walk-ins are always welcome." },
+  { label: "Entrance", value: "Inside the Desa Cindaimas clubhouse. Walk in through the main clubhouse entrance and look for the AQUAHARMONI signboard." },
   { label: "Accessibility", value: "Ground-floor access. Let our team know if you'd like a hand getting settled." },
   { label: "Booking", value: "Walk-ins welcome, but with only four soaking stations, booking ahead is advisable. Reserve online or message us on WhatsApp." },
 ];
@@ -41,6 +42,12 @@ export default function FindUsPage() {
         title="Find Us"
         subtitle="Come by for a warm soak, a quiet break and a friendly cup of coffee."
       />
+
+      {/* Removes the single biggest access doubt before anyone reads further. */}
+      <p className="mt-6 rounded-[22px] border border-olive/25 bg-sage/25 px-6 py-5 text-center text-[18px] leading-relaxed text-olive-dark">
+        <strong>Not a resident? You&rsquo;re welcome too.</strong> Kaki Harmoni is open to
+        everyone — you don&rsquo;t need to live at Desa Cindaimas to come and soak.
+      </p>
 
       <figure className="mt-8 flex flex-col items-center gap-3 rounded-[24px] border border-line bg-cream/50 p-4 shadow-[var(--shadow-warm)] sm:p-6">
         <div className="overflow-hidden rounded-[18px]">
