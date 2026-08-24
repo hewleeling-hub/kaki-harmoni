@@ -3,7 +3,7 @@
  *
  * All values here are the REAL business facts, drawn from the existing app
  * (lib/whatsapp.ts, lib/config.ts, site-footer, location page). The site is
- * PRE-LAUNCH: customers reserve + prepay to lock the launch price; time slots
+ * Customers share their details, pick a slot, then pay — payment is what
  * open after launch. Do not invent prices or availability.
  */
 
@@ -76,22 +76,22 @@ export const visitSteps = [
     number: 1,
     title: "Reserve your spot",
     icon: "calendar",
-    short: "Pop in your details to hold your launch-price visit.",
+    short: "Pop in your details to get started.",
     long: "Share your name and number to hold your first visit at the launch price.",
   },
   {
     number: 2,
-    title: "Prepay to lock the price",
-    icon: "gift",
-    short: "Pay online to lock the launch rate.",
-    long: `Prepay RM${businessConfig.pricing.prepay} for your first visit to lock the launch rate — or choose to pay RM${businessConfig.pricing.walkin} at the door.`,
-  },
-  {
-    number: 3,
     title: "Pick your time",
     icon: "calendar",
     short: "Choose a slot that suits you.",
     long: `Choose a time slot from the calendar — first visits are from ${businessConfig.bookingStartLabel}.`,
+  },
+  {
+    number: 3,
+    title: "Pay to confirm it",
+    icon: "gift",
+    short: "Your slot is confirmed once you pay.",
+    long: `Prepay RM${businessConfig.pricing.prepay} to confirm your slot — or choose to pay RM${businessConfig.pricing.walkin} at the door.`,
   },
   {
     number: 4,
@@ -150,7 +150,7 @@ export const ladderPerVisit = {
 export const faqs = [
   {
     q: "When can I visit?",
-    a: `Booking is open now — first visits are from ${businessConfig.bookingStartLabel}. Reserve, prepay to lock the launch price, then pick a time slot.`,
+    a: `Booking is open now — first visits are from ${businessConfig.bookingStartLabel}. Share your details, pick a time slot, then pay to confirm it.`,
   },
   {
     q: "How long is each session?",
@@ -170,7 +170,7 @@ export const faqs = [
   },
   {
     q: "Do I pick a time when I book?",
-    a: `Yes — after you prepay, you'll choose a time slot from the calendar. The first available date is ${businessConfig.bookingStartLabel}.`,
+    a: `Yes — you choose your slot from the calendar first, and it's confirmed once your payment goes through. The first available date is ${businessConfig.bookingStartLabel}.`,
   },
   {
     q: "Can I just walk in?",

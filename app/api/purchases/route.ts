@@ -4,6 +4,7 @@ import { logActivity, logAudit } from "@/lib/activity";
 import { scoreLead } from "@/lib/scoring";
 import { sendSalesAlert, purchaseConfirmedEmail } from "@/lib/email";
 import { DOOR_SURCHARGE_MYR } from "@/lib/config";
+import { MAX_CAPACITY_PER_SLOT } from "@/lib/slots";
 
 // Legacy default used when no items are sent or the catalogue isn't available yet.
 const DEFAULT_ITEM_NAME = "First Visit — Foot Soak + Coffee";
@@ -80,6 +81,8 @@ export async function POST(request: NextRequest) {
     payment_method?: string;
     pay_timing?: string;
     items?: { product_id?: string; quantity?: number }[];
+    slot_date?: string;
+    slot_time?: string;
   };
   try {
     body = await request.json();
@@ -114,6 +117,27 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // The slot is chosen BEFORE payment, so it arrives with the purchase and is
+  // written on the same row. Nothing holds it in between — re-check capacity
+  // here, because someone else may have paid for the last place meanwhile.
+  const slot_date = body.slot_date?.trim() || null;
+  const slot_time = body.slot_time?.trim() || null;
+
+  if (slot_date && slot_time) {
+    const { count } = await supabase
+      .from("purchases")
+      .select("id", { count: "exact", head: true })
+      .eq("booking_date", slot_date)
+      .eq("booking_time", slot_time);
+
+    if ((count ?? 0) >= MAX_CAPACITY_PER_SLOT) {
+      return NextResponse.json(
+        { error: "That time slot just filled up. Please pick another.", slot_taken: true },
+        { status: 409 },
+      );
+    }
+  }
+
   const lines = await resolveLines(supabase, body.items);
   const subtotal = lines.reduce((sum, l) => sum + l.line_total_myr, 0);
   // Pay-at-the-door adds a small surcharge; prepaying is the cheaper option.
@@ -133,6 +157,8 @@ export async function POST(request: NextRequest) {
       amount_myr: orderTotal,
       payment_method,
       status: paymentStatus,
+      booking_date: slot_date,
+      booking_time: slot_time,
     })
     .select()
     .single();

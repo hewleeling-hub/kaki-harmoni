@@ -47,7 +47,7 @@ export default async function ConfirmationPage({ params }: { params: Promise<{ i
         ) : (
           <div className="space-y-3">
             <Link
-              href={`/purchase/${signup.id}`}
+              href={`/purchase/${signup.id}/book`}
               className="flex min-h-12 items-center justify-center rounded-[26px] bg-olive px-5 font-semibold text-ivory transition hover:bg-olive-dark"
             >
               Complete prepayment

@@ -1,18 +1,33 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import PurchaseForm from "./purchase-form";
 import Logo from "@/app/logo";
 import { PRELAUNCH_MODE, LAUNCH_WINDOW } from "@/lib/config";
+import { formatSlotTime } from "@/lib/slots";
 
-export default async function PurchasePage({ params }: { params: Promise<{ signupId: string }> }) {
+export default async function PurchasePage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ signupId: string }>;
+  searchParams: Promise<{ date?: string; time?: string }>;
+}) {
   const { signupId } = await params;
+  const { date: slotDate, time: slotTime } = await searchParams;
   const supabase = createAdminClient();
 
   const { data: signup } = await supabase.from("signups").select("*").eq("id", signupId).maybeSingle();
 
   if (!signup) {
     notFound();
+  }
+
+  // Payment now confirms a slot the customer has already chosen. Arriving here
+  // without one means they skipped a step (or shared the link) — send them to
+  // pick a time rather than taking money for a visit with no date on it.
+  if (!PRELAUNCH_MODE && !(slotDate && slotTime)) {
+    redirect(`/purchase/${signupId}/book`);
   }
 
   // Active catalogue for the order picker. If the products table doesn't exist yet
@@ -51,14 +66,31 @@ export default async function PurchasePage({ params }: { params: Promise<{ signu
           <p className="text-black/60 text-sm">
             {PRELAUNCH_MODE
               ? `Hi ${signup.name.split(" ")[0]}, lock in the launch price — we open in ${LAUNCH_WINDOW} and we'll message you to schedule your visit.`
-              : `Hi ${signup.name.split(" ")[0]}, lock in your spot.`}
+              : `Hi ${signup.name.split(" ")[0]}, your slot is held until you complete this step.`}
           </p>
         </div>
+
+        {slotDate && slotTime && (
+          <div className="rounded-xl border border-black/10 bg-white/70 px-4 py-3 text-center">
+            <p className="text-xs uppercase tracking-wider text-black/50">Your chosen time</p>
+            <p className="font-medium" style={{ color: "var(--lagoon-dark)" }}>
+              {new Date(`${slotDate}T00:00:00`).toLocaleDateString("en-GB", {
+                weekday: "long",
+                day: "numeric",
+                month: "long",
+              })}{" "}
+              at {formatSlotTime(slotTime)}
+            </p>
+            <p className="mt-1 text-xs text-black/50">Confirmed once your payment is received.</p>
+          </div>
+        )}
         <PurchaseForm
           signupId={signup.id}
           signupName={signup.name}
           signupPhone={signup.phone ?? ""}
           products={products ?? []}
+          slotDate={slotDate ?? null}
+          slotTime={slotTime ?? null}
         />
       </div>
     </main>

@@ -22,11 +22,16 @@ export default function PurchaseForm({
   signupId,
   signupName,
   products,
+  slotDate = null,
+  slotTime = null,
 }: {
   signupId: string;
   signupName: string;
   signupPhone: string;
   products: Product[];
+  /** Chosen on the previous step; saved with the purchase that confirms it. */
+  slotDate?: string | null;
+  slotTime?: string | null;
 }) {
   const router = useRouter();
   const [payTiming, setPayTiming] = useState<PayTiming>("prepay");
@@ -74,21 +79,28 @@ export default function PurchaseForm({
           pay_timing: payTiming,
           payment_method: payTiming === "prepay" ? "ewallet" : "cash",
           items,
+          slot_date: slotDate,
+          slot_time: slotTime,
         }),
       });
       const data = await res.json();
 
       if (!res.ok) {
+        // Someone else took the last place while this checkout was open. Send
+        // them back to choose again rather than leaving them stuck on a dead
+        // payment screen — nothing was charged.
+        if (data.slot_taken) {
+          router.push(`/purchase/${signupId}/book?taken=1`);
+          return;
+        }
         setError(data.error || "Something went wrong. Please try again.");
         setSubmitting(false);
         return;
       }
 
-      // Pre-launch: no slots yet — go straight to the reservation confirmation.
-      // Live: continue to slot booking.
-      router.push(
-        PRELAUNCH_MODE ? `/purchase/${signupId}/success` : `/purchase/${signupId}/book`,
-      );
+      // The slot was chosen first and saved with this purchase, so payment is
+      // the last step for everyone now.
+      router.push(`/purchase/${signupId}/success`);
     } catch {
       setError("Something went wrong. Please try again.");
       setSubmitting(false);

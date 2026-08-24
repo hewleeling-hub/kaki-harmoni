@@ -9,7 +9,7 @@ interface Slot {
   remaining: number;
 }
 
-export default function BookingForm({ purchaseId, signupId }: { purchaseId: string; signupId: string }) {
+export default function BookingForm({ signupId }: { signupId: string }) {
   const router = useRouter();
   const { min, max } = bookableDateRange();
   const [date, setDate] = useState(min);
@@ -44,32 +44,16 @@ export default function BookingForm({ purchaseId, signupId }: { purchaseId: stri
     };
   }, [date]);
 
-  async function confirmBooking() {
+  // The slot isn't written here any more — it travels to the payment step and
+  // is saved with the purchase, so an abandoned checkout leaves no orphan
+  // booking behind and no hold that has to be expired.
+  function confirmBooking() {
     if (!selectedTime) return;
     setSubmitting(true);
     setError(null);
-    try {
-      const res = await fetch("/api/bookings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ purchase_id: purchaseId, slot_date: date, slot_time: selectedTime }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setError(data.error || "Something went wrong. Please try again.");
-        setSubmitting(false);
-        // Refresh slots in case it just filled up
-        const refreshed = await fetch(`/api/slots?date=${date}`);
-        const refreshedData = await refreshed.json();
-        if (refreshed.ok) setSlots(refreshedData.slots);
-        setSelectedTime(null);
-        return;
-      }
-      router.push(`/purchase/${signupId}/success`);
-    } catch {
-      setError("Something went wrong. Please try again.");
-      setSubmitting(false);
-    }
+    router.push(
+      `/purchase/${signupId}?date=${encodeURIComponent(date)}&time=${encodeURIComponent(selectedTime)}`,
+    );
   }
 
   return (
@@ -143,7 +127,11 @@ export default function BookingForm({ purchaseId, signupId }: { purchaseId: stri
         {submitting && (
           <span className="h-4 w-4 rounded-full border-2 border-white/40 border-t-white animate-spin" />
         )}
-        {submitting ? "Booking…" : selectedTime ? `Confirm ${formatSlotTime(selectedTime)}` : "Pick a time"}
+        {submitting
+          ? "One moment…"
+          : selectedTime
+            ? `Continue with ${formatSlotTime(selectedTime)}`
+            : "Pick a time"}
       </button>
     </div>
   );

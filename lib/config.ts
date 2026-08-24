@@ -1,6 +1,7 @@
 // ── Launch configuration ─────────────────────────────────────────────────
-// PRELAUNCH_MODE off => real slot booking is on: customers reserve, prepay,
-// then pick a time slot. Set back to true to pause slot booking.
+// PRELAUNCH_MODE off => real slot booking is on: customers reserve, pick a
+// time slot, then pay — payment is what confirms the slot. Set back to true to
+// pause slot booking (reservations then skip straight to confirmation).
 export const PRELAUNCH_MODE = false;
 
 // Legacy pre-launch label (kept for any old references). Booking is now open —
