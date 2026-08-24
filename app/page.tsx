@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import SignupForm from "./signup-form";
 import { PublicShell } from "@/components/layout/PublicShell";
-import { Button, Card, SectionHeading, Badge } from "@/components/ui/primitives";
+import { Button, Card, SectionHeading } from "@/components/ui/primitives";
 import { PromotionCard } from "@/components/ui/cards";
 import { Lotti } from "@/components/ui/Lotti";
 import { ExperienceList } from "@/components/experiences/ExperienceList";
@@ -72,19 +72,20 @@ export default function Home() {
           </p>
           <div className="mt-7 flex flex-col gap-3 sm:flex-row">
             <Button href="#reserve" size="lg" icon={<CalendarIcon size={22} />}>
-              {ctaLabels.firstVisit}
+              {/* The time limit rides inside the CTA itself — as a badge beside the
+                  button it read as a separate offer sitting next to it. */}
+              <span className="flex flex-col items-start leading-tight">
+                <span>{ctaLabels.firstVisit}</span>
+                <span className="mt-1 text-[12px] font-semibold uppercase tracking-wide opacity-80">
+                  {launchOfferBadge}
+                </span>
+              </span>
             </Button>
             <Button href="#routine" variant="secondary" size="lg">
               {ctaLabels.routine}
             </Button>
           </div>
-          {/* Sits directly under the CTA rather than buried at the end of the
-              detail line — the time limit qualifies the button, so it belongs
-              beside it. Same gold pill as the First Soak card. */}
-          <div className="mt-4">
-            <Badge tone="gold">{launchOfferBadge}</Badge>
-          </div>
-          <p className="mt-3 text-[15px] text-muted">
+          <p className="mt-4 text-[15px] text-muted">
             First visits from {bookingStartLabel}. RM{pricing.prepay} when you prepay, or RM
             {pricing.walkin} at the door — instead of the usual RM{pricing.normal}.
           </p>
@@ -143,7 +144,7 @@ export default function Home() {
             </p>
             <p className="mt-3 text-[18px] leading-relaxed text-brown">
               For the best experience we recommend regular visits — ideally daily — so your
-              Kaki Harmoni soak becomes part of your routine.
+              Kaki Harmoni soak becomes part of your wellness routine.
             </p>
           </div>
         </div>
@@ -200,7 +201,7 @@ export default function Home() {
               <li>A simple daily ritual.</li>
             </ul>
             <p className="mt-5 text-[17px] leading-relaxed text-muted">
-              That&rsquo;s why we encourage making this into your regular wellness routine.
+              That&rsquo;s why we encourage making this as part of your wellness routine.
             </p>
           </Card>
         </div>
