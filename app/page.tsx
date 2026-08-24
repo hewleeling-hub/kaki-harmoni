@@ -23,6 +23,9 @@ import {
   CoffeeIcon,
   ArrowRightIcon,
   UsersIcon,
+  SunIcon,
+  WavesIcon,
+  SparklesIcon,
 } from "@/components/ui/icons";
 import {
   businessConfig,
@@ -49,6 +52,15 @@ const FIFTEEN_MINUTES = [
   "No complicated treatments.",
   "No need to block out half your day.",
 ];
+
+/* The four shapes those 15 minutes take. Each icon is picked for the moment,
+ * not the product: sunrise, the soak itself, company, and the repeat. */
+const FIFTEEN_MINUTES_YOURS = [
+  { icon: SunIcon, text: "A quiet moment before work." },
+  { icon: WavesIcon, text: "A reset after a busy day." },
+  { icon: UsersIcon, text: "A little time with a friend." },
+  { icon: SparklesIcon, text: "A simple daily ritual." },
+] as const;
 
 export default function Home() {
   const { pricing, bookingStartLabel } = businessConfig;
@@ -194,11 +206,13 @@ export default function Home() {
               The best part of Kaki Harmoni isn&rsquo;t only the 15 minutes you spend here.
               It&rsquo;s making those 15 minutes yours.
             </p>
-            <ul className="mt-5 space-y-2 text-[17px] text-olive-dark">
-              <li>A quiet moment before work.</li>
-              <li>A reset after a busy day.</li>
-              <li>A little time with a friend.</li>
-              <li>A simple daily ritual.</li>
+            <ul className="mt-5 space-y-3 text-[17px] text-olive-dark">
+              {FIFTEEN_MINUTES_YOURS.map(({ icon: Icon, text }) => (
+                <li key={text} className="flex items-start gap-3">
+                  <Icon size={20} className="mt-0.5 shrink-0 text-olive" />
+                  {text}
+                </li>
+              ))}
             </ul>
             <p className="mt-5 text-[17px] leading-relaxed text-muted">
               That&rsquo;s why we encourage making this as part of your wellness routine.
@@ -216,7 +230,7 @@ export default function Home() {
           subtitle="Four warm ways to unwind — pick the mood that suits your day."
         />
         <div className="mt-8">
-          <ExperienceList />
+          <ExperienceList columns={2} />
         </div>
         <CustomBlendNote />
         <div className="mt-4 flex justify-center">
