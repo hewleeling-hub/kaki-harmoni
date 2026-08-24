@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import SignupForm from "./signup-form";
 import { PublicShell } from "@/components/layout/PublicShell";
-import { Button, Card, SectionHeading } from "@/components/ui/primitives";
+import { Button, Card, SectionHeading, Badge } from "@/components/ui/primitives";
 import { PromotionCard } from "@/components/ui/cards";
 import { Lotti } from "@/components/ui/Lotti";
 import { ExperienceList } from "@/components/experiences/ExperienceList";
@@ -32,6 +32,7 @@ import {
   ctaLabels,
   doubleSoak,
   launchOfferNote,
+  launchOfferBadge,
 } from "@/config/business";
 
 const STEP_ICONS = { calendar: CalendarIcon, gift: CoffeeIcon, message: MessageIcon, heart: HeartIcon } as const;
@@ -74,13 +75,18 @@ export default function Home() {
               {ctaLabels.firstVisit}
             </Button>
             <Button href="#routine" variant="secondary" size="lg">
-              {ctaLabels.packages}
+              {ctaLabels.routine}
             </Button>
           </div>
-          <p className="mt-4 text-[15px] text-muted">
+          {/* Sits directly under the CTA rather than buried at the end of the
+              detail line — the time limit qualifies the button, so it belongs
+              beside it. Same gold pill as the First Soak card. */}
+          <div className="mt-4">
+            <Badge tone="gold">{launchOfferBadge}</Badge>
+          </div>
+          <p className="mt-3 text-[15px] text-muted">
             First visits from {bookingStartLabel}. RM{pricing.prepay} when you prepay, or RM
-            {pricing.walkin} at the door — instead of the usual RM{pricing.normal}.{" "}
-            {launchOfferNote}
+            {pricing.walkin} at the door — instead of the usual RM{pricing.normal}.
           </p>
         </div>
 

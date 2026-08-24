@@ -133,6 +133,20 @@ export const doubleSoak = {
   save: 12,
 } as const;
 
+/**
+ * Ladder prices, hoisted above `faqs` because the FAQ quotes the per-visit range
+ * and `routinePackages` (declared further down) sets the cards. One source, so
+ * the two can't drift — the FAQ has already carried stale copy once.
+ * The 5-visit price is also the "Buy 4, get 1 free" package: the same product.
+ */
+export const ladderPrices = { fiveVisit: 160, tenVisit: 300, thirtyVisit: 840 } as const;
+
+/** Cheapest and entry per-visit prices on the ladder, derived — never typed. */
+export const ladderPerVisit = {
+  entry: ladderPrices.fiveVisit / 5,
+  cheapest: ladderPrices.thirtyVisit / 30,
+} as const;
+
 export const faqs = [
   {
     q: "When can I visit?",
@@ -152,7 +166,7 @@ export const faqs = [
   },
   {
     q: "How much is a visit?",
-    a: `Your first visit is RM${businessConfig.pricing.prepay} when you prepay online (or RM${businessConfig.pricing.walkin} at the door), instead of the usual RM${businessConfig.pricing.normal}. Both are launch prices for our opening period only — after that a first visit is the usual RM${businessConfig.pricing.normal}.`,
+    a: `Your first visit is RM${businessConfig.pricing.prepay} when you prepay online, or RM${businessConfig.pricing.walkin} at the door — launch prices for our opening period only, after which a first visit is the usual RM${businessConfig.pricing.normal}. A single soak is RM${businessConfig.pricing.normal} after that, or less with a package: from RM${ladderPerVisit.entry} a visit on the 5-Day Reset down to RM${ladderPerVisit.cheapest} on the 30-Day Routine.`,
   },
   {
     q: "Do I pick a time when I book?",
@@ -169,6 +183,10 @@ export const faqs = [
   {
     q: "Can I come with a friend?",
     a: "Of course — bring a friend or a family member. It's a lovely place to sit together and chat.",
+  },
+  {
+    q: `Can two of us share a ${doubleSoak.name}?`,
+    a: `The ${doubleSoak.name} is two soaks for one person — either back to back, or one on each side of a coffee — so it can't be split between two people. Coming as a pair? Just book a soak each. You're very welcome to sit together, and we'll bring your coffees at the same time.`,
   },
   {
     q: "Can I bring my children?",
@@ -221,7 +239,7 @@ export interface PackageOffer {
 }
 
 export const packages: readonly PackageOffer[] = [
-  { id: "five-for-four", name: "Buy 4, get 1 free", price: 160, detail: "5 soaks for the price of 4.", save: 40 },
+  { id: "five-for-four", name: "Buy 4, get 1 free", price: ladderPrices.fiveVisit, detail: "5 soaks for the price of 4.", save: 40 },
   doubleSoak,
 ];
 
@@ -266,8 +284,12 @@ export const ctaLabels = {
   firstVisit: `Try Your First Soak — RM${businessConfig.pricing.prepay}`,
   /** Same promise, short enough for the nav bar. */
   firstVisitShort: `First Soak — RM${businessConfig.pricing.prepay}`,
-  /** Visitor weighing up frequency. */
-  packages: "Explore Our Packages",
+  /**
+   * Visitor weighing up frequency. Deliberately not "packages" — the section it
+   * leads to argues these aren't really discounts but the easiest way to build a
+   * habit, so the button promises the habit, not the transaction.
+   */
+  routine: "Find Your Routine",
   chooseRoutine: "Choose Your Routine",
   /** Returning customer. */
   nextReset: "Book Your Next Reset",
@@ -358,7 +380,7 @@ export const routinePackages: readonly RoutinePackage[] = [
     stage: "RESET",
     name: "5-Day Reset",
     visits: 5,
-    price: 160,
+    price: ladderPrices.fiveVisit,
     positioning: "Try making Kaki Harmoni part of your daily routine.",
     cta: "START MY RESET",
     href: "/#reserve",
@@ -369,7 +391,7 @@ export const routinePackages: readonly RoutinePackage[] = [
     stage: "ROUTINE",
     name: "10-Day Reset",
     visits: 10,
-    price: 300,
+    price: ladderPrices.tenVisit,
     positioning: "Build the habit and make your daily reset part of your routine.",
     cta: "BUILD MY ROUTINE",
     href: "/#reserve",
@@ -379,7 +401,7 @@ export const routinePackages: readonly RoutinePackage[] = [
     stage: "RITUAL",
     name: "30-Day Routine",
     visits: 30,
-    price: 840,
+    price: ladderPrices.thirtyVisit,
     positioning: "Make your 15-minute reset part of your everyday life.",
     cta: "MAKE IT MY ROUTINE",
     href: "/#reserve",
