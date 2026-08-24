@@ -73,6 +73,23 @@ Note that the Supabase migration history table only lists two MCP-applied migrat
 `0001`–`0008` files were applied by hand via the SQL editor, so that history is not a
 reliable record of what's live. Check the actual schema instead.
 
+## Open items — decisions the business still owes the site
+
+Each of these is a one-field change once the answer exists; none needs new code.
+Listed here because a chat thread is not a record.
+
+| # | Open question | Where it lands | What the site does meanwhile |
+|---|---|---|---|
+| 1 | **Drinks other than coffee and tea** — what else can we actually offer someone who wants neither? | `faqs`, the "I don't drink coffee" answer in `config/business.ts` | Answers with tea (confirmed in existing copy) and invites the guest to ask the team. Truthful, but names no other drink. |
+| 2 | **When does the launch offer end?** RM25 prepay / RM30 door is introductory, not the standing rate. | `launchOffer.endsLabel` in `config/business.ts` | Says "available for a limited period only" and the badge reads "Limited time only". Setting a date switches every mention to "until <date>" and the badge to "Until <date>". |
+| 3 | **Guest testimonials** — none exist before the 11 September opening. | `testimonials` in `config/business.ts` | The section renders nothing at all. Never add invented quotes. |
+| 4 | **Experience video** — no real footage filmed yet. | `experienceVideo.src` in `config/business.ts` | The section renders nothing at all. Never substitute stock footage. |
+| 5 | **Team feature** — migration `0005_team_roles.sql` is unapplied (see above). | Supabase | `/dashboard/team` reads an absent table; every signed-in user degrades to `staff`. |
+
+Note the products table lists **Coffee** only — no tea row — while the FAQ and the
+Prices "What's included" list both promise "coffee or tea". Worth reconciling when
+item 1 is settled.
+
 ## Deploying
 
 Deploy by git only — `git push` to `main` and Vercel builds it. Do not run `vercel deploy`
