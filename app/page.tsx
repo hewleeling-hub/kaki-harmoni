@@ -175,7 +175,8 @@ export default function Home() {
                 >
                   {doubleSoak.name}
                 </Link>{" "}
-                is built for exactly that — {doubleSoak.detail.toLowerCase()} RM{doubleSoak.price}.
+                is built for exactly that. {doubleSoak.detail} RM{doubleSoak.price} for the two,
+                or RM{doubleSoak.perSession} a session.
               </p>
             </div>
           </div>

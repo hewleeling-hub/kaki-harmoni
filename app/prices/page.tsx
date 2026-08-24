@@ -26,12 +26,14 @@ function PriceTile({
   price,
   detail,
   save,
+  perSession,
   featured,
 }: {
   name: string;
   price: number;
   detail: string;
   save?: number;
+  perSession?: number;
   featured?: boolean;
 }) {
   return (
@@ -45,6 +47,9 @@ function PriceTile({
       <p className="mt-2 text-4xl font-bold text-olive" style={{ fontFamily: "var(--font-heading)" }}>
         RM{price}
       </p>
+      {perSession ? (
+        <p className="mt-1 text-[15px] font-semibold text-brown">RM{perSession} a session</p>
+      ) : null}
       <p className="mt-2 text-[15px] leading-relaxed text-muted">{detail}</p>
     </Card>
   );
@@ -115,8 +120,8 @@ export default function PricesPage() {
         />
         <RoutineLadder className="mt-6" />
         <p className="mt-4 text-[15px] text-muted">
-          Prices for the 10-Day Reset and 30-Day Routine are still being finalised — message us
-          and we&rsquo;ll let you know as soon as they&rsquo;re set.
+          The more often you come, the less each visit costs — from RM40 for a one-off down to
+          RM28 a visit on the 30-Day Routine.
         </p>
       </section>
 
@@ -130,10 +135,11 @@ export default function PricesPage() {
       <section className="mt-12">
         <SectionHeading
           eyebrow="Coming now and then"
-          title="Single soak rates"
-          subtitle="RM40 for a standard soak, with friendlier rates at quieter times."
+          title="Single soak rate"
+          subtitle="One price, any time of day — no peak or off-peak to work around."
         />
-        <div className="mt-6 grid gap-5 sm:grid-cols-3">
+        {/* Grid only splits once there is more than one rate to show. */}
+        <div className={`mt-6 grid gap-5 ${sessionRates.length > 1 ? "sm:grid-cols-3" : "mx-auto max-w-md"}`}>
           {sessionRates.map((r) => (
             <PriceTile key={r.name} name={r.name} price={r.price} detail={r.detail} featured={r.name === "Standard single"} />
           ))}
@@ -152,7 +158,14 @@ export default function PricesPage() {
         {/* Grid only splits once there is more than one pass to show. */}
         <div className={`mt-6 grid gap-5 ${OTHER_PASSES.length > 1 ? "sm:grid-cols-2" : "mx-auto max-w-md"}`}>
           {OTHER_PASSES.map((p) => (
-            <PriceTile key={p.id} name={p.name} price={p.price} detail={p.detail} save={p.save} />
+            <PriceTile
+              key={p.id}
+              name={p.name}
+              price={p.price}
+              detail={p.detail}
+              save={p.save}
+              perSession={p.perSession}
+            />
           ))}
         </div>
         <p className="mt-4 text-[14px] text-muted">

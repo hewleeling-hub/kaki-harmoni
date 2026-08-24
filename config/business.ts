@@ -172,11 +172,14 @@ export const faqs = [
   },
 ] as const;
 
-/** Per-soak rates (after the first visit). Standard + friendly off-peak. */
+/**
+ * Per-soak rate after the first visit. One price, any time of day — the
+ * off-peak Morning wellness / Midweek afternoon tiers were withdrawn, so
+ * frequency (the routine ladder) is now the only thing that lowers the
+ * per-visit price.
+ */
 export const sessionRates = [
   { name: "Standard single", price: 40, detail: "Anytime · per soak" },
-  { name: "Morning wellness", price: 28, detail: "Weekdays, 10am–12pm · per soak" },
-  { name: "Midweek afternoon", price: 32, detail: "Tue–Thu, 2–4pm · per soak" },
 ] as const;
 
 /**
@@ -187,9 +190,13 @@ export const sessionRates = [
  */
 export const doubleSoak = {
   id: "double-bun-coffee",
-  name: "Double + bun & coffee",
+  name: "Double + free bun & coffee",
   price: 68,
-  detail: "Two soaks, plus a bun & coffee to share.",
+  /** Derived: RM68 for two soaks. Kept out of `detail`, which is reused as prose. */
+  perSession: 34,
+  detail: "Two soaks, plus a free bun & coffee to share.",
+  /** RM68 against two standard singles at RM40. */
+  save: 12,
 } as const;
 
 /** Packages & passes. `save` is vs the RM40 standard single, where it applies. */
@@ -200,6 +207,8 @@ export interface PackageOffer {
   detail: string;
   /** Saving vs paying the standard single rate, in MYR. Omitted when there isn't one. */
   save?: number;
+  /** Per-session price for a multi-session pass, in MYR. Omitted for single items. */
+  perSession?: number;
 }
 
 export const packages: readonly PackageOffer[] = [
@@ -284,13 +293,15 @@ export const launchOfferShort = launchOffer.endsLabel
  *
  * Framed by how often someone comes, not by how big the discount is.
  *
- * PRICING PROVENANCE — do not invent numbers here:
- *  - First Soak RM25 is the real prepay first-visit price (RM30 at the door).
- *  - 5-Day Reset RM160 is the existing "Buy 4, get 1 free" package (5 soaks),
- *    which works out at exactly RM32 per visit.
- *  - 10-Day and 30-Day prices are NOT yet set by the business. They render as
- *    "Price to be confirmed" until a real price is supplied. Set `price` to the
- *    agreed number and the per-visit maths and CTA switch on automatically.
+ * PRICING PROVENANCE — every price below is confirmed by the business. Do not
+ * invent or adjust numbers here; the per-visit figures are DERIVED, not typed:
+ *  - First Soak RM25 is the prepay first-visit launch price (RM30 at the door).
+ *  - 5-Day Reset RM160 — the "Buy 4, get 1 free" package — is RM32 a visit.
+ *  - 10-Day Reset RM300 is RM30 a visit.
+ *  - 30-Day Routine RM840 is RM28 a visit.
+ * The ladder gets cheaper per visit the more often you come, which is the whole
+ * argument for the habit. `price: null` still renders "Price to be confirmed",
+ * so any future unpriced tier degrades honestly rather than showing a guess.
  */
 export interface RoutinePackage {
   id: string;
@@ -337,7 +348,7 @@ export const routinePackages: readonly RoutinePackage[] = [
     stage: "ROUTINE",
     name: "10-Day Reset",
     visits: 10,
-    price: null, // TBC — awaiting the business's final price
+    price: 300,
     positioning: "Build the habit and make your daily reset part of your routine.",
     cta: "BUILD MY ROUTINE",
     href: "/#reserve",
@@ -347,7 +358,7 @@ export const routinePackages: readonly RoutinePackage[] = [
     stage: "RITUAL",
     name: "30-Day Routine",
     visits: 30,
-    price: null, // TBC — awaiting the business's final price
+    price: 840,
     positioning: "Make your 15-minute reset part of your everyday life.",
     cta: "MAKE IT MY ROUTINE",
     href: "/#reserve",
