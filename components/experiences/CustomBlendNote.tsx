@@ -1,8 +1,10 @@
-import { Button } from "@/components/ui/primitives";
-import { DropletIcon, MessageIcon } from "@/components/ui/icons";
-import { whatsappLink } from "@/config/business";
+import { DropletIcon } from "@/components/ui/icons";
 
-/** Callout: beyond the 4 signature blends, we can tailor a custom blend. */
+/**
+ * Callout: beyond the 4 signature blends, we can tailor a custom blend.
+ * No CTA by design — the copy says to ask when you arrive, so a "message us"
+ * button would send people somewhere the instruction doesn't ask them to go.
+ */
 export function CustomBlendNote() {
   return (
     <section className="py-6">
@@ -20,15 +22,6 @@ export function CustomBlendNote() {
               Just ask when you arrive.
             </p>
           </div>
-          <Button
-            href={whatsappLink(
-              "Hi Kaki Harmoni! I'd love to create my own custom blend — could you tell me more?",
-            )}
-            icon={<MessageIcon size={20} />}
-            className="shrink-0"
-          >
-            Ask about a custom blend
-          </Button>
         </div>
       </div>
     </section>

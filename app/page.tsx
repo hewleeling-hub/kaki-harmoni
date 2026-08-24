@@ -5,8 +5,7 @@ import { PublicShell } from "@/components/layout/PublicShell";
 import { Button, Card, SectionHeading } from "@/components/ui/primitives";
 import { PromotionCard } from "@/components/ui/cards";
 import { Lotti } from "@/components/ui/Lotti";
-import { ExperienceList } from "@/components/experiences/ExperienceList";
-import { CustomBlendNote } from "@/components/experiences/CustomBlendNote";
+import { ExperiencePreview } from "@/components/experiences/ExperiencePreview";
 import {
   RoutineLadder,
   PackagePicker,
@@ -230,10 +229,9 @@ export default function Home() {
           subtitle="Four warm ways to unwind — pick the mood that suits your day."
         />
         <div className="mt-8">
-          <ExperienceList columns={2} />
+          <ExperiencePreview />
         </div>
-        <CustomBlendNote />
-        <div className="mt-4 flex justify-center">
+        <div className="mt-8 flex justify-center">
           <Button href="/experiences" variant="secondary" iconRight={<ArrowRightIcon size={20} />}>
             Explore Experiences
           </Button>
