@@ -200,7 +200,7 @@ export default function Home() {
               <li>A simple daily ritual.</li>
             </ul>
             <p className="mt-5 text-[17px] leading-relaxed text-muted">
-              That&rsquo;s why we encourage regular visits.
+              That&rsquo;s why we encourage making this into your regular wellness routine.
             </p>
           </Card>
         </div>
