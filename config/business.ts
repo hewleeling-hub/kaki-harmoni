@@ -192,12 +192,20 @@ export const doubleSoak = {
   detail: "Two soaks, plus a bun & coffee to share.",
 } as const;
 
-/** Packages & passes. `save` is vs the RM40 standard single. */
-export const packages = [
+/** Packages & passes. `save` is vs the RM40 standard single, where it applies. */
+export interface PackageOffer {
+  id: string;
+  name: string;
+  price: number;
+  detail: string;
+  /** Saving vs paying the standard single rate, in MYR. Omitted when there isn't one. */
+  save?: number;
+}
+
+export const packages: readonly PackageOffer[] = [
   { id: "five-for-four", name: "Buy 4, get 1 free", price: 160, detail: "5 soaks for the price of 4.", save: 40 },
   doubleSoak,
-  { id: "resident-pass", name: "Resident pass", price: 240, detail: "8 soaks · proof of residence.", save: 80 },
-] as const;
+];
 
 /* --------------------------- derived helpers --------------------------- */
 

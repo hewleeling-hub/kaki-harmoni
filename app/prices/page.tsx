@@ -140,20 +140,23 @@ export default function PricesPage() {
         </div>
       </section>
 
-      {/* ── Other passes ────────────────────────────────────────────────── */}
-      <section className="mt-12">
+      {/* ── Staying longer ──────────────────────────────────────────────── */}
+      {/* Target of the homepage's "Want longer? Stay for two." link, so the
+          anchor and the heading have to answer that exact question. */}
+      <section id="longer" className="mt-12 scroll-mt-24">
         <SectionHeading
           eyebrow="Also available"
-          title="Other passes"
-          subtitle="Two soaks back to back for a longer sit, and a pass for Desa Cindaimas residents."
+          title="Staying longer?"
+          subtitle="Fifteen minutes is the usual visit, not a limit — you're welcome to go back to back."
         />
-        <div className="mt-6 grid gap-5 sm:grid-cols-2">
+        {/* Grid only splits once there is more than one pass to show. */}
+        <div className={`mt-6 grid gap-5 ${OTHER_PASSES.length > 1 ? "sm:grid-cols-2" : "mx-auto max-w-md"}`}>
           {OTHER_PASSES.map((p) => (
-            <PriceTile key={p.name} name={p.name} price={p.price} detail={p.detail} save={"save" in p ? p.save : undefined} />
+            <PriceTile key={p.id} name={p.name} price={p.price} detail={p.detail} save={p.save} />
           ))}
         </div>
         <p className="mt-4 text-[14px] text-muted">
-          Resident pass requires proof of residence. Ask our team in store or on WhatsApp to set up any package.
+          Ask our team in store or on WhatsApp to set up any package.
         </p>
       </section>
 

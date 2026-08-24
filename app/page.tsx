@@ -170,7 +170,7 @@ export default function Home() {
                 very welcome to go back to back — two soaks in a row, or one either side of a
                 coffee. Our{" "}
                 <Link
-                  href="/prices"
+                  href="/prices#longer"
                   className="font-semibold text-olive underline underline-offset-4 hover:text-olive-dark"
                 >
                   {doubleSoak.name}
