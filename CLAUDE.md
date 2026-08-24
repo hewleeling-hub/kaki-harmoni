@@ -46,9 +46,12 @@ build the wrong thing (e.g. a marketing landing page). Open the plan and build f
   the next deploy.
 - **The Supabase database is already provisioned** and its keys are in this project's Vercel
   env. Pull them locally: `vercel link` then `vercel env pull .env.local`. Don't invent new ones.
-- **Database-first:** the schema is written at `supabase/migrations/0001_init.sql` but **not yet
-  applied**. Apply it to this project's Supabase database BEFORE building features (e.g. paste it into
-  the Supabase SQL editor, or `supabase db push`). Don't build local-only / in-memory.
+- **Database-first — the schema is ALREADY APPLIED. Do not re-run the migrations.** Migrations
+  `0001`–`0008` are live on this project's Supabase database, with one exception: `0005_team_roles.sql`
+  has **not** been applied (no `profiles` table), which is why the team feature is off. The database
+  holds real data — signups, purchases and products — so re-running `0001_init.sql` against it is
+  destructive, not a setup step. Build on the existing tables; check the live schema if unsure, and
+  see `docs/DEV_SETUP.md` for the full state. Don't build local-only / in-memory.
 - **Commit as your GitHub identity, or Vercel will block the deploy.** Vercel verifies that
   every commit's author email belongs to your GitHub account. Your machine's default git email
   often isn't, so the very first local commit gets rejected. Pin this repo's identity once
