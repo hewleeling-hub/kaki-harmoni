@@ -195,7 +195,7 @@ export default function PricesPage() {
           <PromotionCard
             highlight={`RM${pricing.prepay}`}
             title="No need to decide today"
-            description={`Come once, see how it feels, and think about a routine afterwards. Your first visit is RM${pricing.prepay} prepaid instead of the usual RM${pricing.normal}.`}
+            description={`Come once, see how it feels, and think about a routine afterwards. Your first visit is RM${pricing.prepay} prepaid online, or RM${pricing.walkin} at the door, instead of the usual RM${pricing.normal}.`}
             terms={`${launchOfferNote} First visits from ${bookingStartLabel}. After the launch period a first visit is the usual RM${pricing.normal}.`}
           />
         </div>

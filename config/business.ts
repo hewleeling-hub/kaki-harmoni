@@ -283,6 +283,15 @@ export const launchOfferNote = launchOffer.endsLabel
   ? `Launch offer — available until ${launchOffer.endsLabel}.`
   : "Launch offer — available for a limited period only.";
 
+/**
+ * Badge form. Deliberately NOT a watermark: a diagonal overlay reads as
+ * DRAFT/VOID and would make the price look provisional. Once `endsLabel` is set
+ * this sharpens from vague urgency to a real deadline, which converts better.
+ */
+export const launchOfferBadge = launchOffer.endsLabel
+  ? `Until ${launchOffer.endsLabel}`
+  : "Limited time only";
+
 /** Compact form, for price tiles and cards where space is tight. */
 export const launchOfferShort = launchOffer.endsLabel
   ? `Launch price until ${launchOffer.endsLabel}`
@@ -318,6 +327,8 @@ export interface RoutinePackage {
   href: string;
   /** Highlighted as the natural next step after a first visit. */
   featured?: boolean;
+  /** Carries the launch-offer badge — the price is time-limited, not standing. */
+  limitedTime?: boolean;
 }
 
 export const routinePackages: readonly RoutinePackage[] = [
@@ -327,10 +338,11 @@ export const routinePackages: readonly RoutinePackage[] = [
     name: "First Soak",
     visits: 1,
     price: businessConfig.pricing.prepay,
-    priceNote: `or RM${businessConfig.pricing.walkin} at the door · ${launchOfferShort}`,
+    priceNote: `or RM${businessConfig.pricing.walkin} at the door`,
     positioning: "For people who are new to Kaki Harmoni.",
     cta: "TRY IT",
     href: "/#reserve",
+    limitedTime: true,
   },
   {
     id: "five-day-reset",

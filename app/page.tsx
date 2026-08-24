@@ -78,8 +78,9 @@ export default function Home() {
             </Button>
           </div>
           <p className="mt-4 text-[15px] text-muted">
-            First visits from {bookingStartLabel}. RM{pricing.prepay} when you prepay, instead of
-            the usual RM{pricing.normal}. {launchOfferNote}
+            First visits from {bookingStartLabel}. RM{pricing.prepay} when you prepay, or RM
+            {pricing.walkin} at the door — instead of the usual RM{pricing.normal}.{" "}
+            {launchOfferNote}
           </p>
         </div>
 
@@ -312,8 +313,8 @@ export default function Home() {
           <PromotionCard
             highlight={`RM${pricing.prepay}`}
             title="Start with a single soak"
-            description={`There's no need to commit to anything today. Come once for RM${pricing.prepay}, see how it feels, and decide about a routine afterwards.`}
-            terms={`${launchOfferNote} Prepaid online. First visits from ${bookingStartLabel}. After the launch period a first visit is the usual RM${pricing.normal}.`}
+            description={`There's no need to commit to anything today. Come once for RM${pricing.prepay} prepaid online, or RM${pricing.walkin} at the door — see how it feels, and decide about a routine afterwards.`}
+            terms={`${launchOfferNote} First visits from ${bookingStartLabel}. After the launch period a first visit is the usual RM${pricing.normal}.`}
           />
         </div>
       </section>

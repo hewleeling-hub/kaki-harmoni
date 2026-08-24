@@ -8,6 +8,7 @@ import {
   whyNotAtHome,
   testimonials,
   experienceVideo,
+  launchOfferBadge,
   type RoutinePackage,
 } from "@/config/business";
 
@@ -25,8 +26,11 @@ function RoutineCard({ pkg }: { pkg: RoutinePackage }) {
         pkg.featured ? "ring-2 ring-olive/50" : ""
       }`}
     >
-      <span className="mx-auto">
+      <span className="mx-auto flex flex-wrap items-center justify-center gap-2">
         <Badge tone={pkg.featured ? "olive" : "sage"}>{pkg.stage}</Badge>
+        {/* Gold marks a time-limited price — same device as the "Save RMx" badge,
+            rather than a watermark, which would read as DRAFT over the price. */}
+        {pkg.limitedTime && <Badge tone="gold">{launchOfferBadge}</Badge>}
       </span>
 
       <h3 className="mt-3 text-[20px] text-olive-dark">{pkg.name}</h3>
