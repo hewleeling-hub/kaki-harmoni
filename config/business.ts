@@ -113,6 +113,26 @@ export const goodToKnow = [
 ] as const;
 
 /** FAQ content — editable here, rendered by the accordion. */
+/**
+ * Two soaks back to back. A 15-minute soak is the unit that makes a daily habit
+ * easy — it is NOT a cap, and guests who want a longer sit simply stay for a
+ * second. Named to sit beside the 5-Day and 10-Day Resets, and worded so it
+ * covers one person going twice as well as two people going once.
+ *
+ * Declared up here, above `faqs`, because the FAQ copy interpolates the name:
+ * it had already drifted to a stale "Double + bun & coffee" once.
+ */
+export const doubleSoak = {
+  id: "double-bun-coffee",
+  name: "Double Reset",
+  price: 68,
+  /** Derived: RM68 for two soaks. Kept out of `detail`, which is reused as prose. */
+  perSession: 34,
+  detail: "Two soaks, with a bun & coffee on us.",
+  /** RM68 against two standard singles at RM40. */
+  save: 12,
+} as const;
+
 export const faqs = [
   {
     q: "When can I visit?",
@@ -120,7 +140,7 @@ export const faqs = [
   },
   {
     q: "How long is each session?",
-    a: "Each warm leg soak lasts about 15 minutes — a simple break that fits into your day. Fancy a longer unwind? You're very welcome to go back to back: many guests enjoy a second soak straight after, or one either side of a coffee break. Our Double + bun & coffee is built for exactly that.",
+    a: `Each warm leg soak lasts about 15 minutes — a simple break that fits into your day. Fancy a longer unwind? You're very welcome to go back to back: many guests enjoy a second soak straight after, or one either side of a coffee break. Our ${doubleSoak.name} is built for exactly that — two soaks, with a bun & coffee on us.`,
   },
   {
     q: "How often should I come?",
@@ -181,23 +201,6 @@ export const faqs = [
 export const sessionRates = [
   { name: "Standard single", price: 40, detail: "Anytime · per soak" },
 ] as const;
-
-/**
- * Two soaks back to back, with a bun & coffee to share. A 15-minute soak is the
- * unit that makes a daily habit easy — it is NOT a cap, and guests who want a
- * longer sit simply stay for a second. Exported on its own so the homepage and
- * the prices page can name it without duplicating the price.
- */
-export const doubleSoak = {
-  id: "double-bun-coffee",
-  name: "Double + free bun & coffee",
-  price: 68,
-  /** Derived: RM68 for two soaks. Kept out of `detail`, which is reused as prose. */
-  perSession: 34,
-  detail: "Two soaks, plus a free bun & coffee to share.",
-  /** RM68 against two standard singles at RM40. */
-  save: 12,
-} as const;
 
 /** Packages & passes. `save` is vs the RM40 standard single, where it applies. */
 export interface PackageOffer {
