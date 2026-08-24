@@ -165,7 +165,10 @@ export default function Home() {
 
             {/* 15 minutes is the unit that makes the habit easy, not a limit on how
                 long you may stay. Guests who want longer go back to back. */}
-            <div className="mt-6 rounded-[20px] border border-olive/25 bg-sage/20 px-6 py-5">
+            <div className="mt-6 flex items-start gap-3 rounded-[20px] border border-olive/25 bg-sage/20 px-6 py-5">
+              {/* A clock, echoing the one on "15-Minute Soak" — this note answers a
+                  question about duration, so the two belong to the same idea. */}
+              <ClockIcon size={24} className="mt-1 shrink-0 text-olive" />
               <p className="text-[17px] leading-relaxed text-brown">
                 <strong className="text-olive-dark">Want longer? Stay for two.</strong> You&rsquo;re
                 very welcome to go back to back — two soaks in a row, or one either side of a
