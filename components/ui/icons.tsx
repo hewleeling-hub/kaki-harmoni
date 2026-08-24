@@ -161,6 +161,14 @@ export const SunIcon = (p: IconProps) => (
     <path d="M12 2.5v2.3M12 19.2v2.3M2.5 12h2.3M19.2 12h2.3M5.1 5.1l1.6 1.6M17.3 17.3l1.6 1.6M18.9 5.1l-1.6 1.6M6.7 17.3l-1.6 1.6" />
   </Base>
 );
+export const RepeatIcon = (p: IconProps) => (
+  <Base {...p}>
+    <path d="M17 2.5l3.5 3.5L17 9.5" />
+    <path d="M20.5 6H7a3.5 3.5 0 0 0-3.5 3.5V11" />
+    <path d="M7 21.5L3.5 18 7 14.5" />
+    <path d="M3.5 18H17a3.5 3.5 0 0 0 3.5-3.5V13" />
+  </Base>
+);
 
 export const NAV_ICONS: Record<IconName, (p: IconProps) => React.ReactElement> = {
   home: HomeIcon,

@@ -307,7 +307,15 @@ export const ctaLabels = {
  * everywhere automatically. Never invent a date here — an unfixed deadline is quoted
  * as "a limited period", which is true, rather than a made-up one, which is not.
  */
-export const launchOffer: { endsLabel: string | null } = { endsLabel: null };
+export const launchOffer: { active: boolean; endsLabel: string | null } = {
+  /**
+   * The one switch that retires the promotion. Flip to false and every
+   * promotional line disappears without any page needing to be redesigned —
+   * Your Visit in particular is built to still read correctly without it.
+   */
+  active: true,
+  endsLabel: null,
+};
 
 /** Full sentence, for body copy and promotion terms. */
 export const launchOfferNote = launchOffer.endsLabel

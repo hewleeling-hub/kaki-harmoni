@@ -14,7 +14,7 @@ export const desktopNav: NavItem[] = [
   { label: "About", href: "/about", icon: "info" },
   { label: "Experiences", href: "/experiences", icon: "sparkles" },
   { label: "Our Spa", href: "/our-spa", icon: "waves" },
-  { label: "How It Works", href: "/how-it-works", icon: "info" },
+  { label: "Your Visit", href: "/how-it-works", icon: "info" },
   { label: "Prices", href: "/prices", icon: "gift" },
   { label: "Find Us", href: "/location", icon: "mappin" },
   { label: "Contact", href: "/contact", icon: "user" },
