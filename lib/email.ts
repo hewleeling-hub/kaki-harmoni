@@ -42,7 +42,8 @@ export async function sendSalesAlert(subject: string, html: string) {
 
 export function newSignupEmail(params: {
   name: string;
-  email: string;
+  // Email is optional since migration 0008 — phone is the required contact field.
+  email: string | null;
   phone: string | null;
   referral_source: string | null;
 }) {
@@ -51,7 +52,7 @@ export function newSignupEmail(params: {
     html: `
       <h2>New Kaki Harmoni signup</h2>
       <p><strong>Name:</strong> ${params.name}</p>
-      <p><strong>Email:</strong> ${params.email}</p>
+      <p><strong>Email:</strong> ${params.email ?? "—"}</p>
       <p><strong>Phone:</strong> ${params.phone ?? "—"}</p>
       <p><strong>How they heard about us:</strong> ${params.referral_source ?? "—"}</p>
       <p><a href="https://kaki-harmoni.vercel.app/dashboard">View in dashboard →</a></p>

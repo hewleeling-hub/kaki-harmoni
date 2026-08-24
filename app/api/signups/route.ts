@@ -110,7 +110,8 @@ export async function POST(request: NextRequest) {
 
   if (error || !signup) {
     // Unique index race condition -> treat as duplicate
-    if (error?.code === "23505") {
+    // The unique index is on lower(email), so a 23505 here always means a real email.
+    if (error?.code === "23505" && email) {
       const { data: raced } = await supabase
         .from("signups")
         .select("id, status")
