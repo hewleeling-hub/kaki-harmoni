@@ -11,17 +11,19 @@ export interface NavItem {
 /** Desktop top navigation (left of the "Reserve your spot" button). */
 export const desktopNav: NavItem[] = [
   { label: "Home", href: "/", icon: "home" },
+  { label: "About", href: "/about", icon: "info" },
   { label: "Experiences", href: "/experiences", icon: "sparkles" },
   { label: "Our Spa", href: "/our-spa", icon: "waves" },
   { label: "How It Works", href: "/how-it-works", icon: "info" },
   { label: "Prices", href: "/prices", icon: "gift" },
   { label: "Find Us", href: "/location", icon: "mappin" },
+  { label: "Contact", href: "/contact", icon: "user" },
 ];
 
 /** Mobile bottom navigation — four simple tabs. */
 export const mobileNav: NavItem[] = [
   { label: "Home", href: "/", icon: "home" },
-  { label: "Experiences", href: "/experiences", icon: "sparkles" },
-  { label: "Prices", href: "/prices", icon: "gift" },
+  { label: "About", href: "/about", icon: "info" },
   { label: "Find Us", href: "/location", icon: "mappin" },
+  { label: "Contact", href: "/contact", icon: "user" },
 ];
