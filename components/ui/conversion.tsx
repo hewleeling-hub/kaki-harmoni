@@ -235,12 +235,15 @@ export function NextStep({
   cta,
   href,
   secondary,
+  phone,
 }: {
   title: string;
   body: string;
   cta: string;
   href: string;
   secondary?: { label: string; href: string };
+  /** A number to ring, for people who would rather not use WhatsApp. */
+  phone?: { label: string; href: string };
 }) {
   return (
     <section className="py-10">
@@ -258,6 +261,14 @@ export function NextStep({
             >
               {secondary.label}
             </Link>
+          )}
+          {phone && (
+            <a
+              href={phone.href}
+              className="text-[16px] font-semibold text-olive underline underline-offset-4 hover:text-olive-dark"
+            >
+              {phone.label}
+            </a>
           )}
         </div>
       </div>

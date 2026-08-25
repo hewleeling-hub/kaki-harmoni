@@ -13,6 +13,7 @@ import {
   ctaLabels,
   launchOfferNote,
   launchOfferShort,
+  telLink,
 } from "@/config/business";
 
 export const metadata: Metadata = {
@@ -202,11 +203,15 @@ export default function PricesPage() {
       </section>
 
       <NextStep
-        title="Questions about prices?"
-        body="We're happy to help — message us anytime and we'll talk you through it."
+        title="Questions about anything?"
+        body="Prices, packages, what to expect on the day — ask us whatever you like. Message us, or give us a call if you'd rather talk."
         cta={ctaLabels.firstVisit}
         href="/#reserve"
-        secondary={{ label: "Ask us on WhatsApp", href: whatsappLink("Hi Kaki Harmoni! I have a question about prices and packages.") }}
+        secondary={{
+          label: "Ask us on WhatsApp",
+          href: whatsappLink("Hi Kaki Harmoni! I have a question I'd like to ask."),
+        }}
+        phone={{ label: `Call ${businessConfig.callDisplay}`, href: telLink }}
       />
     </PublicShell>
   );
