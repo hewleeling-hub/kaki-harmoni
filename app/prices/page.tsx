@@ -147,7 +147,7 @@ export default function PricesPage() {
       </section>
 
       {/* ── Staying longer ──────────────────────────────────────────────── */}
-      {/* Target of the homepage's "Want longer? Stay for two." link, so the
+      {/* Target of the homepage's "Want longer? Stay for two soaks." link, so the
           anchor and the heading have to answer that exact question. */}
       <section id="longer" className="mt-12 scroll-mt-24">
         <SectionHeading

@@ -188,7 +188,7 @@ export default function Home() {
                   question about duration, so the two belong to the same idea. */}
               <ClockIcon size={24} className="mt-1 shrink-0 text-olive" />
               <p className="text-[17px] leading-relaxed text-brown">
-                <strong className="text-olive-dark">Want longer? Stay for two.</strong> Go back to
+                <strong className="text-olive-dark">Want longer? Stay for two soaks.</strong> Go back to
                 back, or one either side of a coffee — our{" "}
                 <Link
                   href="/prices#longer"
