@@ -147,6 +147,13 @@ export const ladderPerVisit = {
   cheapest: ladderPrices.thirtyVisit / 30,
 } as const;
 
+/**
+ * How long a package stays usable, from the day it's bought. Declared here so
+ * the FAQ copy and any future terms read from one value — there was no expiry
+ * anywhere in the code before this, so it is a real policy, not a default.
+ */
+export const packageValidityLabel = "6 months" as const;
+
 export const faqs = [
   {
     q: "When can I visit?",
@@ -183,6 +190,13 @@ export const faqs = [
   {
     q: "Can I come with a friend?",
     a: "Of course — bring a friend or a family member. It's a lovely place to sit together and chat.",
+  },
+  {
+    /* The tier names read like deadlines ("30-Day Routine") when they are
+       really visit counts, so the answer corrects that before giving the
+       actual validity period. */
+    q: "How long do I have to use my package?",
+    a: `The number in the name is how many visits you get, not a countdown — a 10-Day Reset is ten soaks, not ten days. You have ${packageValidityLabel} from the day you buy it to use them all, so you can come daily or spread them out to suit your week.`,
   },
   {
     q: `Can two of us share a ${doubleSoak.name}?`,
@@ -223,7 +237,7 @@ export const faqs = [
  * per-visit price.
  */
 export const sessionRates = [
-  { name: "Standard single", price: 40, detail: "Anytime · per soak" },
+  { name: "Standard single", price: 40, detail: "Anytime · per soak, coffee included" },
 ] as const;
 
 /** Packages & passes. `save` is vs the RM40 standard single, where it applies. */
