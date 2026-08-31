@@ -13,13 +13,21 @@ const DEFAULT_ITEM_PRICE_MYR = 25.0;
 type ResolvedLine = {
   product_id: string | null;
   product_name: string;
+  category: string;
   quantity: number;
   unit_price_myr: number;
   line_total_myr: number;
 };
 
+/** Services and packages are the thing being bought; add-ons ride along. */
+const isMainCategory = (category: string) => category === "service" || category === "package";
+
 // Resolve requested items against the catalogue, pricing every line from the DB
 // (never trusting client-sent prices). Falls back to the legacy single item.
+//
+// The shape is enforced here, not just in the form: exactly one main item at
+// quantity 1 (one booking holds one place in the slot, and the FAQ tells a pair
+// to book a soak each), plus any number of add-ons at 1–20.
 async function resolveLines(
   supabase: ReturnType<typeof createAdminClient>,
   items: { product_id?: string; quantity?: number }[] | undefined,
@@ -32,26 +40,39 @@ async function resolveLines(
     const ids = requested.map((i) => i.product_id as string);
     const { data: products } = await supabase
       .from("products")
-      .select("id, name, price_myr, active")
+      .select("id, name, price_myr, active, category")
       .in("id", ids);
 
     if (products && products.length > 0) {
       const byId = new Map(products.map((p) => [p.id, p]));
       const lines: ResolvedLine[] = [];
+      let mainTaken = false;
+
       for (const req of requested) {
         const p = byId.get(req.product_id as string);
         if (!p || p.active === false) continue;
-        const quantity = Math.min(Math.max(Math.floor(req.quantity as number), 1), 20);
+
+        const category = String(p.category ?? "service");
+        const main = isMainCategory(category);
+        // Ignore a second main item rather than silently charging for both.
+        if (main && mainTaken) continue;
+        if (main) mainTaken = true;
+
+        const quantity = main
+          ? 1
+          : Math.min(Math.max(Math.floor(req.quantity as number), 1), 20);
         const unit = Number(p.price_myr);
         lines.push({
           product_id: p.id,
           product_name: p.name,
+          category,
           quantity,
           unit_price_myr: unit,
           line_total_myr: Math.round(unit * quantity * 100) / 100,
         });
       }
-      if (lines.length > 0) return lines;
+      // Add-ons alone are not a booking — fall through to the default visit.
+      if (mainTaken) return lines;
     }
   }
 
@@ -60,6 +81,7 @@ async function resolveLines(
     {
       product_id: null,
       product_name: DEFAULT_ITEM_NAME,
+      category: "service",
       quantity: 1,
       unit_price_myr: DEFAULT_ITEM_PRICE_MYR,
       line_total_myr: DEFAULT_ITEM_PRICE_MYR,
@@ -139,6 +161,21 @@ export async function POST(request: NextRequest) {
   }
 
   const lines = await resolveLines(supabase, body.items);
+
+  // Packages are prepay-only. Carrying an unpaid RM840 routine through to the
+  // day is a real loss if the guest doesn't arrive, where an unpaid RM30 first
+  // visit is not. The form doesn't offer the choice; this is what enforces it.
+  const hasPackage = lines.some((l) => l.category === "package");
+  if (hasPackage && payTiming === "door") {
+    return NextResponse.json(
+      {
+        error:
+          "Packages are prepaid — please choose prepay, or pick a single visit to pay at the door.",
+      },
+      { status: 400 },
+    );
+  }
+
   const subtotal = lines.reduce((sum, l) => sum + l.line_total_myr, 0);
   // Pay-at-the-door adds a small surcharge; prepaying is the cheaper option.
   const surcharge = payTiming === "door" ? DOOR_SURCHARGE_MYR : 0;

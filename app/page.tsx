@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import SignupForm from "./signup-form";
@@ -309,7 +310,12 @@ export default function Home() {
             </p>
           </div>
           <Card className="bg-ivory">
-            <SignupForm />
+            {/* The form reads `?option=…` so a ladder CTA can preselect a tier.
+                useSearchParams needs a Suspense boundary, and having one keeps
+                the rest of this page statically rendered. */}
+            <Suspense fallback={<div className="min-h-[420px]" aria-hidden />}>
+              <SignupForm />
+            </Suspense>
           </Card>
         </div>
       </section>

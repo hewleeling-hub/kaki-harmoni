@@ -4,9 +4,18 @@ import { notFound } from "next/navigation";
 import { Lotti } from "@/components/ui/Lotti";
 import { whatsAppLink, BUSINESS_WHATSAPP_NUMBER } from "@/lib/whatsapp";
 import { PREPAY_PRICE_MYR } from "@/lib/config";
+import { withOption } from "@/config/catalogue";
 
-export default async function ConfirmationPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function ConfirmationPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ option?: string }>;
+}) {
   const { id } = await params;
+  // The tier they picked on /prices, still travelling with them.
+  const { option } = await searchParams;
   const supabase = createAdminClient();
 
   const { data: signup } = await supabase.from("signups").select("*").eq("id", id).maybeSingle();
@@ -47,7 +56,7 @@ export default async function ConfirmationPage({ params }: { params: Promise<{ i
         ) : (
           <div className="space-y-3">
             <Link
-              href={`/purchase/${signup.id}/book`}
+              href={withOption(`/purchase/${signup.id}/book`, option)}
               className="flex min-h-12 items-center justify-center rounded-[26px] bg-olive px-5 font-semibold text-ivory transition hover:bg-olive-dark"
             >
               Complete prepayment

@@ -83,6 +83,13 @@ export default async function PurchaseSuccessPage({ params }: { params: Promise<
                 <span className="text-black/45">Name:</span> {signup.name}
               </p>
             )}
+            {/* Now that more than one thing can be bought, the receipt has to
+                say which. */}
+            {purchase.product_name && (
+              <p className="text-sm text-black/70">
+                <span className="text-black/45">Booked:</span> {purchase.product_name}
+              </p>
+            )}
             <p className="text-sm text-black/70">
               <span className="text-black/45">Payment:</span>{" "}
               <span className="font-medium" style={{ color: "var(--lagoon-dark)" }}>

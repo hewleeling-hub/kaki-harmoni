@@ -69,6 +69,28 @@ deliberately when you want the team feature switched on.
 `0008_email_optional.sql` **is** applied — `signups.email` is nullable, phone is the
 required contact field.
 
+### ⚠️ `0009_full_catalogue.sql` is data, and must be run for the ladder to sell
+
+Until this runs, exactly one product is `active` — the RM25 first visit — so checkout can
+only ever sell that, whichever tier the customer clicked. `0009` activates the rest of the
+published ladder and corrects the two prices that had drifted from the site (the 5-visit
+package was seeded RM180 against the RM160 on `/prices`).
+
+It is **data only, no schema change**, and the `on conflict … do update` makes it safe to
+re-run. Paste it into the Supabase SQL editor. The site degrades honestly without it: the
+checkout simply shows whatever is active, so an un-run `0009` looks exactly like today.
+
+**The catalogue is coupled to site copy in `config/catalogue.ts`.** Prices live in two
+places — `config/business.ts` (what the site says) and the `products` table (what a
+customer is charged) — and they have drifted once already. `config/catalogue.ts` maps site
+slugs onto the deterministic product ids, and those slugs travel through the booking flow
+as `?option=…` so a ladder CTA lands in checkout with the right tier preselected. Change a
+price and change it in both, or the page and the till disagree.
+
+Charging is always priced from the `products` row server-side; nothing the browser sends
+sets a price. Packages are prepay-only, enforced in `app/api/purchases/route.ts`, not just
+hidden in the form.
+
 Note that the Supabase migration history table only lists two MCP-applied migrations; the
 `0001`–`0008` files were applied by hand via the SQL editor, so that history is not a
 reliable record of what's live. Check the actual schema instead.

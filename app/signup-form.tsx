@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { isCatalogueSlug, withOption } from "@/config/catalogue";
+import { offerForSlug } from "@/config/business";
 
 const REFERRAL_OPTIONS = ["Instagram", "Facebook", "TikTok", "Friend", "Walk-in", "Other"];
 
@@ -11,6 +13,13 @@ const labelClass = "block text-[15px] font-medium text-olive-dark mb-1.5";
 
 export default function SignupForm() {
   const router = useRouter();
+  // Which option they clicked on /prices, if any. It is carried in the URL the
+  // whole way to checkout rather than stored, so an abandoned signup leaves
+  // nothing behind and a shared link still works.
+  const optionParam = useSearchParams().get("option");
+  const option = isCatalogueSlug(optionParam) ? optionParam : null;
+  const chosen = option ? offerForSlug(option) : null;
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -42,7 +51,7 @@ export default function SignupForm() {
       if (!res.ok) {
         if (res.status === 409 && data.signup_id) {
           // Returning visitor with the same email — take them straight back to their spot.
-          router.push(`/confirmation/${data.signup_id}`);
+          router.push(withOption(`/confirmation/${data.signup_id}`, option));
           return;
         }
         if (data.field) {
@@ -54,7 +63,7 @@ export default function SignupForm() {
         return;
       }
 
-      router.push(`/confirmation/${data.signup.id}`);
+      router.push(withOption(`/confirmation/${data.signup.id}`, option));
     } catch {
       setBannerError("Something went wrong. Please try again.");
       setSubmitting(false);
@@ -63,6 +72,24 @@ export default function SignupForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+      {/* Reassurance that the tier they clicked on /prices came with them. They
+          can still change it at the payment step, so this promises nothing the
+          checkout won't honour. */}
+      {chosen && (
+        <div className="rounded-[14px] border border-olive/30 bg-beige/50 px-4 py-3">
+          <p className="text-[13px] font-semibold uppercase tracking-wide text-olive">
+            You&apos;re reserving
+          </p>
+          <p className="mt-0.5 text-[16px] font-semibold text-olive-dark">
+            {chosen.name} — RM{chosen.price}
+          </p>
+          <p className="mt-0.5 text-[14px] text-muted">
+            {chosen.visits === 1 ? "1 visit" : `${chosen.visits} visits`} · you can change this
+            before paying.
+          </p>
+        </div>
+      )}
+
       {bannerError && (
         <div className="rounded-[14px] border border-[#e4b8ab] bg-[#f6e3dc] px-4 py-3 text-sm text-[#8a3b28]" role="alert">
           {bannerError}

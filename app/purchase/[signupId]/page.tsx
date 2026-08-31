@@ -5,16 +5,17 @@ import PurchaseForm from "./purchase-form";
 import Logo from "@/app/logo";
 import { PRELAUNCH_MODE, LAUNCH_WINDOW } from "@/lib/config";
 import { formatSlotTime } from "@/lib/slots";
+import { productIdForSlug } from "@/config/catalogue";
 
 export default async function PurchasePage({
   params,
   searchParams,
 }: {
   params: Promise<{ signupId: string }>;
-  searchParams: Promise<{ date?: string; time?: string }>;
+  searchParams: Promise<{ date?: string; time?: string; option?: string }>;
 }) {
   const { signupId } = await params;
-  const { date: slotDate, time: slotTime } = await searchParams;
+  const { date: slotDate, time: slotTime, option } = await searchParams;
   const supabase = createAdminClient();
 
   const { data: signup } = await supabase.from("signups").select("*").eq("id", signupId).maybeSingle();
@@ -38,6 +39,13 @@ export default async function PurchasePage({
     .select("id, name, description, price_myr, category")
     .eq("active", true)
     .order("sort_order", { ascending: true });
+
+  // The tier they clicked on /prices, resolved to a real catalogue row. An
+  // unrecognised or withdrawn option falls through to null and the form simply
+  // defaults, rather than 404ing someone who followed a stale link.
+  const preselectedId = productIdForSlug(option);
+  const preselected =
+    preselectedId && (products ?? []).some((p) => p.id === preselectedId) ? preselectedId : null;
 
   if (signup.status === "converted") {
     return (
@@ -91,6 +99,8 @@ export default async function PurchasePage({
           products={products ?? []}
           slotDate={slotDate ?? null}
           slotTime={slotTime ?? null}
+          preselectedProductId={preselected}
+          option={option ?? null}
         />
       </div>
     </main>

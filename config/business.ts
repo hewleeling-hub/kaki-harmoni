@@ -21,6 +21,7 @@ import {
   BOOKING_START_LABEL,
   BOOKING_START_DATE,
 } from "@/lib/config";
+import { reserveHref, type CatalogueSlug } from "@/config/catalogue";
 
 export const businessConfig = {
   name: "Kaki Harmoni",
@@ -124,6 +125,8 @@ export const goodToKnow = [
  */
 export const doubleSoak = {
   id: "double-bun-coffee",
+  /** Sellable catalogue entry this card buys. */
+  slug: "double-reset",
   name: "Double Reset",
   price: 68,
   /** Derived: RM68 for two soaks. Kept out of `detail`, which is reused as prose. */
@@ -237,12 +240,19 @@ export const faqs = [
  * per-visit price.
  */
 export const sessionRates = [
-  { name: "Standard single", price: 40, detail: "Anytime · per soak, coffee included" },
+  {
+    name: "Standard single",
+    slug: "single-soak",
+    price: 40,
+    detail: "Anytime · per soak, coffee included",
+  },
 ] as const;
 
 /** Packages & passes. `save` is vs the RM40 standard single, where it applies. */
 export interface PackageOffer {
   id: string;
+  /** Sellable catalogue entry this offer buys, so its CTA can preselect it. */
+  slug: CatalogueSlug;
   name: string;
   price: number;
   detail: string;
@@ -253,7 +263,7 @@ export interface PackageOffer {
 }
 
 export const packages: readonly PackageOffer[] = [
-  { id: "five-for-four", name: "Buy 4, get 1 free", price: ladderPrices.fiveVisit, detail: "5 soaks for the price of 4.", save: 40 },
+  { id: "five-for-four", slug: "five-day-reset", name: "Buy 4, get 1 free", price: ladderPrices.fiveVisit, detail: "5 soaks for the price of 4.", save: 40 },
   doubleSoak,
 ];
 
@@ -367,6 +377,13 @@ export const launchOfferShort = launchOffer.endsLabel
  */
 export interface RoutinePackage {
   id: string;
+  /**
+   * Sellable catalogue entry this rung buys. Every rung used to point at a bare
+   * `/#reserve`, which dropped the customer into the RM25 first-visit basket
+   * whichever tier they clicked; the slug is what carries their actual choice
+   * through signup → slot → payment.
+   */
+  slug: CatalogueSlug;
   stage: "TRY" | "RESET" | "ROUTINE" | "RITUAL";
   name: string;
   visits: number;
@@ -387,6 +404,7 @@ export interface RoutinePackage {
 export const routinePackages: readonly RoutinePackage[] = [
   {
     id: "first-soak",
+    slug: "first-soak",
     stage: "TRY",
     name: "First Soak",
     visits: 1,
@@ -394,41 +412,66 @@ export const routinePackages: readonly RoutinePackage[] = [
     priceNote: `or RM${businessConfig.pricing.walkin} at the door`,
     positioning: "For people who are new to Kaki Harmoni.",
     cta: "TRY IT",
-    href: "/#reserve",
+    href: reserveHref("first-soak"),
     limitedTime: true,
   },
   {
     id: "five-day-reset",
+    slug: "five-day-reset",
     stage: "RESET",
     name: "5-Day Reset",
     visits: 5,
     price: ladderPrices.fiveVisit,
     positioning: "Try making Kaki Harmoni part of your daily routine.",
     cta: "START MY RESET",
-    href: "/#reserve",
+    href: reserveHref("five-day-reset"),
     featured: true,
   },
   {
     id: "ten-day-reset",
+    slug: "ten-day-reset",
     stage: "ROUTINE",
     name: "10-Day Reset",
     visits: 10,
     price: ladderPrices.tenVisit,
     positioning: "Build the habit and make your daily reset part of your routine.",
     cta: "BUILD MY ROUTINE",
-    href: "/#reserve",
+    href: reserveHref("ten-day-reset"),
   },
   {
     id: "thirty-day-routine",
+    slug: "thirty-day-routine",
     stage: "RITUAL",
     name: "30-Day Routine",
     visits: 30,
     price: ladderPrices.thirtyVisit,
     positioning: "Make your 15-minute reset part of your everyday life.",
     cta: "MAKE IT MY ROUTINE",
-    href: "/#reserve",
+    href: reserveHref("thirty-day-routine"),
   },
 ] as const;
+
+/**
+ * Headline name + price for a catalogue slug, for the "you're reserving …"
+ * line the booking flow shows once a customer has picked a tier. Copy only —
+ * what they are actually charged is priced from the `products` table server
+ * side, never from anything the browser sends.
+ */
+export function offerForSlug(
+  slug: CatalogueSlug,
+): { name: string; price: number; visits: number } | null {
+  const rung = routinePackages.find((p) => p.slug === slug);
+  if (rung && rung.price !== null) {
+    return { name: rung.name, price: rung.price, visits: rung.visits };
+  }
+  if (slug === "double-reset") {
+    return { name: doubleSoak.name, price: doubleSoak.price, visits: 2 };
+  }
+  if (slug === "single-soak") {
+    return { name: sessionRates[0].name, price: sessionRates[0].price, visits: 1 };
+  }
+  return null;
+}
 
 /** Per-visit price, or null while the package price is unconfirmed. */
 export function perVisitPrice(pkg: RoutinePackage): number | null {

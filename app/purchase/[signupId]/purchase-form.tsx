@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { whatsAppLink, BUSINESS_WHATSAPP_NUMBER } from "@/lib/whatsapp";
 import { PRELAUNCH_MODE, DOOR_SURCHARGE_MYR } from "@/lib/config";
+import { withOption } from "@/config/catalogue";
 
 type Product = {
   id: string;
@@ -18,12 +19,17 @@ type PayTiming = "prepay" | "door";
 
 const money = (n: number) => `RM${n.toFixed(2)}`;
 
+/** Services and packages are the thing being bought; add-ons ride along. */
+const isMainItem = (p: Product) => p.category === "service" || p.category === "package";
+
 export default function PurchaseForm({
   signupId,
   signupName,
   products,
   slotDate = null,
   slotTime = null,
+  preselectedProductId = null,
+  option = null,
 }: {
   signupId: string;
   signupName: string;
@@ -32,42 +38,62 @@ export default function PurchaseForm({
   /** Chosen on the previous step; saved with the purchase that confirms it. */
   slotDate?: string | null;
   slotTime?: string | null;
+  /** Catalogue row matching the tier clicked on /prices, already validated. */
+  preselectedProductId?: string | null;
+  /** The raw slug, kept so a bounce back to the calendar doesn't lose it. */
+  option?: string | null;
 }) {
   const router = useRouter();
+
+  const mainItems = useMemo(() => products.filter(isMainItem), [products]);
+  const addOns = useMemo(() => products.filter((p) => p.category === "addon"), [products]);
+
+  // One visit, one main item. The FAQ is explicit that a Double Reset is two
+  // soaks for ONE person and that a pair should "book a soak each", so a
+  // quantity stepper here would both contradict the copy and overbook the slot
+  // — capacity is counted per booking, not per head.
+  const [selectedId, setSelectedId] = useState<string | null>(
+    preselectedProductId ?? mainItems[0]?.id ?? null,
+  );
+  const [addOnQty, setAddOnQty] = useState<Record<string, number>>({});
   const [payTiming, setPayTiming] = useState<PayTiming>("prepay");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Default: pre-select the first catalogue item (the first-visit offer) at qty 1.
-  const [qty, setQty] = useState<Record<string, number>>(() =>
-    products.length > 0 ? { [products[0].id]: 1 } : {},
-  );
-
   const setQuantity = (id: string, next: number) =>
-    setQty((prev) => ({ ...prev, [id]: Math.max(0, Math.min(20, next)) }));
+    setAddOnQty((prev) => ({ ...prev, [id]: Math.max(0, Math.min(20, next)) }));
 
-  const subtotal = useMemo(
-    () => products.reduce((sum, p) => sum + (qty[p.id] ?? 0) * Number(p.price_myr), 0),
-    [products, qty],
-  );
+  const selected = mainItems.find((p) => p.id === selectedId) ?? null;
+  const hasCatalogue = mainItems.length > 0;
 
-  const hasCatalogue = products.length > 0;
-  const prepayTotal = subtotal;
-  const doorTotal = subtotal + DOOR_SURCHARGE_MYR;
-  const total = payTiming === "door" ? doorTotal : prepayTotal;
+  // Packages are prepay-only, so a door surcharge can never apply to one.
+  const isPackage = selected?.category === "package";
+  const effectiveTiming: PayTiming = isPackage ? "prepay" : payTiming;
+
+  const subtotal = useMemo(() => {
+    const main = selected ? Number(selected.price_myr) : 0;
+    const extras = addOns.reduce((sum, p) => sum + (addOnQty[p.id] ?? 0) * Number(p.price_myr), 0);
+    return Math.round((main + extras) * 100) / 100;
+  }, [selected, addOns, addOnQty]);
+
+  const surcharge = effectiveTiming === "door" ? DOOR_SURCHARGE_MYR : 0;
+  const total = Math.round((subtotal + surcharge) * 100) / 100;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
 
-    const items = products
-      .filter((p) => (qty[p.id] ?? 0) > 0)
-      .map((p) => ({ product_id: p.id, quantity: qty[p.id] }));
-
-    if (hasCatalogue && items.length === 0) {
-      setError("Please add at least one item to your order.");
+    if (hasCatalogue && !selected) {
+      setError("Please choose what you'd like to book.");
       return;
     }
+
+    const items = [
+      ...(selected ? [{ product_id: selected.id, quantity: 1 }] : []),
+      ...addOns
+        .filter((p) => (addOnQty[p.id] ?? 0) > 0)
+        .map((p) => ({ product_id: p.id, quantity: addOnQty[p.id] })),
+    ];
 
     setSubmitting(true);
     try {
@@ -76,8 +102,8 @@ export default function PurchaseForm({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           signup_id: signupId,
-          pay_timing: payTiming,
-          payment_method: payTiming === "prepay" ? "ewallet" : "cash",
+          pay_timing: effectiveTiming,
+          payment_method: effectiveTiming === "prepay" ? "ewallet" : "cash",
           items,
           slot_date: slotDate,
           slot_time: slotTime,
@@ -88,9 +114,9 @@ export default function PurchaseForm({
       if (!res.ok) {
         // Someone else took the last place while this checkout was open. Send
         // them back to choose again rather than leaving them stuck on a dead
-        // payment screen — nothing was charged.
+        // payment screen — nothing was charged, and their option comes along.
         if (data.slot_taken) {
-          router.push(`/purchase/${signupId}/book?taken=1`);
+          router.push(withOption(`/purchase/${signupId}/book?taken=1`, option));
           return;
         }
         setError(data.error || "Something went wrong. Please try again.");
@@ -143,19 +169,82 @@ export default function PurchaseForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-5">
       {error && (
         <div className="rounded-lg bg-red-50 border border-red-200 text-red-800 text-sm px-4 py-3">
           {error}
         </div>
       )}
 
-      <div>
-        <label className="block text-sm font-medium mb-1">Your order</label>
+      {/* ── What are you booking? ─────────────────────────────────────── */}
+      <fieldset>
+        <legend className="block text-sm font-medium mb-1.5">What would you like to book?</legend>
         {hasCatalogue ? (
+          <div className="grid gap-2">
+            {mainItems.map((p) => {
+              const active = selectedId === p.id;
+              return (
+                <label
+                  key={p.id}
+                  className="flex cursor-pointer items-start gap-3 rounded-xl border-2 px-4 py-3 transition"
+                  style={{
+                    borderColor: active ? "var(--lagoon)" : "rgba(0,0,0,0.12)",
+                    background: active ? "rgba(46,125,123,0.07)" : "white",
+                  }}
+                >
+                  <input
+                    type="radio"
+                    name="main-item"
+                    value={p.id}
+                    checked={active}
+                    onChange={() => setSelectedId(p.id)}
+                    className="mt-1 h-4 w-4 shrink-0 accent-[var(--lagoon)]"
+                  />
+                  <span className="min-w-0 flex-1">
+                    <span className="flex items-baseline justify-between gap-2">
+                      <span className="text-sm font-semibold text-black/80">{p.name}</span>
+                      <span
+                        className="font-display text-lg font-bold whitespace-nowrap"
+                        style={{ color: "var(--lagoon-dark)" }}
+                      >
+                        {money(Number(p.price_myr))}
+                      </span>
+                    </span>
+                    {p.description && (
+                      <span className="mt-0.5 block text-xs text-black/50">{p.description}</span>
+                    )}
+                    {p.category === "package" && (
+                      <span className="mt-1 inline-block text-[10px] font-bold uppercase tracking-wider text-black/45">
+                        Prepay only
+                      </span>
+                    )}
+                  </span>
+                </label>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="w-full rounded-lg border border-black/10 bg-black/5 px-3 py-2.5">
+            <p className="text-black/80 text-sm font-medium">First Visit — Foot Soak + Coffee</p>
+          </div>
+        )}
+        {isPackage && (
+          <p className="mt-2 text-xs text-black/55">
+            Your package is paid for now; you&apos;re booking the first visit today and can
+            arrange the rest whenever suits — just message us or ask at the counter.
+          </p>
+        )}
+      </fieldset>
+
+      {/* ── Add-ons ───────────────────────────────────────────────────── */}
+      {addOns.length > 0 && (
+        <div>
+          <label className="block text-sm font-medium mb-1.5">
+            Anything else? <span className="font-normal text-black/45">(optional)</span>
+          </label>
           <div className="rounded-lg border border-black/10 divide-y divide-black/5">
-            {products.map((p) => {
-              const q = qty[p.id] ?? 0;
+            {addOns.map((p) => {
+              const q = addOnQty[p.id] ?? 0;
               return (
                 <div key={p.id} className="flex items-center gap-3 px-3 py-2.5">
                   <div className="flex-1 min-w-0">
@@ -178,26 +267,70 @@ export default function PurchaseForm({
               );
             })}
           </div>
-        ) : (
-          <div className="w-full rounded-lg border border-black/10 bg-black/5 px-3 py-2.5">
-            <p className="text-black/80 text-sm font-medium">First Visit — Foot Soak + Coffee</p>
-          </div>
-        )}
-      </div>
+        </div>
+      )}
 
+      {/* ── How to pay ────────────────────────────────────────────────── */}
       <div>
         <label className="block text-sm font-medium mb-1.5">How would you like to pay?</label>
-        <div className="grid gap-2">
-          {timingOption("prepay", "Prepay", prepayTotal, "Secures your slot at the launch rate.", true)}
-          {timingOption("door", "Pay at the door", doorTotal, "Prefer to pay when you arrive? No problem.")}
-        </div>
-        {payTiming === "prepay" && (
+        {isPackage ? (
+          /* Not a hidden rule: say plainly why there is no choice here, so the
+             missing "pay at the door" card doesn't look like a broken page. */
+          <div className="rounded-xl border-2 px-4 py-3" style={{ borderColor: "var(--lagoon)", background: "rgba(46,125,123,0.07)" }}>
+            <div className="flex items-baseline justify-between gap-2">
+              <span className="text-sm font-semibold">Prepay</span>
+              <span className="font-display text-xl font-bold" style={{ color: "var(--lagoon-dark)" }}>
+                {money(total)}
+              </span>
+            </div>
+            <p className="mt-1 text-xs text-black/55">
+              Packages are prepaid so your visits are credited to you from the start. Single
+              visits can still be paid at the door.
+            </p>
+          </div>
+        ) : (
+          <div className="grid gap-2">
+            {timingOption("prepay", "Prepay", subtotal, "Secures your slot at the launch rate.", true)}
+            {timingOption("door", "Pay at the door", subtotal + DOOR_SURCHARGE_MYR, "Prefer to pay when you arrive? No problem.")}
+          </div>
+        )}
+        {effectiveTiming === "prepay" && (
           <p className="text-xs mt-2 rounded-lg px-3 py-2" style={{ background: "rgba(46,125,123,0.08)", color: "var(--lagoon-dark)" }}>
             Your spot is only locked once payment is received — we&apos;ll show you a
             DuitNow QR to scan on the next step. Fully refundable until your slot is confirmed.
           </p>
         )}
       </div>
+
+      {/* ── Total ─────────────────────────────────────────────────────── */}
+      {selected && (
+        <div className="rounded-lg bg-black/5 px-4 py-3 text-sm space-y-1">
+          <div className="flex justify-between gap-2 text-black/70">
+            <span className="min-w-0 truncate">{selected.name}</span>
+            <span className="tabular-nums">{money(Number(selected.price_myr))}</span>
+          </div>
+          {addOns
+            .filter((p) => (addOnQty[p.id] ?? 0) > 0)
+            .map((p) => (
+              <div key={p.id} className="flex justify-between gap-2 text-black/70">
+                <span className="min-w-0 truncate">
+                  {addOnQty[p.id]}× {p.name}
+                </span>
+                <span className="tabular-nums">{money(addOnQty[p.id] * Number(p.price_myr))}</span>
+              </div>
+            ))}
+          {surcharge > 0 && (
+            <div className="flex justify-between gap-2 text-black/70">
+              <span>Pay-at-the-door</span>
+              <span className="tabular-nums">{money(surcharge)}</span>
+            </div>
+          )}
+          <div className="flex justify-between gap-2 border-t border-black/10 pt-1.5 font-semibold" style={{ color: "var(--lagoon-dark)" }}>
+            <span>Total</span>
+            <span className="tabular-nums">{money(total)}</span>
+          </div>
+        </div>
+      )}
 
       <button
         type="submit"

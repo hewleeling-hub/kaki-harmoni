@@ -3,13 +3,21 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { bookableDateRange, formatSlotTime } from "@/lib/slots";
+import { withOption } from "@/config/catalogue";
 
 interface Slot {
   time: string;
   remaining: number;
 }
 
-export default function BookingForm({ signupId }: { signupId: string }) {
+export default function BookingForm({
+  signupId,
+  option = null,
+}: {
+  signupId: string;
+  /** Tier chosen on /prices, handed on to the payment step. */
+  option?: string | null;
+}) {
   const router = useRouter();
   const { min, max } = bookableDateRange();
   const [date, setDate] = useState(min);
@@ -52,7 +60,10 @@ export default function BookingForm({ signupId }: { signupId: string }) {
     setSubmitting(true);
     setError(null);
     router.push(
-      `/purchase/${signupId}?date=${encodeURIComponent(date)}&time=${encodeURIComponent(selectedTime)}`,
+      withOption(
+        `/purchase/${signupId}?date=${encodeURIComponent(date)}&time=${encodeURIComponent(selectedTime)}`,
+        option,
+      ),
     );
   }
 

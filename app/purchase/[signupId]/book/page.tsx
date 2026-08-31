@@ -9,11 +9,12 @@ export default async function BookPage({
   searchParams,
 }: {
   params: Promise<{ signupId: string }>;
-  searchParams: Promise<{ taken?: string }>;
+  searchParams: Promise<{ taken?: string; option?: string }>;
 }) {
   const { signupId } = await params;
-  // Set when payment was refused because the slot filled while checking out.
-  const { taken } = await searchParams;
+  // `taken` is set when payment was refused because the slot filled while
+  // checking out; `option` is the tier chosen back on /prices.
+  const { taken, option } = await searchParams;
 
   // Pre-launch: slots aren't open yet — reservations skip straight to confirmation.
   if (PRELAUNCH_MODE) {
@@ -60,7 +61,7 @@ export default async function BookPage({
             pick another slot.
           </div>
         )}
-        <BookingForm signupId={signupId} />
+        <BookingForm signupId={signupId} option={option ?? null} />
       </div>
     </main>
   );

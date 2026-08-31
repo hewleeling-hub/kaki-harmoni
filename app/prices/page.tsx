@@ -15,6 +15,7 @@ import {
   launchOfferShort,
   telLink,
 } from "@/config/business";
+import { reserveHref, type CatalogueSlug } from "@/config/catalogue";
 
 export const metadata: Metadata = {
   title: "Prices & Packages — Kaki Harmoni",
@@ -24,6 +25,7 @@ export const metadata: Metadata = {
 
 function PriceTile({
   name,
+  slug,
   price,
   detail,
   save,
@@ -31,6 +33,8 @@ function PriceTile({
   featured,
 }: {
   name: string;
+  /** Catalogue entry this tile sells, so the button books this exact thing. */
+  slug: CatalogueSlug;
   price: number;
   detail: string;
   save?: number;
@@ -51,7 +55,10 @@ function PriceTile({
       {perSession ? (
         <p className="mt-1 text-[15px] font-semibold text-brown">RM{perSession} a session</p>
       ) : null}
-      <p className="mt-2 text-[15px] leading-relaxed text-muted">{detail}</p>
+      <p className="mt-2 flex-1 text-[15px] leading-relaxed text-muted">{detail}</p>
+      <Button href={reserveHref(slug)} variant="secondary" full className="mt-5">
+        Book {name}
+      </Button>
     </Card>
   );
 }
@@ -90,7 +97,7 @@ export default function PricesPage() {
             <p className="mt-3 text-[16px] leading-relaxed text-muted">
               A warm 15-minute leg soak and a coffee — an easy way to see whether it suits you.
             </p>
-            <Button href="/#reserve" full className="mt-5" icon={<CalendarIcon size={20} />}>
+            <Button href={reserveHref("first-soak")} full className="mt-5" icon={<CalendarIcon size={20} />}>
               {ctaLabels.firstVisit}
             </Button>
           </Card>
@@ -105,7 +112,7 @@ export default function PricesPage() {
             <p className="mt-3 text-[16px] leading-relaxed text-muted">
               Reserve your spot now and settle when you arrive. Same warm soak and coffee.
             </p>
-            <Button href="/#reserve" variant="secondary" full className="mt-5">
+            <Button href={reserveHref("first-soak")} variant="secondary" full className="mt-5">
               Reserve your spot
             </Button>
           </Card>
@@ -142,7 +149,7 @@ export default function PricesPage() {
         {/* Grid only splits once there is more than one rate to show. */}
         <div className={`mt-6 grid gap-5 ${sessionRates.length > 1 ? "sm:grid-cols-3" : "mx-auto max-w-md"}`}>
           {sessionRates.map((r) => (
-            <PriceTile key={r.name} name={r.name} price={r.price} detail={r.detail} featured={r.name === "Standard single"} />
+            <PriceTile key={r.name} name={r.name} slug={r.slug} price={r.price} detail={r.detail} featured={r.name === "Standard single"} />
           ))}
         </div>
       </section>
@@ -162,6 +169,7 @@ export default function PricesPage() {
             <PriceTile
               key={p.id}
               name={p.name}
+              slug={p.slug}
               price={p.price}
               detail={p.detail}
               save={p.save}
@@ -170,7 +178,8 @@ export default function PricesPage() {
           ))}
         </div>
         <p className="mt-4 text-[14px] text-muted">
-          Ask our team in store or on WhatsApp to set up any package.
+          Book any package right here — or ask our team in store or on WhatsApp if you&apos;d
+          rather set it up with a person.
         </p>
       </section>
 
