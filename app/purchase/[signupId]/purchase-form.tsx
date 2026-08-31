@@ -45,8 +45,11 @@ export default function PurchaseForm({
 }) {
   const router = useRouter();
 
+  // Add-ons are deliberately not sold here — an extra fifteen minutes or a
+  // second coffee is a decision made in the chair, and the shop handles it in
+  // person. The filter stays so a reactivated add-on row could never sneak
+  // into this list as if it were a bookable visit.
   const mainItems = useMemo(() => products.filter(isMainItem), [products]);
-  const addOns = useMemo(() => products.filter((p) => p.category === "addon"), [products]);
 
   // One visit, one main item. The FAQ is explicit that a Double Reset is two
   // soaks for ONE person and that a pair should "book a soak each", so a
@@ -55,13 +58,9 @@ export default function PurchaseForm({
   const [selectedId, setSelectedId] = useState<string | null>(
     preselectedProductId ?? mainItems[0]?.id ?? null,
   );
-  const [addOnQty, setAddOnQty] = useState<Record<string, number>>({});
   const [payTiming, setPayTiming] = useState<PayTiming>("prepay");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const setQuantity = (id: string, next: number) =>
-    setAddOnQty((prev) => ({ ...prev, [id]: Math.max(0, Math.min(20, next)) }));
 
   const selected = mainItems.find((p) => p.id === selectedId) ?? null;
   const hasCatalogue = mainItems.length > 0;
@@ -70,11 +69,7 @@ export default function PurchaseForm({
   const isPackage = selected?.category === "package";
   const effectiveTiming: PayTiming = isPackage ? "prepay" : payTiming;
 
-  const subtotal = useMemo(() => {
-    const main = selected ? Number(selected.price_myr) : 0;
-    const extras = addOns.reduce((sum, p) => sum + (addOnQty[p.id] ?? 0) * Number(p.price_myr), 0);
-    return Math.round((main + extras) * 100) / 100;
-  }, [selected, addOns, addOnQty]);
+  const subtotal = selected ? Number(selected.price_myr) : 0;
 
   const surcharge = effectiveTiming === "door" ? DOOR_SURCHARGE_MYR : 0;
   const total = Math.round((subtotal + surcharge) * 100) / 100;
@@ -88,12 +83,7 @@ export default function PurchaseForm({
       return;
     }
 
-    const items = [
-      ...(selected ? [{ product_id: selected.id, quantity: 1 }] : []),
-      ...addOns
-        .filter((p) => (addOnQty[p.id] ?? 0) > 0)
-        .map((p) => ({ product_id: p.id, quantity: addOnQty[p.id] })),
-    ];
+    const items = selected ? [{ product_id: selected.id, quantity: 1 }] : [];
 
     setSubmitting(true);
     try {
@@ -243,40 +233,6 @@ export default function PurchaseForm({
         )}
       </fieldset>
 
-      {/* ── Add-ons ───────────────────────────────────────────────────── */}
-      {addOns.length > 0 && (
-        <div>
-          <label className="block text-sm font-medium mb-1.5">
-            Anything else? <span className="font-normal text-black/45">(optional)</span>
-          </label>
-          <div className="rounded-lg border border-black/10 divide-y divide-black/5">
-            {addOns.map((p) => {
-              const q = addOnQty[p.id] ?? 0;
-              return (
-                <div key={p.id} className="flex items-center gap-3 px-3 py-2.5">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-black/80">{p.name}</p>
-                    {p.description && <p className="text-xs text-black/45 mt-0.5">{p.description}</p>}
-                    <p className="text-xs font-semibold mt-0.5" style={{ color: "var(--clay)" }}>
-                      {money(Number(p.price_myr))}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <button type="button" aria-label={`Remove one ${p.name}`} onClick={() => setQuantity(p.id, q - 1)} className="w-7 h-7 rounded-full border border-black/15 text-black/70 disabled:opacity-40" disabled={q === 0}>
-                      −
-                    </button>
-                    <span className="w-5 text-center text-sm tabular-nums">{q}</span>
-                    <button type="button" aria-label={`Add one ${p.name}`} onClick={() => setQuantity(p.id, q + 1)} className="w-7 h-7 rounded-full border border-black/15 text-black/70">
-                      +
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
       {/* ── How to pay ────────────────────────────────────────────────── */}
       <div>
         <label className="block text-sm font-medium mb-1.5">How would you like to pay?</label>
@@ -304,29 +260,21 @@ export default function PurchaseForm({
         )}
       </div>
 
-      {/* ── Total ─────────────────────────────────────────────────────── */}
-      {selected && (
+      {/* ── Total ─────────────────────────────────────────────────────── *
+       * Only shown when the total isn't simply the price already on the card
+       * above — i.e. when the door surcharge is being added. Now that add-ons
+       * are gone, a prepay order would otherwise repeat the same figure as a
+       * line and again as a "Total", with the button below making three. */}
+      {selected && surcharge > 0 && (
         <div className="rounded-lg bg-black/5 px-4 py-3 text-sm space-y-1">
           <div className="flex justify-between gap-2 text-black/70">
             <span className="min-w-0 truncate">{selected.name}</span>
             <span className="tabular-nums">{money(Number(selected.price_myr))}</span>
           </div>
-          {addOns
-            .filter((p) => (addOnQty[p.id] ?? 0) > 0)
-            .map((p) => (
-              <div key={p.id} className="flex justify-between gap-2 text-black/70">
-                <span className="min-w-0 truncate">
-                  {addOnQty[p.id]}× {p.name}
-                </span>
-                <span className="tabular-nums">{money(addOnQty[p.id] * Number(p.price_myr))}</span>
-              </div>
-            ))}
-          {surcharge > 0 && (
-            <div className="flex justify-between gap-2 text-black/70">
-              <span>Pay-at-the-door</span>
-              <span className="tabular-nums">{money(surcharge)}</span>
-            </div>
-          )}
+          <div className="flex justify-between gap-2 text-black/70">
+            <span>Pay-at-the-door</span>
+            <span className="tabular-nums">{money(surcharge)}</span>
+          </div>
           <div className="flex justify-between gap-2 border-t border-black/10 pt-1.5 font-semibold" style={{ color: "var(--lagoon-dark)" }}>
             <span>Total</span>
             <span className="tabular-nums">{money(total)}</span>
