@@ -136,7 +136,12 @@ export default function PurchaseForm({
   // Two clear cards rather than a compact list: this is the one real decision
   // on the page. Prepay is visually preferred, but paying at the door is a
   // proper booking too and must not read as a penalty.
-  const timingOption = (value: PayTiming, title: string, price: number, note: string, recommended?: boolean) => {
+  //
+  // These cards deliberately do NOT restate the item price — it is already on
+  // the card above, and repeating it made the same RM25.00 appear twice in a
+  // row as though it were two charges. Only the difference between the two
+  // ways of paying belongs here; the total is stated once, at the bottom.
+  const timingOption = (value: PayTiming, title: string, extra: number, note: string, recommended?: boolean) => {
     const active = payTiming === value;
     return (
       <button
@@ -151,9 +156,11 @@ export default function PurchaseForm({
       >
         <div className="flex items-baseline justify-between gap-2">
           <span className="text-sm font-semibold">{title}</span>
-          <span className="font-display text-xl font-bold" style={{ color: "var(--lagoon-dark)" }}>
-            {money(price)}
-          </span>
+          {extra > 0 && (
+            <span className="font-display text-lg font-bold whitespace-nowrap" style={{ color: "var(--clay)" }}>
+              +{money(extra)}
+            </span>
+          )}
         </div>
         {recommended && (
           <span
@@ -277,12 +284,7 @@ export default function PurchaseForm({
           /* Not a hidden rule: say plainly why there is no choice here, so the
              missing "pay at the door" card doesn't look like a broken page. */
           <div className="rounded-xl border-2 px-4 py-3" style={{ borderColor: "var(--lagoon)", background: "rgba(46,125,123,0.07)" }}>
-            <div className="flex items-baseline justify-between gap-2">
-              <span className="text-sm font-semibold">Prepay</span>
-              <span className="font-display text-xl font-bold" style={{ color: "var(--lagoon-dark)" }}>
-                {money(total)}
-              </span>
-            </div>
+            <span className="text-sm font-semibold">Prepay</span>
             <p className="mt-1 text-xs text-black/55">
               Packages are prepaid so your visits are credited to you from the start. Single
               visits can still be paid at the door.
@@ -290,8 +292,8 @@ export default function PurchaseForm({
           </div>
         ) : (
           <div className="grid gap-2">
-            {timingOption("prepay", "Prepay", subtotal, "Secures your slot at the launch rate.", true)}
-            {timingOption("door", "Pay at the door", subtotal + DOOR_SURCHARGE_MYR, "Prefer to pay when you arrive? No problem.")}
+            {timingOption("prepay", "Prepay", 0, "Secures your slot at the launch rate — no extra charge.", true)}
+            {timingOption("door", "Pay at the door", DOOR_SURCHARGE_MYR, "Prefer to pay when you arrive? No problem.")}
           </div>
         )}
         {effectiveTiming === "prepay" && (
