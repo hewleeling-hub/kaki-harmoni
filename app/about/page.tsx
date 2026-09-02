@@ -51,17 +51,30 @@ export default function AboutPage() {
           className="mb-6 w-full max-w-sm rounded-[22px] object-contain"
         />
         <p className="text-xs font-semibold uppercase tracking-widest text-olive">About us</p>
-        <h1 className="mt-3 text-[34px] leading-tight text-olive-dark sm:text-[44px]">Come rest those feet.</h1>
+        <h1 className="mt-3 text-[34px] leading-tight text-olive-dark sm:text-[44px]">
+          It started with my mother.
+        </h1>
 
+        {/* The founder's real reason, told through what he WANTED for her —
+            keeping up with her friends — and not through what the spa did for
+            her. The family stories behind this business include an ankle that
+            recovered and a stroke, and those are deliberately not here: a foot
+            spa claiming to restore mobility is a medical claim, needs Medicine
+            Advertisements Board approval in Malaysia, and is the exact thing
+            docs/leg-spa-benefits.md says to keep off the site. Wanting to keep
+            up with the people you love is a feeling, not a cure — it is just as
+            moving, and it is true. Keep it that way. */}
         <div className="mt-6 space-y-5 text-[18px] leading-relaxed text-muted">
           <p>
-            Hi, I&apos;m Lotti! 🌸 The little lotus who looks after the warmest corner of Desa
-            Cindaimas — warm leg soaks and good coffee.
+            She&apos;s 78. What I kept noticing wasn&apos;t the aches themselves — it was how often
+            she and her friends would hang back from an outing, saying they&apos;d only slow
+            everyone down. My aunt said much the same about keeping up with a toddler grandchild.
           </p>
           <p>
-            The idea&apos;s small on purpose: fifteen quiet minutes with your feet in warm, bubbly
-            water. Come as you are, bring a friend or don&apos;t — I&apos;ve saved you a spot. Relax,
-            refresh, reconnect. 💛
+            Kaki Harmoni is my answer to that: a warm leg soak, a proper coffee and a comfortable
+            chair, fifteen minutes from your door inside the Desa Cindaimas clubhouse. No
+            appointment weeks ahead, no whole afternoon set aside, and you don&apos;t need to live
+            here — everyone is welcome.
           </p>
         </div>
 
