@@ -232,13 +232,18 @@ export const faqs = [
   },
   {
     q: "Is coffee included?",
-    a: "Yes — a warm coffee or tea is part of your visit, to enjoy before or after your soak (not during, so everything stays clean and hygienic).",
+    a: "Yes — a freshly made coffee is part of your visit, to enjoy before or after your soak (not during, so everything stays clean and hygienic).",
   },
   {
-    /* Only tea is confirmed as an alternative, so no other drink is named here.
-       If the café settles a fuller drinks list, name it in this answer. */
+    /* DRINKS: coffee is the one drink guaranteed with a visit, and the only one
+       named anywhere on this site. Other drinks are stocked but the selection
+       varies day to day, so the answer promises that something else exists
+       without naming it — the previous copy offered tea "on exactly the same
+       terms", which isn't carried at all, and a guest who chose us for that
+       would have found out at the counter. Name a specific drink here only if
+       it is always in stock. */
     q: "I don't drink coffee — is there something else?",
-    a: "Absolutely. Tea is included on exactly the same terms, so you never have to drink coffee to enjoy your visit. If you'd rather have something else, ask our team when you arrive or message us beforehand and we'll tell you what we have that day.",
+    a: "Yes — coffee is what comes with your visit, but we keep other drinks too. What's on changes from day to day, so just ask our team when you arrive and they'll tell you what we have. You're very welcome either way: the soak is the point, and nobody has to drink anything.",
   },
 ] as const;
 

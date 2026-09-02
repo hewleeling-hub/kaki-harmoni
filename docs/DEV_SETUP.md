@@ -102,15 +102,17 @@ Listed here because a chat thread is not a record.
 
 | # | Open question | Where it lands | What the site does meanwhile |
 |---|---|---|---|
-| 1 | **Drinks other than coffee and tea** — what else can we actually offer someone who wants neither? | `faqs`, the "I don't drink coffee" answer in `config/business.ts` | Answers with tea (confirmed in existing copy) and invites the guest to ask the team. Truthful, but names no other drink. |
+| 1 | **Which non-coffee drinks are ALWAYS in stock?** Others are carried, but the selection varies by day, so none can be named as included. | `faqs`, the "I don't drink coffee" answer in `config/business.ts` | Says other drinks exist and to ask on the day. Truthful, but names none — so a guest can't arrive expecting one. Name a drink here only once it is permanently stocked. |
 | 2 | **When does the launch offer end?** RM25 prepay / RM30 door is introductory, not the standing rate. | `launchOffer.endsLabel` in `config/business.ts` | Says "available for a limited period only" and the badge reads "Limited time only". Setting a date switches every mention to "until <date>" and the badge to "Until <date>". |
 | 3 | **Guest testimonials** — none exist before the 11 September opening. | `testimonials` in `config/business.ts` | The section renders nothing at all. Never add invented quotes. |
 | 4 | **Experience video** — no real footage filmed yet. | `experienceVideo.src` in `config/business.ts` | The section renders nothing at all. Never substitute stock footage. |
 | 5 | **Team feature** — migration `0005_team_roles.sql` is unapplied (see above). | Supabase | `/dashboard/team` reads an absent table; every signed-in user degrades to `staff`. |
 
-Note the products table lists **Coffee** only — no tea row — while the FAQ and the
-Prices "What's included" list both promise "coffee or tea". Worth reconciling when
-item 1 is settled.
+**Resolved (0013) — tea.** The catalogue descriptions, the FAQ and the Prices "What's
+included" list all promised "coffee or tea". Tea is not stocked: the products table had a
+Coffee row and no tea row, so the database was right and the copy was wrong. Every mention
+is gone from all four places. Other drinks *are* carried, but the selection varies by day,
+which is why the FAQ says so without naming one — see open item 1 above.
 
 ## Deploying
 

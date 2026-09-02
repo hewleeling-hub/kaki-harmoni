@@ -216,7 +216,8 @@ export default function PricesPage() {
           <ul className="grid gap-3 sm:grid-cols-2">
             {[
               "A warm 15-minute leg soak",
-              "A freshly made coffee or tea",
+              // Coffee only — tea isn't stocked. See the drinks note in the FAQ.
+              "A freshly made coffee",
               "A comfortable place to rest",
               "Time to relax and reconnect",
             ].map((item) => (
