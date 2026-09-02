@@ -15,7 +15,9 @@ export function ExperienceList() {
 
   return (
     <>
-      <section className="space-y-5 py-6">
+      {/* 2×2 from md up. One column on phones — four tall cards side by side
+          would squeeze the description into a ribbon. */}
+      <section className="grid gap-5 py-6 md:grid-cols-2">
         {experiences.map((exp) => (
           <ExperienceCard key={exp.id} exp={exp} onLearnMore={() => setOpen(exp)} />
         ))}

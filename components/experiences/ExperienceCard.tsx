@@ -23,8 +23,11 @@ export function ExperienceCard({
   const badgeBg = `rgba(${exp.glowRgb},0.18)`;
   const badgeText = `rgb(${Math.round(r * 0.68)},${Math.round(g * 0.68)},${Math.round(b * 0.68)})`;
 
+  // Icon above content, never beside it. In a 2-up grid each card is roughly
+  // half the old width, and the old icon-column-plus-text split left the
+  // description as a narrow ribbon. h-full keeps a pair in a row level.
   return (
-    <article className="group grid grid-cols-1 gap-4 rounded-[22px] border border-[rgba(130,105,76,0.12)] bg-[rgba(255,250,241,0.95)] p-5 shadow-[0_8px_30px_rgba(83,66,46,0.06)] transition-[transform,box-shadow] duration-[240ms] ease-out hover:-translate-y-[3px] hover:shadow-[0_16px_40px_rgba(83,66,46,0.11)] sm:grid-cols-[minmax(0,28%)_1fr] sm:items-stretch sm:gap-5 sm:p-7 sm:min-h-[168px]">
+    <article className="group flex h-full flex-col gap-4 rounded-[22px] border border-[rgba(130,105,76,0.12)] bg-[rgba(255,250,241,0.95)] p-5 shadow-[0_8px_30px_rgba(83,66,46,0.06)] transition-[transform,box-shadow] duration-[240ms] ease-out hover:-translate-y-[3px] hover:shadow-[0_16px_40px_rgba(83,66,46,0.11)] sm:gap-5 sm:p-7">
       {/* Icon area — soft radial glow, no visible box */}
       <div className="relative flex min-h-[120px] items-center justify-center">
         <div
@@ -50,8 +53,8 @@ export function ExperienceCard({
         )}
       </div>
 
-      {/* Content */}
-      <div className="flex flex-col">
+      {/* Content — flex-1 so the meta row below still sits at the card's foot */}
+      <div className="flex flex-1 flex-col">
         <h3 className="text-[24px] leading-[1.1] text-olive-dark sm:text-[26px]">{exp.name}</h3>
         <span
           className="mt-1.5 inline-block w-fit rounded-full px-2.5 py-1.5 text-[12.5px] font-semibold leading-none"
