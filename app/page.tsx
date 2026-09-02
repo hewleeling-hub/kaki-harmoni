@@ -428,8 +428,19 @@ export default function Home() {
                 </Button>
               </div>
             </div>
+            {/* The welcome sign rather than Lotti again. She already appears in
+                the hero and the 15-minutes card on this page, so a third
+                identical pose at the closing CTA was just repetition — and the
+                sign carries the tagline in English and Chinese, which does
+                more work at the point of asking. */}
             <div className="hidden justify-self-end sm:block">
-              <Lotti size={160} className="h-auto w-40" />
+              <Image
+                src="/kaki-welcome.png"
+                alt="Lotti holding a wooden sign: Welcome to Kaki Harmoni — Relax. Refresh. Reconnect."
+                width={1083}
+                height={949}
+                className="h-auto w-48 object-contain lg:w-60"
+              />
             </div>
           </div>
         </div>
