@@ -28,7 +28,7 @@ const VISIT_INFO = [
   { label: "Parking", value: "Free parking available on site at the clubhouse." },
   { label: "Who can visit", value: "Everyone is welcome — you do not need to live at Desa Cindaimas. Visitors and walk-ins are always welcome." },
   { label: "Entrance", value: "Inside the Desa Cindaimas clubhouse. Walk in through the main clubhouse entrance and look for the Kaki Harmoni signboard." },
-  { label: "Accessibility", value: "Ground-floor access. Let our team know if you'd like a hand getting settled." },
+  { label: "Accessibility", value: "Ground-floor access, with a ramp on the left-hand side of the clubhouse building. Let our team know if you'd like a hand getting settled." },
   { label: "Booking", value: "Walk-ins welcome, but with only four soaking stations, booking ahead is advisable. Reserve online or message us on WhatsApp." },
 ];
 
