@@ -6,12 +6,20 @@ import { Lotti } from "@/components/ui/Lotti";
 export function PageHeader({
   title,
   subtitle,
-  showLotti = true,
+  showLotti = false,
   image,
   children,
 }: {
   title: string;
   subtitle?: string;
+  /**
+   * Off by default. The mascot used to sit in every one of these headers, so
+   * you met the same drawing again at the top of Our Spa, Prices, Contact and
+   * FAQ — it stopped being a greeting and became furniture. Lotti still
+   * appears where she is doing a job: the homepage hero, About, Your Visit,
+   * Experiences and the booking confirmation. Pass `showLotti` to bring her
+   * back on a specific page.
+   */
   showLotti?: boolean;
   /**
    * A real photo in the mascot's slot, for pages where a picture does a job
