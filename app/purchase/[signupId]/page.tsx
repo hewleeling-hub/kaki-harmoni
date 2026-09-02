@@ -1,11 +1,11 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { notFound, redirect } from "next/navigation";
-import Link from "next/link";
 import PurchaseForm from "./purchase-form";
 import Logo from "@/app/logo";
 import { PRELAUNCH_MODE, LAUNCH_WINDOW } from "@/lib/config";
 import { formatSlotTime } from "@/lib/slots";
-import { productIdForSlug } from "@/config/catalogue";
+import { productIdForSlug, FIRST_VISIT_PRODUCT_ID } from "@/config/catalogue";
+import { hasBookedBefore } from "@/lib/customer";
 
 export default async function PurchasePage({
   params,
@@ -31,37 +31,34 @@ export default async function PurchasePage({
     redirect(`/purchase/${signupId}/book`);
   }
 
+  // Matched on phone, not on this signup row alone — see lib/customer.ts.
+  const isReturning = await hasBookedBefore(supabase, signup);
+
   // Active catalogue for the order picker. If the products table doesn't exist yet
   // (migration 0006 not applied), fall back to an empty list — the form then shows
   // the legacy single first-visit item.
-  const { data: products } = await supabase
+  const { data: allProducts } = await supabase
     .from("products")
     .select("id, name, description, price_myr, category")
     .eq("active", true)
     .order("sort_order", { ascending: true });
 
+  // The first visit is a one-per-person offer, so it simply isn't on the menu
+  // for someone who already has a booking. The API enforces this too — hiding
+  // a radio button is presentation, not a rule.
+  const products = (allProducts ?? []).filter(
+    (p) => !(isReturning && p.id === FIRST_VISIT_PRODUCT_ID),
+  );
+
   // The tier they clicked on /prices, resolved to a real catalogue row. An
   // unrecognised or withdrawn option falls through to null and the form simply
   // defaults, rather than 404ing someone who followed a stale link.
+  // Checked against the filtered list, so a returning guest arriving on a
+  // "First Soak" link falls back to the default rather than preselecting an
+  // option that is no longer theirs to take.
   const preselectedId = productIdForSlug(option);
   const preselected =
-    preselectedId && (products ?? []).some((p) => p.id === preselectedId) ? preselectedId : null;
-
-  if (signup.status === "converted") {
-    return (
-      <main className="min-h-screen flex items-center justify-center p-6">
-        <div className="w-full max-w-md bg-white/80 rounded-2xl shadow-sm border border-black/5 p-8 text-center space-y-4">
-          <Logo size="sm" />
-          <h1 className="font-display text-2xl font-semibold" style={{ color: "var(--lagoon-dark)" }}>
-            You&apos;ve already completed your purchase. Thank you!
-          </h1>
-          <Link href="/" className="inline-block rounded-lg px-4 py-2.5 font-medium text-white" style={{ background: "var(--lagoon)" }}>
-            Back to home
-          </Link>
-        </div>
-      </main>
-    );
-  }
+    preselectedId && products.some((p) => p.id === preselectedId) ? preselectedId : null;
 
   return (
     <main className="min-h-screen flex items-center justify-center p-6">
@@ -69,12 +66,18 @@ export default async function PurchasePage({
         <div className="text-center space-y-1">
           <Logo size="sm" className="mb-2" />
           <h1 className="font-display text-2xl font-semibold" style={{ color: "var(--lagoon-dark)" }}>
-            {PRELAUNCH_MODE ? "Reserve your launch spot" : "Complete your purchase"}
+            {PRELAUNCH_MODE
+              ? "Reserve your launch spot"
+              : isReturning
+                ? "Book your next visit"
+                : "Complete your purchase"}
           </h1>
           <p className="text-black/60 text-sm">
             {PRELAUNCH_MODE
               ? `Hi ${signup.name.split(" ")[0]}, lock in the launch price — we open in ${LAUNCH_WINDOW} and we'll message you to schedule your visit.`
-              : `Hi ${signup.name.split(" ")[0]}, your slot is held until you complete this step.`}
+              : isReturning
+                ? `Welcome back, ${signup.name.split(" ")[0]}. Your slot is held until you complete this step.`
+                : `Hi ${signup.name.split(" ")[0]}, your slot is held until you complete this step.`}
           </p>
         </div>
 
@@ -96,7 +99,7 @@ export default async function PurchasePage({
           signupId={signup.id}
           signupName={signup.name}
           signupPhone={signup.phone ?? ""}
-          products={products ?? []}
+          products={products}
           slotDate={slotDate ?? null}
           slotTime={slotTime ?? null}
           preselectedProductId={preselected}

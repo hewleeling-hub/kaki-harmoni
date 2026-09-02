@@ -47,12 +47,21 @@ export default async function ConfirmationPage({
         </p>
 
         {alreadyConverted ? (
-          <Link
-            href="/"
-            className="inline-flex min-h-12 items-center justify-center rounded-[26px] bg-olive px-5 font-semibold text-ivory transition hover:bg-olive-dark"
-          >
-            Back to home
-          </Link>
+          /* Was a dead end with only "Back to home", which turned away exactly
+             the people the routine ladder is built for. A returning guest goes
+             to the calendar; the first-visit price is dropped from their
+             options at checkout, not hidden from them here. */
+          <div className="space-y-3">
+            <Link
+              href={withOption(`/purchase/${signup.id}/book`, option)}
+              className="flex min-h-12 items-center justify-center rounded-[26px] bg-olive px-5 font-semibold text-ivory transition hover:bg-olive-dark"
+            >
+              Book your next visit
+            </Link>
+            <Link href="/" className="inline-block text-sm text-muted underline underline-offset-2 hover:text-ink">
+              Back to home
+            </Link>
+          </div>
         ) : (
           <div className="space-y-3">
             <Link

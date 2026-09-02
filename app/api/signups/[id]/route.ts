@@ -18,10 +18,14 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
     return NextResponse.json({ error: "Signup not found." }, { status: 404 });
   }
 
+  // Newest first: a returning guest has more than one, and .maybeSingle() on
+  // its own throws as soon as a second row exists.
   const { data: purchase } = await supabase
     .from("purchases")
     .select("*")
     .eq("signup_id", id)
+    .order("created_at", { ascending: false })
+    .limit(1)
     .maybeSingle();
 
   return NextResponse.json({ signup, purchase: purchase ?? null });

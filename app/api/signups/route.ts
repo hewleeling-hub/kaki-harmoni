@@ -5,6 +5,7 @@ import { logActivity, logAudit } from "@/lib/activity";
 import { scoreLead } from "@/lib/scoring";
 import { requireStaff } from "@/lib/auth";
 import { sendSalesAlert, newSignupEmail } from "@/lib/email";
+import { phoneKeyFor } from "@/lib/customer";
 
 export async function GET() {
   const user = await requireStaff();
@@ -98,6 +99,9 @@ export async function POST(request: NextRequest) {
       name,
       email,
       phone,
+      // Written on insert so returning guests can be recognised by the field
+      // we always have. Email is optional since 0008; phone is not.
+      phone_normalised: phoneKeyFor(phone),
       referral_source,
       status: "signed_up",
       lead_score: score.lead_score,

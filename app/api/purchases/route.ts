@@ -5,6 +5,8 @@ import { scoreLead } from "@/lib/scoring";
 import { sendSalesAlert, purchaseConfirmedEmail } from "@/lib/email";
 import { DOOR_SURCHARGE_MYR } from "@/lib/config";
 import { MAX_CAPACITY_PER_SLOT } from "@/lib/slots";
+import { hasBookedBefore } from "@/lib/customer";
+import { FIRST_VISIT_PRODUCT_ID } from "@/config/catalogue";
 
 // Legacy default used when no items are sent or the catalogue isn't available yet.
 const DEFAULT_ITEM_NAME = "First Visit — Foot Soak + Coffee";
@@ -132,12 +134,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Signup not found." }, { status: 404 });
   }
 
-  if (signup.status === "converted") {
-    return NextResponse.json(
-      { error: "You've already completed your purchase. Thank you!", already_converted: true },
-      { status: 409 },
-    );
-  }
+  // Repeat visits are the whole proposition — the routine ladder only means
+  // anything if a guest can come back — so a converted signup is no longer
+  // turned away here. The one thing that does NOT repeat is the discounted
+  // first visit, enforced once the lines are priced below.
+  const isReturning = await hasBookedBefore(supabase, signup);
 
   // The slot is chosen BEFORE payment, so it arrives with the purchase and is
   // written on the same row. Nothing holds it in between — re-check capacity
@@ -165,6 +166,20 @@ export async function POST(request: NextRequest) {
   // Packages are prepay-only. Carrying an unpaid RM840 routine through to the
   // day is a real loss if the guest doesn't arrive, where an unpaid RM30 first
   // visit is not. The form doesn't offer the choice; this is what enforces it.
+  // The first visit is priced below the standard single as an acquisition
+  // offer, so it is available once per person. The checkout doesn't show it to
+  // a returning guest; this is what makes that a rule rather than a hint.
+  if (isReturning && lines.some((l) => l.product_id === FIRST_VISIT_PRODUCT_ID)) {
+    return NextResponse.json(
+      {
+        error:
+          "The first-visit price is for your first soak with us. Please pick another option — welcome back!",
+        first_visit_used: true,
+      },
+      { status: 409 },
+    );
+  }
+
   const hasPackage = lines.some((l) => l.category === "package");
   if (hasPackage && payTiming === "door") {
     return NextResponse.json(

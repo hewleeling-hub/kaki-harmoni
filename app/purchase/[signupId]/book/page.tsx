@@ -28,18 +28,10 @@ export default async function BookPage({
     notFound();
   }
 
-  // Choosing a slot now comes BEFORE payment, so there is deliberately no
-  // purchase to look for here. If one already exists the visit is booked and
-  // paid for, and there is nothing left to do.
-  const { data: purchase } = await supabase
-    .from("purchases")
-    .select("*")
-    .eq("signup_id", signupId)
-    .maybeSingle();
-
-  if (purchase) {
-    redirect(`/purchase/${signupId}/success`);
-  }
+  // An existing booking used to send people straight to the success page,
+  // which made a second visit impossible to book — the routine ladder is built
+  // on people coming back, so a returning guest belongs in the calendar, not at
+  // a dead end. Their previous visit is history, not a blocker.
 
   return (
     <main className="min-h-screen flex items-center justify-center p-6">

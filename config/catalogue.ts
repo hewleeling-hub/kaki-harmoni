@@ -55,3 +55,15 @@ export function withOption(path: string, slug: string | null | undefined): strin
  * simply doesn't offer the choice.
  */
 export const PACKAGES_ARE_PREPAY_ONLY = true;
+
+/**
+ * The discounted first visit, which is exactly that: a first visit. It is an
+ * acquisition offer priced below the RM40 standard single, so a guest may take
+ * it once and once only. Anyone with a booking already on file is offered the
+ * rest of the catalogue instead.
+ *
+ * "Already a customer" is ANY prior purchase row, not a paid one — a booking
+ * made and not yet settled has still used the offer up, or the same person
+ * could claim RM25 repeatedly by never completing payment.
+ */
+export const FIRST_VISIT_PRODUCT_ID = CATALOGUE_PRODUCT_IDS["first-soak"];

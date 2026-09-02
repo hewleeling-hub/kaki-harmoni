@@ -11,10 +11,14 @@ export default async function PurchaseSuccessPage({ params }: { params: Promise<
   const { signupId } = await params;
   const supabase = createAdminClient();
 
+  // The newest booking, not "the" booking: a returning guest has several, and
+  // .maybeSingle() throws outright as soon as there is more than one row.
   const { data: purchase } = await supabase
     .from("purchases")
     .select("*")
     .eq("signup_id", signupId)
+    .order("created_at", { ascending: false })
+    .limit(1)
     .maybeSingle();
 
   const { data: signup } = await supabase
