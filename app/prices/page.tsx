@@ -64,8 +64,17 @@ function PriceTile({
           Book {name}
         </Button>
       ) : (
-        <p className="mt-5 rounded-[18px] border border-dashed border-line bg-cream/50 px-4 py-3 text-[14px] text-muted">
-          Ask our team in store or on WhatsApp to set this up.
+        <p className="mt-5 rounded-[18px] border border-dashed border-line bg-cream/50 px-4 py-3 text-[14px] leading-relaxed text-muted">
+          Sign up at the shop, or{" "}
+          <a
+            href={whatsappLink(`Hi Kaki Harmoni! I'd like to know more about ${name}.`)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-olive underline underline-offset-2 hover:text-olive-dark"
+          >
+            contact us on WhatsApp
+          </a>{" "}
+          for more details.
         </p>
       )}
     </Card>
@@ -189,7 +198,7 @@ export default function PricesPage() {
         <p className="mt-4 text-[14px] text-muted">
           {PACKAGES_ON_SALE
             ? "Book any package right here — or ask our team in store or on WhatsApp if you'd rather set it up with a person."
-            : "Ask our team in store or on WhatsApp to set up any package."}
+            : "Packages are signed up for at the shop — message us on WhatsApp and we'll talk you through them."}
         </p>
       </section>
 
