@@ -169,7 +169,14 @@ export async function POST(request: NextRequest) {
   // The first visit is priced below the standard single as an acquisition
   // offer, so it is available once per person. The checkout doesn't show it to
   // a returning guest; this is what makes that a rule rather than a hint.
-  if (isReturning && lines.some((l) => l.product_id === FIRST_VISIT_PRODUCT_ID)) {
+  // `product_id === null` catches the legacy fallback line, which IS the RM25
+  // first visit under another name. Without that clause a returning guest whose
+  // options came back empty would fall through to it and be charged the
+  // introductory price again, every visit.
+  const isFirstVisitLine = (l: { product_id: string | null }) =>
+    l.product_id === FIRST_VISIT_PRODUCT_ID || l.product_id === null;
+
+  if (isReturning && lines.some(isFirstVisitLine)) {
     return NextResponse.json(
       {
         error:

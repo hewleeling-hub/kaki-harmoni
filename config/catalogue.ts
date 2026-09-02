@@ -36,11 +36,44 @@ export function productIdForSlug(value: string | null | undefined): string | nul
 }
 
 /**
+ * ── LAUNCH SWITCH ────────────────────────────────────────────────────────────
+ * Packages are advertised but not sold online yet. Kaki Harmoni opens on
+ * 11 September and the multi-visit checkout wasn't ready in time, so launch
+ * sells the two single visits only: First Soak (RM25) and Single Soak (RM40).
+ *
+ * NOTHING was deleted to do this. The whole ladder — the ?option= plumbing, the
+ * prepay-only rule, the preselect — is intact and covered by the code below.
+ * To switch packages back on, BOTH of these must happen together:
+ *   1. reactivate the four package rows (revert 0012_first_soak_only.sql), and
+ *   2. flip this to true.
+ * Doing only (1) leaves the CTAs pointing at /#reserve; doing only (2) sends
+ * customers to a checkout that can't sell them what they clicked.
+ */
+export const PACKAGES_ON_SALE = false;
+
+/** The slugs gated by PACKAGES_ON_SALE. Singles are always sellable. */
+const PACKAGE_SLUGS: CatalogueSlug[] = [
+  "double-reset",
+  "five-day-reset",
+  "ten-day-reset",
+  "thirty-day-routine",
+];
+
+/** Can a customer actually buy this today? Drives both CTAs and copy. */
+export function isOnSale(slug: CatalogueSlug): boolean {
+  return PACKAGES_ON_SALE || !PACKAGE_SLUGS.includes(slug);
+}
+
+/**
  * Homepage reserve form, with the chosen option carried along. The query has to
  * come BEFORE the hash or the browser treats it as part of the fragment.
+ *
+ * A slug that isn't on sale drops back to the plain reserve link rather than
+ * preselecting something checkout can't offer — that mismatch is exactly what
+ * made "I picked the 5-day bundle but it still shows 1 visit" happen.
  */
 export function reserveHref(slug?: CatalogueSlug): string {
-  return slug ? `/?option=${slug}#reserve` : "/#reserve";
+  return slug && isOnSale(slug) ? `/?option=${slug}#reserve` : "/#reserve";
 }
 
 /** Appends `?option=…` to a booking-flow URL, when one is being carried. */

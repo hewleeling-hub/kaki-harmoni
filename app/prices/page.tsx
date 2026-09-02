@@ -15,7 +15,7 @@ import {
   launchOfferShort,
   telLink,
 } from "@/config/business";
-import { reserveHref, type CatalogueSlug } from "@/config/catalogue";
+import { reserveHref, isOnSale, PACKAGES_ON_SALE, type CatalogueSlug } from "@/config/catalogue";
 
 export const metadata: Metadata = {
   title: "Prices & Packages — Kaki Harmoni",
@@ -56,9 +56,18 @@ function PriceTile({
         <p className="mt-1 text-[15px] font-semibold text-brown">RM{perSession} a session</p>
       ) : null}
       <p className="mt-2 flex-1 text-[15px] leading-relaxed text-muted">{detail}</p>
-      <Button href={reserveHref(slug)} variant="secondary" full className="mt-5">
-        Book {name}
-      </Button>
+      {/* Only offer a button for what checkout can actually sell today. A
+          package tile keeps its price and its pitch, but sends people to the
+          team rather than to a checkout that would show them a single soak. */}
+      {isOnSale(slug) ? (
+        <Button href={reserveHref(slug)} variant="secondary" full className="mt-5">
+          Book {name}
+        </Button>
+      ) : (
+        <p className="mt-5 rounded-[18px] border border-dashed border-line bg-cream/50 px-4 py-3 text-[14px] text-muted">
+          Ask our team in store or on WhatsApp to set this up.
+        </p>
+      )}
     </Card>
   );
 }
@@ -178,8 +187,9 @@ export default function PricesPage() {
           ))}
         </div>
         <p className="mt-4 text-[14px] text-muted">
-          Book any package right here — or ask our team in store or on WhatsApp if you&apos;d
-          rather set it up with a person.
+          {PACKAGES_ON_SALE
+            ? "Book any package right here — or ask our team in store or on WhatsApp if you'd rather set it up with a person."
+            : "Ask our team in store or on WhatsApp to set up any package."}
         </p>
       </section>
 

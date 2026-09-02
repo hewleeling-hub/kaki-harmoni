@@ -11,6 +11,7 @@ import {
   launchOfferBadge,
   type RoutinePackage,
 } from "@/config/business";
+import { isOnSale } from "@/config/catalogue";
 
 /* --------------------------- RoutineCard ---------------------------- *
  * One rung of the TRY → RESET → ROUTINE → RITUAL ladder. Leads with how
@@ -60,7 +61,15 @@ function RoutineCard({ pkg }: { pkg: RoutinePackage }) {
 
       <p className="mt-3 flex-1 text-[16px] leading-relaxed text-muted">{pkg.positioning}</p>
 
-      {priceKnown ? (
+      {priceKnown && !isOnSale(pkg.slug) ? (
+        /* Priced and real, but not sellable online yet. The tier keeps its
+           pitch; the action becomes the one we can actually honour, rather
+           than a "MAKE IT MY ROUTINE" button that lands on a checkout
+           offering a single soak. */
+        <p className="mt-5 rounded-[18px] border border-dashed border-line bg-cream/50 px-4 py-3 text-[15px] text-muted">
+          Ask our team to set this up — in store or on WhatsApp.
+        </p>
+      ) : priceKnown ? (
         <Button href={pkg.href} full className="mt-5" variant={pkg.featured ? "primary" : "secondary"}>
           {pkg.cta}
         </Button>

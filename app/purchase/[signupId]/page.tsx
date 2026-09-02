@@ -104,6 +104,7 @@ export default async function PurchasePage({
           slotTime={slotTime ?? null}
           preselectedProductId={preselected}
           option={option ?? null}
+          isReturning={isReturning}
         />
       </div>
     </main>

@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { whatsAppLink, BUSINESS_WHATSAPP_NUMBER } from "@/lib/whatsapp";
-import { PRELAUNCH_MODE, DOOR_SURCHARGE_MYR } from "@/lib/config";
+import { PRELAUNCH_MODE, DOOR_SURCHARGE_MYR, PREPAY_PRICE_MYR } from "@/lib/config";
 import { withOption } from "@/config/catalogue";
 
 type Product = {
@@ -30,6 +30,7 @@ export default function PurchaseForm({
   slotTime = null,
   preselectedProductId = null,
   option = null,
+  isReturning = false,
 }: {
   signupId: string;
   signupName: string;
@@ -42,6 +43,8 @@ export default function PurchaseForm({
   preselectedProductId?: string | null;
   /** The raw slug, kept so a bounce back to the calendar doesn't lose it. */
   option?: string | null;
+  /** This phone has booked before, so the first-visit price isn't on offer. */
+  isReturning?: boolean;
 }) {
   const router = useRouter();
 
@@ -174,6 +177,25 @@ export default function PurchaseForm({
       )}
 
       {/* ── What are you booking? ─────────────────────────────────────── */}
+      {/* Say why the RM25 option isn't here. Removing it silently left people
+          wondering whether the site was broken or the price had gone up —
+          worse than the answer, which is simply that they've had it. Warm, not
+          a telling-off: they are a returning customer, which is the point. */}
+      {isReturning && (
+        <div
+          className="rounded-xl border px-4 py-3"
+          style={{ borderColor: "rgba(46,125,123,0.35)", background: "rgba(46,125,123,0.07)" }}
+        >
+          <p className="text-sm font-semibold" style={{ color: "var(--lagoon-dark)" }}>
+            Welcome back — you&apos;ve already had your first soak with us.
+          </p>
+          <p className="mt-1 text-xs text-black/60">
+            The RM{PREPAY_PRICE_MYR} first-visit price is a one-off for new guests, so it isn&apos;t
+            shown below. Everything else is open to you as usual.
+          </p>
+        </div>
+      )}
+
       <fieldset>
         <legend className="block text-sm font-medium mb-1.5">What would you like to book?</legend>
         {hasCatalogue ? (
