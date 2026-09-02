@@ -42,13 +42,10 @@ export const businessConfig = {
      * only channel here that carries the Chinese-language welcome already on
      * the shopfront.
      *
-     * `null` until the real profile URL is confirmed. Rednote handles cannot be
-     * guessed from the Instagram one, and linking the wrong account would send
-     * customers to a stranger — so, like `testimonials` and `experienceVideo`,
-     * this renders NOTHING rather than a placeholder. Set the URL and the link
-     * appears in the footer and on Contact automatically.
+     * Set to null to withdraw the channel: the footer link and the Contact row
+     * both disappear rather than leaving a dead link behind.
      */
-    rednote: null as string | null,
+    rednote: "https://www.rednote.com/user/profile/6a6323d3000000000e03bc02" as string | null,
   },
 
   address: {
