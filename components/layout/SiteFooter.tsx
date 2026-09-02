@@ -66,6 +66,12 @@ export function SiteFooter() {
             <a href={businessConfig.social.facebook} target="_blank" rel="noopener noreferrer" className="text-sm hover:text-ivory">
               Facebook
             </a>
+            {/* Appears the moment social.rednote holds a real URL. */}
+            {businessConfig.social.rednote && (
+              <a href={businessConfig.social.rednote} target="_blank" rel="noopener noreferrer" className="text-sm hover:text-ivory">
+                Rednote
+              </a>
+            )}
           </div>
           <a href={mapsSearchLink} target="_blank" rel="noopener noreferrer" className="block pt-1 text-sm underline underline-offset-4 hover:text-ivory">
             Open in Google Maps

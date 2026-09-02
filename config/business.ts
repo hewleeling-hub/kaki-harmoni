@@ -37,6 +37,18 @@ export const businessConfig = {
   social: {
     instagram: "https://www.instagram.com/kakiharmoni/",
     facebook: "https://facebook.com/KakiHarmoni",
+    /**
+     * Rednote (Xiaohongshu / 小红书) — a strong fit for this audience, and the
+     * only channel here that carries the Chinese-language welcome already on
+     * the shopfront.
+     *
+     * `null` until the real profile URL is confirmed. Rednote handles cannot be
+     * guessed from the Instagram one, and linking the wrong account would send
+     * customers to a stranger — so, like `testimonials` and `experienceVideo`,
+     * this renders NOTHING rather than a placeholder. Set the URL and the link
+     * appears in the footer and on Contact automatically.
+     */
+    rednote: null as string | null,
   },
 
   address: {

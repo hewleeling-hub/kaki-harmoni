@@ -20,6 +20,10 @@ export default function ContactPage() {
     { label: "Email", value: businessConfig.email, href: `mailto:${businessConfig.email}`, external: false, cta: "Send an email" },
     { label: "Instagram", value: "@kakiharmoni", href: businessConfig.social.instagram, external: true, cta: "Follow us" },
     { label: "Facebook", value: "Kaki Harmoni", href: businessConfig.social.facebook, external: true, cta: "Like our page" },
+    // Only listed once social.rednote holds a real URL — see config/business.ts.
+    ...(businessConfig.social.rednote
+      ? [{ label: "Rednote", value: "Kaki Harmoni", href: businessConfig.social.rednote, external: true, cta: "Follow us" }]
+      : []),
   ];
 
   return (
