@@ -40,20 +40,26 @@ export default function FindUsPage() {
       <PageHeader
         title="Find Us"
         subtitle="Come by for a warm soak, a quiet break and a friendly cup of coffee."
-        image={{ src: "/shop/entrance.png", alt: "The Kaki Harmoni entrance — the AQUAHARMONI SDN BHD signboard, glass doors with Lotti waving hello, and Open Daily 10am–8pm", width: 1092, height: 1456 }}
-      />
+        image={{
+          src: "/shop/entrance.png",
+          alt: "The Kaki Harmoni entrance — an illuminated sign reading Kaki Harmoni, Pusat Relaksasi dan Kafe above glass double doors, with Lotti the mascot waving beside speech bubbles saying Welcome, Jemput Masuk and 欢迎, and the café tables visible inside",
+          width: 1086,
+          height: 1448,
+        }}
+      >
+        {/* The wayfinding line sits inside the header, with the photo it
+            describes — outside the box it read as a stray caption floating
+            between two sections.
 
-      {/* The wayfinding line that used to caption the standalone photo. The photo
-          now sits in the header, so the instruction moves with it. */}
-      {/* The trading name, not the company name. AQUAHARMONI SDN BHD is the
-          small ownership line on the signboard; "Kaki Harmoni" is the part
-          somebody standing in the clubhouse can actually read from a distance,
-          and the only name they know us by. The legal name stays in the
-          footer, where it belongs. */}
-      <p className="mt-3 text-center text-[15px] text-muted">
-        Look for the <span className="font-semibold text-olive-dark">Kaki Harmoni</span> sign
-        — Lotti will be waving you in.
-      </p>
+            The trading name, not the company name: AQUAHARMONI SDN BHD is the
+            small ownership line on the signboard, while "Kaki Harmoni" is the
+            part somebody standing in the clubhouse can read from across the
+            lobby, and the only name they know us by. */}
+        <p className="text-[15px] text-muted">
+          Look for the <span className="font-semibold text-olive-dark">Kaki Harmoni</span> sign
+          — Lotti will be waving you in.
+        </p>
+      </PageHeader>
 
       {/* Removes the single biggest access doubt before anyone reads further. */}
       <p className="mt-6 rounded-[22px] border border-olive/25 bg-sage/25 px-6 py-5 text-center text-[18px] leading-relaxed text-olive-dark">

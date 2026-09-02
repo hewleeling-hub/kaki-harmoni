@@ -386,9 +386,9 @@ export default function Home() {
           <figure className="overflow-hidden rounded-[22px] border border-line shadow-[var(--shadow-warm)]">
             <Image
               src="/shop/entrance.png"
-              alt="The Kaki Harmoni entrance, with Lotti waving hello on the glass door"
-              width={1092}
-              height={1456}
+              alt="The Kaki Harmoni entrance, with the illuminated sign above glass doors and Lotti waving hello"
+              width={1086}
+              height={1448}
               className="h-40 w-full object-cover object-top sm:h-44 lg:h-full"
             />
           </figure>
