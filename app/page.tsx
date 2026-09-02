@@ -82,7 +82,13 @@ export default function Home() {
             A warm leg soak, a good coffee and a comfortable place to sit — all in
             fifteen minutes. Easy enough to fit into your day, every day.
           </p>
-          <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+          {/* One CTA only. "Build Your Routine" asked a first-time visitor to
+              choose a multi-visit package before they knew what a soak here is
+              even like — a decision they have no basis to make at the top of
+              the page. The routine ladder still sits further down, once the
+              15-minute visit has been explained, which is where the question
+              actually makes sense. */}
+          <div className="mt-7">
             <Button href="#reserve" size="lg" icon={<CalendarIcon size={22} />}>
               {/* The time limit rides inside the CTA itself — as a badge beside the
                   button it read as a separate offer sitting next to it. */}
@@ -92,9 +98,6 @@ export default function Home() {
                   {launchOfferBadge}
                 </span>
               </span>
-            </Button>
-            <Button href="#routine" variant="secondary" size="lg">
-              {ctaLabels.routine}
             </Button>
           </div>
           <p className="mt-4 text-[15px] text-muted">
