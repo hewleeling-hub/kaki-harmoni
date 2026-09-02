@@ -97,11 +97,13 @@ export default function FindUsPage() {
             >
               WhatsApp Us
             </Button>
+            {/* The number belongs on the button, not under the row: sitting
+                below all three it read as a caption for the group, and "Call"
+                alone made you hunt for what you'd be dialling. */}
             <Button href={telLink} variant="secondary" icon={<PhoneIcon size={20} />} full>
-              Call
+              Call {callDisplay}
             </Button>
           </div>
-          <p className="mt-3 text-[14px] text-muted">{callDisplay}</p>
         </Card>
 
         <Card className="flex flex-col bg-cream/60">
