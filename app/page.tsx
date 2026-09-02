@@ -220,6 +220,14 @@ export default function Home() {
             <p className="mt-5 text-[17px] leading-relaxed text-muted">
               That&rsquo;s why we encourage making this as part of your wellness routine.
             </p>
+            {/* The routine CTA belongs here rather than in the hero: by this
+                point the case for coming regularly has actually been made, so
+                the button answers a question the reader is already holding
+                instead of asking them to commit before they know what a soak
+                here is like. */}
+            <Button href="#routine" variant="secondary" className="mt-5">
+              {ctaLabels.routine}
+            </Button>
           </Card>
         </div>
       </section>
