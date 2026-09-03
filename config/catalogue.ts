@@ -82,12 +82,20 @@ export function withOption(path: string, slug: string | null | undefined): strin
 }
 
 /**
- * Packages are prepay-only. Pay-at-the-door is a sensible option on a RM30
- * first visit; carrying an unpaid RM840 booking through to the day is a real
- * loss if the guest doesn't turn up. Enforced on the server too — the client
- * simply doesn't offer the choice.
+ * Whether a package must be prepaid, or may be settled on arrival like a
+ * single visit.
+ *
+ * FALSE, because packages are signed up for at the shop and paid there — the
+ * site's own copy says "book your first session online and pay at the shop",
+ * and refusing pay-at-the-door in checkout would contradict it.
+ *
+ * The argument for true is real and worth keeping in view: an unpaid RM840
+ * routine that no-shows costs far more than an unpaid RM30 first visit. If
+ * packages ever go on sale online AND no-shows become a problem, flip this
+ * back — one switch, read by both the checkout form and POST /api/purchases,
+ * so the two can't disagree.
  */
-export const PACKAGES_ARE_PREPAY_ONLY = true;
+export const PACKAGES_ARE_PREPAY_ONLY = false;
 
 /**
  * The discounted first visit, which is exactly that: a first visit. It is an

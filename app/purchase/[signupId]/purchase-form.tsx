@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { whatsAppLink, BUSINESS_WHATSAPP_NUMBER } from "@/lib/whatsapp";
 import { PRELAUNCH_MODE, DOOR_SURCHARGE_MYR, PREPAY_PRICE_MYR } from "@/lib/config";
-import { withOption } from "@/config/catalogue";
+import { withOption, PACKAGES_ARE_PREPAY_ONLY } from "@/config/catalogue";
 
 type Product = {
   id: string;
@@ -68,9 +68,12 @@ export default function PurchaseForm({
   const selected = mainItems.find((p) => p.id === selectedId) ?? null;
   const hasCatalogue = mainItems.length > 0;
 
-  // Packages are prepay-only, so a door surcharge can never apply to one.
+  // Packages may be settled on arrival like a single visit — see
+  // PACKAGES_ARE_PREPAY_ONLY, which is the one switch governing this and the
+  // matching server-side rule.
   const isPackage = selected?.category === "package";
-  const effectiveTiming: PayTiming = isPackage ? "prepay" : payTiming;
+  const prepayOnly = PACKAGES_ARE_PREPAY_ONLY && isPackage;
+  const effectiveTiming: PayTiming = prepayOnly ? "prepay" : payTiming;
 
   const subtotal = selected ? Number(selected.price_myr) : 0;
 
@@ -232,7 +235,7 @@ export default function PurchaseForm({
                     {p.description && (
                       <span className="mt-0.5 block text-xs text-black/50">{p.description}</span>
                     )}
-                    {p.category === "package" && (
+                    {PACKAGES_ARE_PREPAY_ONLY && p.category === "package" && (
                       <span className="mt-1 inline-block text-[10px] font-bold uppercase tracking-wider text-black/45">
                         Prepay only
                       </span>
@@ -249,8 +252,8 @@ export default function PurchaseForm({
         )}
         {isPackage && (
           <p className="mt-2 text-xs text-black/55">
-            Your package is paid for now; you&apos;re booking the first visit today and can
-            arrange the rest whenever suits — just message us or ask at the counter.
+            You&apos;re booking the first visit today; the rest are yours to arrange whenever
+            suits — just message us or ask at the counter.
           </p>
         )}
       </fieldset>
@@ -258,7 +261,7 @@ export default function PurchaseForm({
       {/* ── How to pay ────────────────────────────────────────────────── */}
       <div>
         <label className="block text-sm font-medium mb-1.5">How would you like to pay?</label>
-        {isPackage ? (
+        {prepayOnly ? (
           /* Not a hidden rule: say plainly why there is no choice here, so the
              missing "pay at the door" card doesn't look like a broken page. */
           <div className="rounded-xl border-2 px-4 py-3" style={{ borderColor: "var(--lagoon)", background: "rgba(46,125,123,0.07)" }}>

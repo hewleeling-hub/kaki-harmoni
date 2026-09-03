@@ -6,7 +6,7 @@ import { sendSalesAlert, purchaseConfirmedEmail } from "@/lib/email";
 import { DOOR_SURCHARGE_MYR } from "@/lib/config";
 import { MAX_CAPACITY_PER_SLOT } from "@/lib/slots";
 import { hasBookedBefore } from "@/lib/customer";
-import { FIRST_VISIT_PRODUCT_ID } from "@/config/catalogue";
+import { FIRST_VISIT_PRODUCT_ID, PACKAGES_ARE_PREPAY_ONLY } from "@/config/catalogue";
 
 // Legacy default used when no items are sent or the catalogue isn't available yet.
 const DEFAULT_ITEM_NAME = "First Visit — Foot Soak + Coffee";
@@ -163,7 +163,9 @@ export async function POST(request: NextRequest) {
 
   const lines = await resolveLines(supabase, body.items);
 
-  // Packages are prepay-only. Carrying an unpaid RM840 routine through to the
+  // Off by default — packages are settled at the shop, so refusing
+  // pay-at-the-door here would contradict the site's own instruction. Kept as
+  // a switch: carrying an unpaid RM840 routine through to the
   // day is a real loss if the guest doesn't arrive, where an unpaid RM30 first
   // visit is not. The form doesn't offer the choice; this is what enforces it.
   // The first visit is priced below the standard single as an acquisition
@@ -188,7 +190,7 @@ export async function POST(request: NextRequest) {
   }
 
   const hasPackage = lines.some((l) => l.category === "package");
-  if (hasPackage && payTiming === "door") {
+  if (PACKAGES_ARE_PREPAY_ONLY && hasPackage && payTiming === "door") {
     return NextResponse.json(
       {
         error:
