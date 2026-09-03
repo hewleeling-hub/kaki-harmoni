@@ -9,7 +9,6 @@ import {
   testimonials,
   experienceVideo,
   launchOfferBadge,
-  whatsappLink,
   type RoutinePackage,
 } from "@/config/business";
 import { isOnSale, reserveHref } from "@/config/catalogue";
@@ -66,22 +65,14 @@ function RoutineCard({ pkg }: { pkg: RoutinePackage }) {
         /* Priced and real, but not sellable online yet. The tier keeps its
            pitch; the action becomes the one we can actually honour, rather
            than a "MAKE IT MY ROUTINE" button that lands on a checkout
-           offering a single soak. The WhatsApp link is live and pre-fills the
-           package name, so the guest doesn't have to explain what they saw. */
+           offering a single soak. One line, because these cards are narrow —
+           anything longer wrapped to four lines and swamped the price. The
+           WhatsApp route lives under the ladder rather than in every card. */
         <p className="mt-5 rounded-[18px] border border-dashed border-line bg-cream/50 px-4 py-3 text-[15px] leading-relaxed text-muted">
           <a href={reserveHref()} className="font-semibold text-olive underline underline-offset-2 hover:text-olive-dark">
-            Book a soak online
-          </a>
-          , then tell us at the shop and we&apos;ll set up your {pkg.name}. Or{" "}
-          <a
-            href={whatsappLink(`Hi Kaki Harmoni! I'd like to know more about the ${pkg.name} package.`)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-semibold text-olive underline underline-offset-2 hover:text-olive-dark"
-          >
-            ask us on WhatsApp
-          </a>
-          .
+            Book your first session online
+          </a>{" "}
+          and pay at the shop.
         </p>
       ) : priceKnown ? (
         <Button href={pkg.href} full className="mt-5" variant={pkg.featured ? "primary" : "secondary"}>

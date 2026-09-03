@@ -70,18 +70,9 @@ function PriceTile({
       ) : (
         <p className="mt-5 rounded-[18px] border border-dashed border-line bg-cream/50 px-4 py-3 text-[14px] leading-relaxed text-muted">
           <a href={reserveHref()} className="font-semibold text-olive underline underline-offset-2 hover:text-olive-dark">
-            Book a soak online
-          </a>
-          , then tell us at the shop and we&apos;ll set up your {name}. Or{" "}
-          <a
-            href={whatsappLink(`Hi Kaki Harmoni! I'd like to know more about ${name}.`)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-semibold text-olive underline underline-offset-2 hover:text-olive-dark"
-          >
-            ask us on WhatsApp
-          </a>
-          .
+            Book your first session online
+          </a>{" "}
+          and pay at the shop.
         </p>
       )}
     </Card>
@@ -205,7 +196,7 @@ export default function PricesPage() {
         <p className="mt-4 text-[14px] text-muted">
           {PACKAGES_ON_SALE
             ? "Book any package right here — or ask our team in store or on WhatsApp if you'd rather set it up with a person."
-            : "Book a soak online and tell us at the shop, and we'll set your package up from there — or message us on WhatsApp and we'll talk you through them."}
+            : "Book your first session online and pay at the shop — our team will set the package up for you there. Message us on WhatsApp if you'd like to talk it through first."}
         </p>
       </section>
 
