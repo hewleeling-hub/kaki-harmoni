@@ -63,11 +63,22 @@ export default function AboutPage() {
             she and her friends would hang back from an outing, saying they&apos;d only slow
             everyone down. My aunt said much the same about keeping up with a toddler grandchild.
           </p>
+          {/* The founder's own ten years is the credibility beat, and it works
+              because it is a fact about what HE does, not a claim about what
+              the soak does. "I've seen the benefits" was the original wording;
+              "benefits" is both vaguely medical and unpersuasive, where a
+              decade of not skipping proves the same point and lets the reader
+              draw their own conclusion. It also matches what we sell: a daily
+              habit, from someone who has kept one. */}
           <p>
-            Kaki Harmoni is my answer to that: a warm leg soak, a proper coffee and a comfortable
-            chair, fifteen minutes from your door inside the Desa Cindaimas clubhouse. No
-            appointment weeks ahead, no whole afternoon set aside, and you don&apos;t need to live
-            here — everyone is welcome.
+            I&apos;ve used this same soak myself for more than ten years, most days — it&apos;s
+            fifteen minutes I don&apos;t skip. I&apos;d wanted to share it more widely for a long
+            time, and this is the place to do it.
+          </p>
+          <p>
+            So Kaki Harmoni is a warm leg soak, a proper coffee and a comfortable chair, inside
+            the Desa Cindaimas clubhouse. No appointment weeks ahead, no whole afternoon set
+            aside, and you don&apos;t need to live here — everyone is welcome.
           </p>
         </div>
 
