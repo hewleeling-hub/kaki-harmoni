@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { whatsAppLink, BUSINESS_WHATSAPP_NUMBER } from "@/lib/whatsapp";
 import { PRELAUNCH_MODE, DOOR_SURCHARGE_MYR, PREPAY_PRICE_MYR } from "@/lib/config";
-import { withOption, PACKAGES_ARE_PREPAY_ONLY } from "@/config/catalogue";
+import { withOption, PACKAGES_ARE_PREPAY_ONLY, FIRST_VISIT_PRODUCT_ID } from "@/config/catalogue";
 
 type Product = {
   id: string;
@@ -77,7 +77,13 @@ export default function PurchaseForm({
 
   const subtotal = selected ? Number(selected.price_myr) : 0;
 
-  const surcharge = effectiveTiming === "door" ? DOOR_SURCHARGE_MYR : 0;
+  // The surcharge is the FIRST VISIT's prepay-vs-door gap and nothing else:
+  // lib/config defines it as WALKIN_PRICE_MYR - PREPAY_PRICE_MYR, RM30 at the
+  // door against RM25 prepaid. It is not a fee for paying in person, so a
+  // returning guest pays RM40 for a Single Soak either way — there is no RM45
+  // rate published anywhere.
+  const doorSurcharge = selected?.id === FIRST_VISIT_PRODUCT_ID ? DOOR_SURCHARGE_MYR : 0;
+  const surcharge = effectiveTiming === "door" ? doorSurcharge : 0;
   const total = Math.round((subtotal + surcharge) * 100) / 100;
 
   async function handleSubmit(e: React.FormEvent) {
@@ -273,8 +279,24 @@ export default function PurchaseForm({
           </div>
         ) : (
           <div className="grid gap-2">
-            {timingOption("prepay", "Prepay", 0, "Secures your slot at the launch rate — no extra charge.", true)}
-            {timingOption("door", "Pay at the door", DOOR_SURCHARGE_MYR, "Prefer to pay when you arrive? No problem.")}
+            {timingOption(
+              "prepay",
+              "Prepay",
+              0,
+              doorSurcharge > 0
+                ? "Secures your slot at the launch rate — no extra charge."
+                : "Secures your slot before you arrive — no extra charge.",
+              // "Best value" only means something where prepaying is cheaper.
+              doorSurcharge > 0,
+            )}
+            {timingOption(
+              "door",
+              "Pay at the door",
+              doorSurcharge,
+              doorSurcharge > 0
+                ? "Prefer to pay when you arrive? No problem."
+                : "Same price — settle it with us when you arrive.",
+            )}
           </div>
         )}
         {effectiveTiming === "prepay" && (

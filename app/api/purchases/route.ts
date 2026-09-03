@@ -201,8 +201,14 @@ export async function POST(request: NextRequest) {
   }
 
   const subtotal = lines.reduce((sum, l) => sum + l.line_total_myr, 0);
-  // Pay-at-the-door adds a small surcharge; prepaying is the cheaper option.
-  const surcharge = payTiming === "door" ? DOOR_SURCHARGE_MYR : 0;
+  // The surcharge belongs to the FIRST VISIT ONLY. It is defined in lib/config
+  // as WALKIN_PRICE_MYR - PREPAY_PRICE_MYR — RM30 at the door against RM25
+  // prepaid — so it is the shape of the launch offer, not a general fee for
+  // paying in person. Everything else costs the same either way: a Single Soak
+  // is RM40 online or at the counter, and there is no RM45 rate anywhere on
+  // the site to justify adding it.
+  const surcharge =
+    payTiming === "door" && lines.some(isFirstVisitLine) ? DOOR_SURCHARGE_MYR : 0;
   const orderTotal = Math.round((subtotal + surcharge) * 100) / 100;
 
   // Nothing is actually collected at the moment of checkout — cash is paid in person at the
