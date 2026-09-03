@@ -70,15 +70,32 @@ export default function AboutPage() {
               decade of not skipping proves the same point and lets the reader
               draw their own conclusion. It also matches what we sell: a daily
               habit, from someone who has kept one. */}
+          {/* "Like brushing my teeth" is the founder's own phrase and worth
+              protecting: it reframes a soak from a treat you occasionally
+              justify into an ordinary daily thing, which is precisely what the
+              routine ladder sells. The bubbles line is the only sensory beat on
+              the page — everything else here is commitment and convenience. */}
           <p>
-            I&apos;ve used this same soak myself for more than ten years, most days — it&apos;s
-            fifteen minutes I don&apos;t skip. I&apos;d wanted to share it more widely for a long
-            time, and this is the place to do it.
+            I&apos;ve had a spa at home for more than ten years, and I soak every day I&apos;m
+            home. It&apos;s become a habit, not unlike brushing my teeth, and the bubbles set the
+            day off in a good mood. Travelling is the only thing that stops me.
+          </p>
+          {/* The founder's reason for opening is, word for word, the argument
+              `whyNotAtHome` already makes on the homepage: fresh water, salts
+              and oils you wouldn't keep in, nothing to clean up. Worth keeping
+              the two in step — a sales point lands differently when it turns
+              out to be why the place exists. */}
+          <p>
+            But a home spa is a serious outlay, and even once you have one there&apos;s water to
+            run, salts and oils to measure out, and the whole lot to clean up afterwards. Kaki
+            Harmoni is the same fifteen minutes without any of that — the water&apos;s ready, the
+            blend is made up for you, there&apos;s a coffee waiting, and someone else clears it
+            all away.
           </p>
           <p>
-            So Kaki Harmoni is a warm leg soak, a proper coffee and a comfortable chair, inside
-            the Desa Cindaimas clubhouse. No appointment weeks ahead, no whole afternoon set
-            aside, and you don&apos;t need to live here — everyone is welcome.
+            You&apos;ll find us inside the Desa Cindaimas clubhouse. No appointment weeks ahead,
+            no whole afternoon set aside, and you don&apos;t need to live here — everyone is
+            welcome.
           </p>
         </div>
 
