@@ -3,7 +3,7 @@ import Image from "next/image";
 import { PublicShell } from "@/components/layout/PublicShell";
 import { Button, Card } from "@/components/ui/primitives";
 import { CalendarIcon, MapPinIcon } from "@/components/ui/icons";
-import { businessConfig } from "@/config/business";
+import { businessConfig, founders } from "@/config/business";
 
 export const metadata: Metadata = {
   title: "About — Kaki Harmoni",
@@ -43,13 +43,6 @@ export default function AboutPage() {
   return (
     <PublicShell>
       <div className="mx-auto max-w-3xl py-8 md:py-12">
-        <Image
-          src="/kaki-welcome.png"
-          alt="Welcome to Kaki Harmoni — Relax. Refresh. Reconnect."
-          width={420}
-          height={315}
-          className="mb-6 w-full max-w-sm rounded-[22px] object-contain"
-        />
         <p className="text-xs font-semibold uppercase tracking-widest text-olive">About us</p>
         <h1 className="mt-3 text-[34px] leading-tight text-olive-dark sm:text-[44px]">
           It started with my mother.
@@ -77,6 +70,31 @@ export default function AboutPage() {
             here — everyone is welcome.
           </p>
         </div>
+
+        {/* Renders NOTHING until config/business.ts has real photographs —
+            same rule as testimonials and the experience video. The welcome
+            sign used to sit at the top of this page, but a drawing is exactly
+            what an About page shouldn't lead with: the point is that real
+            people run this. Empty is better than a stand-in. */}
+        {founders.length > 0 && (
+          <div className="mt-10 grid gap-6 sm:grid-cols-2">
+            {founders.map((person) => (
+              <figure key={person.name} className="flex items-center gap-4">
+                <Image
+                  src={person.photo}
+                  alt={person.alt ?? person.name}
+                  width={160}
+                  height={160}
+                  className="h-20 w-20 shrink-0 rounded-full border border-line object-cover"
+                />
+                <figcaption>
+                  <p className="text-[17px] font-semibold text-olive-dark">{person.name}</p>
+                  {person.role && <p className="text-[15px] text-muted">{person.role}</p>}
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        )}
 
         <div className="mt-8 flex flex-wrap gap-3">
           <Button href="/#reserve" icon={<CalendarIcon size={20} />}>
