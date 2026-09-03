@@ -3,7 +3,6 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { notFound } from "next/navigation";
 import { Lotti } from "@/components/ui/Lotti";
 import { whatsAppLink, BUSINESS_WHATSAPP_NUMBER } from "@/lib/whatsapp";
-import { PREPAY_PRICE_MYR } from "@/lib/config";
 import { withOption } from "@/config/catalogue";
 
 export default async function ConfirmationPage({
@@ -28,7 +27,7 @@ export default async function ConfirmationPage({
   const firstName = signup.name.split(" ")[0];
   const waLink = whatsAppLink(
     BUSINESS_WHATSAPP_NUMBER,
-    `Hi Kaki Harmoni! This is ${signup.name}. I reserved the RM${PREPAY_PRICE_MYR} first-visit offer but need a bit more time before purchasing — please remind me!`,
+    `Hi Kaki Harmoni! This is ${signup.name}. I've signed up but haven't picked a time yet — please remind me!`,
   );
 
   return (
@@ -39,11 +38,14 @@ export default async function ConfirmationPage({
           ✓
         </div>
         <h1 className="text-[26px] text-olive-dark">You&apos;re on the list, {firstName}!</h1>
+        {/* The next screen is the CALENDAR, not payment — the flow became
+            details → pick a time → pay, and this page still promised a
+            prepayment step that doesn't come next. Nothing is held until a
+            slot is chosen, so this asks for the slot. */}
         <p className="text-[16px] text-muted">
-          We&apos;ve saved your spot.{" "}
           {alreadyConverted
-            ? "You've already completed your reservation — see you soon."
-            : "Ready to lock it in with a prepayment?"}
+            ? "We've saved your details. Ready to book your next visit?"
+            : "We've saved your details. Next, pick a time that suits you."}
         </p>
 
         {alreadyConverted ? (
@@ -68,7 +70,7 @@ export default async function ConfirmationPage({
               href={withOption(`/purchase/${signup.id}/book`, option)}
               className="flex min-h-12 items-center justify-center rounded-[26px] bg-olive px-5 font-semibold text-ivory transition hover:bg-olive-dark"
             >
-              Complete prepayment
+              Book your appointment slot
             </Link>
             <a
               href={waLink}
@@ -79,8 +81,14 @@ export default async function ConfirmationPage({
               <WhatsAppIcon />
               Remind me on WhatsApp
             </a>
+            {/* Was "we'll hold your spot at the RM25 price for 48 hours".
+                Nothing holds anything: no slot is reserved until a purchase
+                row is written, and no job expires a signup after 48 hours.
+                That was a promise with no mechanism behind it, and the guest
+                who relied on it would have arrived to find their time gone. */}
             <p className="text-xs text-muted">
-              No rush — we&apos;ll hold your spot at the RM{PREPAY_PRICE_MYR} first-visit price for 48 hours.
+              No rush — your details are saved, so you can pick a time whenever you&apos;re ready.
+              Slots are first come, first served.
             </p>
             <Link href="/" className="inline-block text-sm text-muted underline underline-offset-2 hover:text-ink">
               No thanks, maybe another time
