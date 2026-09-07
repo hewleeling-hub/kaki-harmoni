@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { PublicShell } from "@/components/layout/PublicShell";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { SectionHeading, Card, Button, Badge } from "@/components/ui/primitives";
@@ -17,11 +18,12 @@ import {
 } from "@/config/business";
 import { reserveHref, isOnSale, PACKAGES_ON_SALE, type CatalogueSlug } from "@/config/catalogue";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Prices & Packages — Kaki Harmoni",
   description:
     "Try your first 15-minute soak for RM25, then choose how often you come: the 5-Day Reset works out at RM32 a visit, with longer routines available.",
-};
+  path: "/prices",
+});
 
 function PriceTile({
   name,

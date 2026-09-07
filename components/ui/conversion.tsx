@@ -2,8 +2,10 @@ import Link from "next/link";
 import { Card, Badge, SectionHeading, Button } from "@/components/ui/primitives";
 import { CheckIcon, ArrowRightIcon } from "@/components/ui/icons";
 import {
+  businessConfig,
   routinePackages,
   perVisitPrice,
+  packageValidityLabel,
   packagePicker,
   whyNotAtHome,
   testimonials,
@@ -47,10 +49,27 @@ function RoutineCard({ pkg }: { pkg: RoutinePackage }) {
           >
             RM{pkg.price}
           </p>
+          {/* The per-visit price only means something against the number it
+              beats. "RM32 per visit" is a figure; "RM32 per visit · usually
+              RM40" is a saving, and RM40 is the single-soak price this
+              customer would otherwise pay. Derived from
+              businessConfig.pricing.normal — never typed here. */}
           {perVisit !== null && pkg.visits > 1 && (
-            <p className="mt-1 text-[15px] font-semibold text-brown">RM{perVisit} per visit</p>
+            <p className="mt-1 text-[15px] font-semibold text-brown">
+              RM{perVisit} per visit{" "}
+              <span className="font-normal text-muted">· usually RM{businessConfig.pricing.normal}</span>
+            </p>
           )}
           {pkg.priceNote && <p className="mt-1 text-[14px] text-muted">{pkg.priceNote}</p>}
+          {/* "How long do I have to use these?" is the question that stops an
+              RM840 decision, and the answer is generous — six months for thirty
+              visits. It was buried in one FAQ answer, which is no use to
+              someone looking at the card. */}
+          {pkg.visits > 1 && (
+            <p className="mt-1 text-[13px] font-medium uppercase tracking-wide text-muted">
+              Valid {packageValidityLabel}
+            </p>
+          )}
         </>
       ) : (
         /* No invented numbers: the tier is shown, the price is honestly pending. */

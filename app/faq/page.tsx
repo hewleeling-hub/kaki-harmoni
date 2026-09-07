@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { PublicShell } from "@/components/layout/PublicShell";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { FAQAccordion } from "@/components/ui/FAQAccordion";
@@ -6,11 +7,12 @@ import { Button } from "@/components/ui/primitives";
 import { MessageIcon, CalendarIcon } from "@/components/ui/icons";
 import { faqs, whatsappLink, ctaLabels } from "@/config/business";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "FAQ — Kaki Harmoni",
   description:
     "Answers to common questions about Kaki Harmoni — visits, pricing, walk-ins, what to wear, water hygiene and more.",
-};
+  path: "/faq",
+});
 
 export default function FaqPage() {
   return (

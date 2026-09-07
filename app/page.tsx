@@ -36,7 +36,10 @@ import {
   doubleSoak,
   launchOfferNote,
   launchOfferBadge,
+  offerForSlug,
+  packageValidityLabel,
 } from "@/config/business";
+import { isCatalogueSlug, isOnSale } from "@/config/catalogue";
 
 const STEP_ICONS = { calendar: CalendarIcon, gift: CoffeeIcon, message: MessageIcon, heart: HeartIcon } as const;
 const BENEFITS = [
@@ -62,8 +65,27 @@ const FIFTEEN_MINUTES_YOURS = [
   { icon: SparklesIcon, text: "A simple daily ritual." },
 ] as const;
 
-export default function Home() {
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ option?: string }>;
+}) {
   const { pricing, bookingStartLabel } = businessConfig;
+
+  /* The chosen tier, lifted out of the form and into the section around it.
+     A ladder CTA sends someone here with ?option=thirty-day-routine, and the
+     form correctly showed "YOU'RE RESERVING · 30-Day Routine — RM840" — but
+     the heading above it still read "Try your first soak — RM25", the body
+     repeated RM25 twice more, and the bullets talked about a first visit.
+     Someone about to spend RM840 read RM25 three times before reaching their
+     own basket, which reads as a bait-and-switch even though the basket was
+     right.
+
+     Null for a bare /#reserve, or for an unknown or unsellable slug, so the
+     first-visit copy below is unchanged for everyone arriving normally. */
+  const { option } = await searchParams;
+  const chosenSlug = isCatalogueSlug(option) && isOnSale(option) ? option : null;
+  const chosen = chosenSlug ? offerForSlug(chosenSlug) : null;
 
   return (
     <PublicShell>
@@ -297,28 +319,76 @@ export default function Home() {
       <section id="reserve" className="scroll-mt-24 py-10">
         <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
           <div>
-            <SectionHeading eyebrow="Start here" title={`Try your first soak — RM${pricing.prepay}`} />
-            <p className="mt-4 text-[18px] leading-relaxed text-muted">
-              An easy way to find out whether fifteen minutes suits you. Your first visit is{" "}
-              <strong className="text-olive-dark">RM{pricing.prepay} when you prepay</strong> online
-              (or RM{pricing.walkin} at the door), instead of the usual RM{pricing.normal}. Reserve,
-              pick your time, then pay to confirm — first visits from {bookingStartLabel}.
-            </p>
-            <p className="mt-2 text-[15px] text-muted">
-              {launchOfferNote} After it ends, a first visit is the usual RM{pricing.normal}.
-            </p>
-            <ul className="mt-5 space-y-2 text-[16px] text-brown">
-              {["No account needed", "Pick your visit time from the calendar", "Pay online or at the door"].map((t) => (
-                <li key={t} className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-olive" aria-hidden />
-                  {t}
-                </li>
-              ))}
-            </ul>
-            <p className="mt-5 text-[16px] leading-relaxed text-muted">
-              Enjoyed it? Then it&rsquo;s worth looking at how to make it a routine — no rush,
-              and no need to decide today.
-            </p>
+            {chosen ? (
+              <>
+                <SectionHeading
+                  eyebrow="You're reserving"
+                  title={`${chosen.name} — RM${chosen.price}`}
+                />
+                <p className="mt-4 text-[18px] leading-relaxed text-muted">
+                  {chosen.visits > 1 ? (
+                    <>
+                      <strong className="text-olive-dark">
+                        {chosen.visits} visits, RM{Math.round((chosen.price / chosen.visits) * 100) / 100} each
+                      </strong>{" "}
+                      — against RM{pricing.normal} for a one-off soak. Reserve below and pick the
+                      time for your first visit; the rest are yours to book whenever suits.
+                    </>
+                  ) : (
+                    <>
+                      A warm 15-minute leg soak and a coffee. Reserve below, pick your time, then
+                      settle up — first visits from {bookingStartLabel}.
+                    </>
+                  )}
+                </p>
+                <ul className="mt-5 space-y-2 text-[16px] text-brown">
+                  {[
+                    "No account needed",
+                    "Pick your visit time from the calendar",
+                    chosen.visits > 1
+                      ? `Set up and paid for at the shop — valid ${packageValidityLabel}`
+                      : "Pay online or at the door",
+                  ].map((t) => (
+                    <li key={t} className="flex items-center gap-2">
+                      <span className="h-1.5 w-1.5 rounded-full bg-olive" aria-hidden />
+                      {t}
+                    </li>
+                  ))}
+                </ul>
+                <p className="mt-5 text-[16px] leading-relaxed text-muted">
+                  Changed your mind?{" "}
+                  <Link href="/#reserve" className="font-semibold text-olive underline underline-offset-2 hover:text-olive-dark">
+                    Start with a single first soak
+                  </Link>{" "}
+                  instead — RM{pricing.prepay} when you prepay.
+                </p>
+              </>
+            ) : (
+              <>
+                <SectionHeading eyebrow="Start here" title={`Try your first soak — RM${pricing.prepay}`} />
+                <p className="mt-4 text-[18px] leading-relaxed text-muted">
+                  An easy way to find out whether fifteen minutes suits you. Your first visit is{" "}
+                  <strong className="text-olive-dark">RM{pricing.prepay} when you prepay</strong> online
+                  (or RM{pricing.walkin} at the door), instead of the usual RM{pricing.normal}. Reserve,
+                  pick your time, then pay to confirm — first visits from {bookingStartLabel}.
+                </p>
+                <p className="mt-2 text-[15px] text-muted">
+                  {launchOfferNote} After it ends, a first visit is the usual RM{pricing.normal}.
+                </p>
+                <ul className="mt-5 space-y-2 text-[16px] text-brown">
+                  {["No account needed", "Pick your visit time from the calendar", "Pay online or at the door"].map((t) => (
+                    <li key={t} className="flex items-center gap-2">
+                      <span className="h-1.5 w-1.5 rounded-full bg-olive" aria-hidden />
+                      {t}
+                    </li>
+                  ))}
+                </ul>
+                <p className="mt-5 text-[16px] leading-relaxed text-muted">
+                  Enjoyed it? Then it&rsquo;s worth looking at how to make it a routine — no rush,
+                  and no need to decide today.
+                </p>
+              </>
+            )}
           </div>
           <Card className="bg-ivory">
             {/* The form reads `?option=…` so a ladder CTA can preselect a tier.

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { PublicShell } from "@/components/layout/PublicShell";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/primitives";
@@ -11,11 +12,12 @@ import {
   ArrowRightIcon,
 } from "@/components/ui/icons";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Our Signature Experiences — Kaki Harmoni",
   description:
     "Four warm ways to unwind at Kaki Harmoni — Deep Calm, Gentle Comfort, Fresh Start and Light Legs. A cosy 15-minute leg soak, good coffee and a moment to slow down.",
-};
+  path: "/experiences",
+});
 
 const EXPECT = [
   { icon: ArmchairIcon, title: "Get Comfortable", text: "Sit back, settle in and choose your experience." },

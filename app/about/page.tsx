@@ -1,15 +1,17 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import Image from "next/image";
 import { PublicShell } from "@/components/layout/PublicShell";
 import { Button, Card } from "@/components/ui/primitives";
 import { CalendarIcon, MapPinIcon } from "@/components/ui/icons";
 import { businessConfig } from "@/config/business";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "About — Kaki Harmoni",
   description:
     "Kaki Harmoni pairs a warm leg soak with freshly brewed coffee at Desa Cindaimas Condominium Clubhouse. Fifteen quiet minutes to relax, refresh and reconnect.",
-};
+  path: "/about",
+});
 
 // A few gentle reasons a Kaki Harmoni soak feels different from a basin at home.
 // NOTE: softened from the original medical/technical copy per brand guidelines —
