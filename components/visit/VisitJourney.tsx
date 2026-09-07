@@ -9,6 +9,20 @@ import { businessConfig, launchOffer } from "@/config/business";
 type Visitor = "first" | "returning";
 
 /**
+ * Off for launch: the page shows the first-time panel only, with no choice to
+ * make. Every visitor on 11 September is a first-time visitor, so offering the
+ * question made the site look like it had a history it doesn't have — and a
+ * "Welcome back!" tab that nobody could honestly click.
+ *
+ * A flag rather than a deletion. Returning guests are the entire point of the
+ * routine ladder, and the booking system already handles them properly (the
+ * RM25 first-visit price is enforced once per person server-side). Flip this
+ * back to true once there are regulars, and the toggle, its panel and the
+ * stage-one note all come back together.
+ */
+const SHOW_VISITOR_TOGGLE = false;
+
+/**
  * The five stages of a visit: choose a time, choose how to pay, arrive, soak,
  * stay. Payment sits at 02 because that is genuinely where it happens — the
  * slot is picked first and paying is what confirms it — and the customer needs
@@ -147,49 +161,63 @@ export function VisitJourney() {
       {/* ── Who are you? ────────────────────────────────────────────────── */}
       <section className="py-8">
         <div className="mx-auto flex max-w-2xl flex-col items-center gap-4 text-center">
-          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-olive">I&rsquo;m a…</p>
+          {SHOW_VISITOR_TOGGLE && (
+            <>
+              <p className="text-sm font-semibold uppercase tracking-[0.16em] text-olive">I&rsquo;m a…</p>
 
-          <div
-            role="tablist"
-            aria-label="Are you visiting for the first time?"
-            className="flex w-full gap-2 rounded-full border border-line bg-beige/70 p-1.5 sm:w-auto"
-          >
-            <button
-              type="button"
-              role="tab"
-              id={`${panelId}-tab-first`}
-              aria-selected={isFirst}
-              aria-controls={panelId}
-              onClick={() => setWho("first")}
-              className={`${tab} ${
-                isFirst ? "bg-olive text-ivory shadow-[var(--shadow-warm)]" : "text-brown hover:bg-ivory/70"
-              }`}
-            >
-              First-time visitor
-            </button>
-            <button
-              type="button"
-              role="tab"
-              id={`${panelId}-tab-returning`}
-              aria-selected={!isFirst}
-              aria-controls={panelId}
-              onClick={() => setWho("returning")}
-              className={`${tab} ${
-                !isFirst ? "bg-olive text-ivory shadow-[var(--shadow-warm)]" : "text-brown hover:bg-ivory/70"
-              }`}
-            >
-              Returning visitor
-            </button>
-          </div>
+              <div
+                role="tablist"
+                aria-label="Are you visiting for the first time?"
+                className="flex w-full gap-2 rounded-full border border-line bg-beige/70 p-1.5 sm:w-auto"
+              >
+                <button
+                  type="button"
+                  role="tab"
+                  id={`${panelId}-tab-first`}
+                  aria-selected={isFirst}
+                  aria-controls={panelId}
+                  onClick={() => setWho("first")}
+                  className={`${tab} ${
+                    isFirst ? "bg-olive text-ivory shadow-[var(--shadow-warm)]" : "text-brown hover:bg-ivory/70"
+                  }`}
+                >
+                  First-time visitor
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  id={`${panelId}-tab-returning`}
+                  aria-selected={!isFirst}
+                  aria-controls={panelId}
+                  onClick={() => setWho("returning")}
+                  className={`${tab} ${
+                    !isFirst ? "bg-olive text-ivory shadow-[var(--shadow-warm)]" : "text-brown hover:bg-ivory/70"
+                  }`}
+                >
+                  Returning visitor
+                </button>
+              </div>
+            </>
+          )}
 
           {/* One panel, swapped content. `key` restarts the fade so the change
-              is felt without anything moving on the page. */}
+              is felt without anything moving on the page.
+
+              The tab semantics are attached only when the toggle is on. A
+              tabpanel whose aria-labelledby points at a button that isn't in
+              the document is broken ARIA, and a screen reader announcing "tab
+              panel" with no tabs to move between is worse than a plain
+              region. */}
           <div
-            id={panelId}
-            role="tabpanel"
-            aria-labelledby={`${panelId}-tab-${isFirst ? "first" : "returning"}`}
+            {...(SHOW_VISITOR_TOGGLE
+              ? {
+                  id: panelId,
+                  role: "tabpanel" as const,
+                  "aria-labelledby": `${panelId}-tab-${isFirst ? "first" : "returning"}`,
+                }
+              : {})}
             key={who}
-            className="fade-up mt-2 w-full rounded-[24px] border border-line bg-ivory p-7 shadow-[var(--shadow-warm)] sm:p-9"
+            className="fade-up w-full rounded-[24px] border border-line bg-ivory p-7 shadow-[var(--shadow-warm)] sm:p-9"
           >
             {isFirst ? (
               <>
