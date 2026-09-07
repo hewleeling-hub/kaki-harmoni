@@ -180,6 +180,16 @@ export const faqs = [
     a: "As often as you like — though Kaki Harmoni is really designed around regular visits. It's only fifteen minutes, so many guests find it works best as a small daily habit: a quiet moment before work, or a reset on the way home. Come once first and see how it fits your day.",
   },
   {
+    /* Placed straight after the "how often" answer on purpose: someone reading
+       about a daily habit is exactly the person who might want a spa at home,
+       and Margret's ten years on the About page has already done the
+       persuading. Deliberately quotes NO price, model or availability — none
+       of that is confirmed here, and an unkeepable number is worse than an
+       invitation to ask. Same rule as the drinks answer. */
+    q: "Can I get one of these for home?",
+    a: "Yes, ask us about it. A home spa is how Kaki Harmoni started — one of us has had one for over ten years. Have a word with our team when you visit, or message us, and we'll talk you through what's involved.",
+  },
+  {
     q: "Do I need to live at Desa Cindaimas?",
     a: "Not at all. Kaki Harmoni is inside the Desa Cindaimas clubhouse, but it's open to everyone — you don't need to be a resident. Visitors and walk-ins are always welcome, and there's free parking on site.",
   },
