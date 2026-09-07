@@ -274,7 +274,7 @@ export default function DashboardClient({ canDelete = false }: { canDelete?: boo
                 container the Actions column was pushed off the right edge of
                 the viewport and simply could not be reached — no editing and
                 no deleting on any screen narrower than the whole table. */}
-            <table className="w-full min-w-[900px] text-sm">
+            <table className="w-full min-w-[720px] text-sm">
             <thead>
               <tr className="text-left text-black/50 border-b border-black/5">
                 <th className="px-4 py-3 font-medium">Name</th>
@@ -309,7 +309,11 @@ export default function DashboardClient({ canDelete = false }: { canDelete?: boo
                         s.name
                       )}
                     </td>
-                    <td className="px-4 py-3 text-black/70">{s.email}</td>
+                    {/* Long addresses were the single widest thing in the
+                        table, forcing a horizontal scroll that pushed the
+                        Actions column under the sticky overlay. Wrapping
+                        them lets the whole table fit the screen. */}
+                    <td className="px-4 py-3 text-black/70 max-w-[190px] break-words">{s.email}</td>
                     <td className="px-4 py-3 text-black/70">{s.referral_source ?? "—"}</td>
                     <td className="px-4 py-3">
                       {isEditing ? (
