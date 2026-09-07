@@ -96,9 +96,16 @@ export default function AboutPage() {
             Side by side the whole section is one screen, so nobody is buried.
 
             The narrower column is what forces the trims below. Each quote is
-            cut to roughly fifty words; nothing was rewritten into words the
-            speaker didn't use, and no line was cut for length alone where it
-            carried the point of that person's block. */}
+            about thirty-five words — roughly six lines in a third of a
+            768px column — and all three are within two words of each other, so
+            the cards come out the same height without stretching.
+
+            Nothing is rewritten into words the speaker didn't use. Each block
+            keeps ONE idea and drops the second: Margret's daily habit (not the
+            grandchild), Lee Ling's "shall we?" (not the aches), Kimberly's
+            corner to sit in (not the naming of Desa Cindaimas, which the
+            paragraph below already does). Anything added back needs something
+            else taken out, or the cards go ragged again. */}
         <div className="mt-8 grid gap-4 sm:grid-cols-3 sm:gap-5">
           {/* Margret's own words. "Like brushing my teeth" reframes a soak from
               a treat you occasionally justify into an ordinary daily thing —
@@ -120,10 +127,9 @@ export default function AboutPage() {
               Margret
             </p>
             <blockquote className="text-[16px] leading-relaxed text-muted">
-              I&apos;ve had a spa at home for more than ten years, and I soak every day
-              I&apos;m home. It&apos;s a habit now, like brushing my teeth, and the bubbles
-              set the day off in a good mood. I&apos;ve a toddler grandchild to keep up
-              with — those fifteen minutes I don&apos;t skip.
+              Ten years with a spa at home, and I still soak every day I&apos;m here.
+              It&apos;s a habit now, like brushing my teeth — and the bubbles start the
+              day in a good mood.
             </blockquote>
           </Card>
 
@@ -139,10 +145,9 @@ export default function AboutPage() {
               Lee Ling
             </p>
             <blockquote className="text-[16px] leading-relaxed text-muted">
-              My mother is 78. What I noticed wasn&apos;t the aches — it was how often she
-              and her friends hung back from an outing, saying they&apos;d only slow everyone
-              down. I wanted somewhere close by that asked nothing of them, and makes the
-              answer to &ldquo;shall we?&rdquo; yes a little more often.
+              My mother is 78. She and her friends would hang back from an outing rather
+              than slow anyone down. I wanted somewhere close by that makes the answer to
+              &ldquo;shall we?&rdquo; yes more often.
             </blockquote>
           </Card>
 
@@ -163,9 +168,9 @@ export default function AboutPage() {
               Kimberly
             </p>
             <blockquote className="text-[16px] leading-relaxed text-muted">
-              Every neighbourhood should have somewhere to just sit down. I wanted Desa
-              Cindaimas to have a corner where you can kick your feet up for a quarter of an
-              hour, have a coffee and see a familiar face — right here in our own clubhouse.
+              Every neighbourhood should have somewhere to sit down. A corner in our own
+              clubhouse where you can kick your feet up for a quarter of an hour, have a
+              coffee and see a familiar face.
             </blockquote>
           </Card>
         </div>
