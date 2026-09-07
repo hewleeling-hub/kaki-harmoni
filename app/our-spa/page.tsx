@@ -58,13 +58,19 @@ export default function OurSpaPage() {
         subtitle="A few gentle things that make a Kaki Harmoni soak feel different."
       />
 
-      <figure className="mt-8 overflow-hidden rounded-[24px] border border-line shadow-[var(--shadow-warm)]">
+      {/* Cropped to a banner rather than shown at its native 4:3. At full
+          column width the photo stood taller than the four feature cards put
+          together, so the page opened with a wall of picture and the reasons
+          to come started below the fold. The room shot has ceiling and floor
+          to spare, so 16:9 takes the crop off the parts carrying nothing. */}
+      <figure className="mt-8 aspect-[16/9] overflow-hidden rounded-[24px] border border-line shadow-[var(--shadow-warm)]">
         <Image
           src="/shop/spa.png"
           alt="Inside the Kaki Harmoni soaking room — Grand Sun spa stations, comfy chairs and plants"
           width={1400}
           height={1050}
-          className="h-auto w-full object-cover"
+          sizes="(max-width: 768px) 100vw, 768px"
+          className="h-full w-full object-cover"
           priority
         />
       </figure>

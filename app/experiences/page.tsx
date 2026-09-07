@@ -8,10 +8,8 @@ import {
   ArmchairIcon,
   WavesIcon,
   CoffeeIcon,
-  MessageIcon,
   ArrowRightIcon,
 } from "@/components/ui/icons";
-import { whatsappLink } from "@/config/business";
 
 export const metadata: Metadata = {
   title: "Our Signature Experiences — Kaki Harmoni",
@@ -34,54 +32,31 @@ export default function ExperiencesPage() {
           about them. A grid with an empty second column would just squeeze the
           words into half the width. */}
       <section className="fade-up py-8 sm:py-10">
-        <div>
-          <p className="inline-flex items-center gap-1.5 text-sm font-semibold uppercase tracking-[0.18em] text-teal">
-            <SparklesIcon size={18} className="text-coral" />
-            Signature Experiences
-          </p>
-          <h1 className="mt-3 text-[42px] leading-[0.98] text-olive-dark sm:text-[52px] lg:text-[60px]">
-            Our Signature
-            <br />
-            Experiences
-          </h1>
-          <p className="mt-5 max-w-md text-[18px] leading-relaxed text-muted">
-            Fifteen minutes of pure relaxation.
-            <br className="hidden sm:block" /> You deserve it.
-          </p>
-          {/* No "Book Now" here. The page's job above the fold is to get you
-              looking at the four blends; the closing CTA asks for the booking
-              once you've picked one. Asking at the top means asking before the
-              reader knows what they'd be booking. */}
-        </div>
-
+        <p className="inline-flex items-center gap-1.5 text-sm font-semibold uppercase tracking-[0.18em] text-teal">
+          <SparklesIcon size={18} className="text-coral" />
+          Signature Experiences
+        </p>
+        <h1 className="mt-3 text-[42px] leading-[0.98] text-olive-dark sm:text-[52px] lg:text-[60px]">
+          Our Signature
+          <br />
+          Experiences
+        </h1>
+        <p className="mt-5 max-w-md text-[18px] leading-relaxed text-muted">
+          Fifteen minutes of pure relaxation.
+          <br className="hidden sm:block" /> You deserve it.
+        </p>
+        {/* No "Book Now" here. The page's job above the fold is to get you
+            looking at the four blends; the closing CTA asks for the booking
+            once you've picked one. Asking at the top means asking before the
+            reader knows what they'd be booking. */}
       </section>
 
       {/* Experience cards + detail modal */}
       <ExperienceList />
 
-      {/* Custom blend callout */}
+      {/* Custom blend + "not sure which one?" — one callout, not two boxes in
+          a row asking the same question. Lives in CustomBlendNote. */}
       <CustomBlendNote />
-
-      {/* Recommendation */}
-      <section className="py-8">
-        <div className="flex flex-col items-center gap-5 rounded-[24px] border border-line bg-sage-light/60 p-8 text-center sm:p-10">
-          <div>
-            <h2 className="text-[28px] text-olive-dark sm:text-[32px]">Not sure which one feels right today?</h2>
-            {/* Was "tell Lotti how you're feeling" — the button opens WhatsApp
-                to a real person, so naming the mascot promised a chatbot that
-                doesn't exist. */}
-            <p className="mx-auto mt-2 max-w-md text-[17px] leading-relaxed text-muted">
-              Tell us how you&apos;re feeling and we&apos;ll help you choose.
-            </p>
-          </div>
-          <Button
-            href={whatsappLink("Hi Kaki Harmoni! Not sure which experience suits me — could you help me choose?")}
-            icon={<MessageIcon size={20} />}
-          >
-            Help Me Choose
-          </Button>
-        </div>
-      </section>
 
       {/* What to expect */}
       <section className="py-8">

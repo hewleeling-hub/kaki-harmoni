@@ -1,9 +1,17 @@
 import { DropletIcon } from "@/components/ui/icons";
+import { whatsappLink } from "@/config/business";
 
 /**
- * Callout: beyond the 4 signature blends, we can tailor a custom blend.
- * No CTA by design — the copy says to ask when you arrive, so a "message us"
- * button would send people somewhere the instruction doesn't ask them to go.
+ * One callout doing the job two used to. There was a "create your own blend"
+ * note here and, directly beneath it, a "Not sure which one feels right today?"
+ * panel with a Help Me Choose button — two boxes back to back asking a version
+ * of the same question, which made the page look like it was nagging.
+ *
+ * The WhatsApp link is deliberately NOT a button. A button says the website
+ * will do something for you; what actually happens is a conversation with a
+ * person, who then recommends a blend. Ask on arrival is the primary route
+ * anyway — the shop is where the oils are — so messaging first is the smaller
+ * of the two options and is sized accordingly.
  */
 export function CustomBlendNote() {
   return (
@@ -14,12 +22,24 @@ export function CustomBlendNote() {
             <DropletIcon size={26} />
           </span>
           <div className="flex-1">
-            <h3 className="text-[22px] text-olive-dark sm:text-[24px]">Or create your own blend</h3>
+            <h3 className="text-[22px] text-olive-dark sm:text-[24px]">
+              Not sure which one suits you?
+            </h3>
             <p className="mt-1.5 max-w-2xl text-[16px] leading-relaxed text-brown">
-              Beyond our four signature soaks, our team can tailor a blend just for you — mix and match from{" "}
+              Tell us how you&apos;re feeling and we&apos;ll help you choose — or we&apos;ll make
+              you something of your own. Beyond the four signature soaks we can mix and match{" "}
               <strong className="text-olive-dark">7 aromatic oils</strong> and{" "}
-              <strong className="text-olive-dark">3 herbal spa salts</strong> to suit exactly how you&apos;re feeling.
-              Just ask when you arrive.
+              <strong className="text-olive-dark">3 herbal spa salts</strong> into a blend just for
+              you. Just ask when you arrive, or{" "}
+              <a
+                href={whatsappLink(
+                  "Hi Kaki Harmoni! I'm not sure which soak suits me — could you help me choose?",
+                )}
+                className="font-semibold text-olive-dark underline decoration-olive/40 underline-offset-4 transition-colors hover:decoration-olive"
+              >
+                message us on WhatsApp
+              </a>{" "}
+              beforehand.
             </p>
           </div>
         </div>
