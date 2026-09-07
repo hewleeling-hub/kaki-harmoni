@@ -277,18 +277,17 @@ export default function DashboardClient({ canDelete = false }: { canDelete?: boo
             <table className="w-full min-w-[720px] text-sm">
             <thead>
               <tr className="text-left text-black/50 border-b border-black/5">
+                {/* Email lives under the name rather than in its own column.
+                    Eight columns did not fit, and pinning Actions to the right
+                    only traded one hidden column for another — it covered Lead
+                    score. Seven columns fit, so nothing is hidden or overlaid. */}
                 <th className="px-4 py-3 font-medium">Name</th>
-                <th className="px-4 py-3 font-medium">Email</th>
                 <th className="px-4 py-3 font-medium">Source</th>
                 <th className="px-4 py-3 font-medium">Status</th>
                 <th className="px-4 py-3 font-medium">Visit</th>
                 <th className="px-4 py-3 font-medium">Lead score</th>
                 <th className="px-4 py-3 font-medium">Signed up</th>
-                {/* Pinned to the right edge. Scrolling to reach Edit and
-                    Delete on every row is the kind of friction that gets a
-                    tool abandoned on a busy morning — the column staff use
-                    most should never be the one off screen. */}
-                <th className="sticky right-0 z-10 bg-white px-4 py-3 font-medium text-right">Actions</th>
+                <th className="px-4 py-3 font-medium text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -298,7 +297,7 @@ export default function DashboardClient({ canDelete = false }: { canDelete?: boo
                 const reviewBusy = updatingReviewId === s.id;
                 return (
                   <tr key={s.id} className="border-b border-black/5 last:border-0">
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 max-w-[220px]">
                       {isEditing ? (
                         <input
                           value={draft.name}
@@ -306,14 +305,14 @@ export default function DashboardClient({ canDelete = false }: { canDelete?: boo
                           className="rounded border border-black/10 px-2 py-1 w-full"
                         />
                       ) : (
-                        s.name
+                        <>
+                          <span className="block font-medium">{s.name}</span>
+                          {s.email && (
+                            <span className="block text-xs text-black/50 break-words">{s.email}</span>
+                          )}
+                        </>
                       )}
                     </td>
-                    {/* Long addresses were the single widest thing in the
-                        table, forcing a horizontal scroll that pushed the
-                        Actions column under the sticky overlay. Wrapping
-                        them lets the whole table fit the screen. */}
-                    <td className="px-4 py-3 text-black/70 max-w-[190px] break-words">{s.email}</td>
                     <td className="px-4 py-3 text-black/70">{s.referral_source ?? "—"}</td>
                     <td className="px-4 py-3">
                       {isEditing ? (
@@ -451,7 +450,7 @@ export default function DashboardClient({ canDelete = false }: { canDelete?: boo
                       {new Date(s.created_at).toLocaleDateString()}
                       <div className="text-black/35">{daysAgo(s.created_at)}</div>
                     </td>
-                    <td className="sticky right-0 z-10 bg-white px-4 py-3 text-right space-x-2 whitespace-nowrap">
+                    <td className="px-4 py-3 text-right space-x-2 whitespace-nowrap">
                       {isEditing ? (
                         <>
                           <button
