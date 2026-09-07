@@ -269,7 +269,12 @@ export default function DashboardClient({ canDelete = false }: { canDelete?: boo
             No {reviewFilter} leads. Try a different filter.
           </div>
         ) : (
-          <table className="w-full text-sm">
+          <div className="overflow-x-auto">
+            {/* Eight columns, with Edit/Delete last. Without this scroll
+                container the Actions column was pushed off the right edge of
+                the viewport and simply could not be reached — no editing and
+                no deleting on any screen narrower than the whole table. */}
+            <table className="w-full min-w-[900px] text-sm">
             <thead>
               <tr className="text-left text-black/50 border-b border-black/5">
                 <th className="px-4 py-3 font-medium">Name</th>
@@ -525,6 +530,7 @@ export default function DashboardClient({ canDelete = false }: { canDelete?: boo
               })}
             </tbody>
           </table>
+          </div>
         )}
       </div>
 
