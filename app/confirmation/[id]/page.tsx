@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Lotti } from "@/components/ui/Lotti";
 import { whatsAppLink, BUSINESS_WHATSAPP_NUMBER } from "@/lib/whatsapp";
 import { withOption } from "@/config/catalogue";
+import { ReferralPrompt } from "@/components/visit/ReferralPrompt";
 
 export default async function ConfirmationPage({
   params,
@@ -93,6 +94,13 @@ export default async function ConfirmationPage({
             <Link href="/" className="inline-block text-sm text-muted underline underline-offset-2 hover:text-ink">
               No thanks, maybe another time
             </Link>
+
+            {/* Moved off the signup form, where it stood between the customer
+                and the button. Last on the page and after the booking link on
+                purpose: nothing here competes with picking a time, and it is
+                only asked of people signing up for the first time — a
+                returning guest has already told us. */}
+            {!signup.referral_source && <ReferralPrompt signupId={signup.id} />}
           </div>
         )}
       </div>

@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { isCatalogueSlug, withOption } from "@/config/catalogue";
 import { offerForSlug } from "@/config/business";
 
-const REFERRAL_OPTIONS = ["Instagram", "Facebook", "TikTok", "Friend", "Walk-in", "Other"];
 
 const inputClass =
   "w-full min-h-12 rounded-[14px] border border-line bg-ivory px-3.5 text-[16px] text-ink placeholder:text-muted/70 focus:outline-none focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-olive";
@@ -23,7 +22,6 @@ export default function SignupForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [referralSource, setReferralSource] = useState("Instagram");
   const [submitting, setSubmitting] = useState(false);
   const [fieldError, setFieldError] = useState<{ field?: string; message: string } | null>(null);
   const [bannerError, setBannerError] = useState<string | null>(null);
@@ -44,7 +42,11 @@ export default function SignupForm() {
       const res = await fetch("/api/signups", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, phone, referral_source: referralSource }),
+        // No referral_source: "how did you hear about us?" moved to the
+        // confirmation page, where it no longer stands between the customer
+        // and the button. The column stays nullable and lead scoring already
+        // handles a null.
+        body: JSON.stringify({ name, email, phone }),
       });
       const data = await res.json();
 
@@ -116,8 +118,11 @@ export default function SignupForm() {
       </div>
 
       <div>
+        {/* The API has always treated a blank email as null — only the phone
+            is required — but the label didn't say so, so it read as another
+            mandatory field standing between someone and the button. */}
         <label htmlFor="email" className={labelClass}>
-          Email
+          Email <span className="font-normal text-muted">(optional)</span>
         </label>
         <input
           id="email"
@@ -128,6 +133,9 @@ export default function SignupForm() {
           className={inputClass}
           placeholder="you@email.com"
         />
+        <p className="mt-1 text-xs text-muted">
+          We&apos;ll send your booking confirmation here if you&apos;d like one.
+        </p>
         {fieldError?.field === "email" && (
           <p className="mt-1 text-sm font-medium text-[#a8442f]" role="alert">
             {fieldError.message}
@@ -154,24 +162,6 @@ export default function SignupForm() {
             {fieldError.message}
           </p>
         )}
-      </div>
-
-      <div>
-        <label htmlFor="referral" className={labelClass}>
-          How did you hear about us?
-        </label>
-        <select
-          id="referral"
-          value={referralSource}
-          onChange={(e) => setReferralSource(e.target.value)}
-          className={inputClass}
-        >
-          {REFERRAL_OPTIONS.map((opt) => (
-            <option key={opt} value={opt}>
-              {opt}
-            </option>
-          ))}
-        </select>
       </div>
 
       <button

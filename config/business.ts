@@ -114,6 +114,25 @@ export const visitSteps = [
   },
 ] as const;
 
+/**
+ * "How did you hear about us?" — asked on the CONFIRMATION page, not in the
+ * signup form. It is a question that serves the shop rather than the customer,
+ * and it sat between them and the button; after the details are saved there is
+ * nothing left to lose by asking, and answer rates go up rather than down when
+ * nothing is at stake.
+ *
+ * Shared by the prompt and the endpoint that stores the answer, so the two
+ * can't disagree about what a valid value is.
+ */
+export const referralOptions = [
+  "Instagram",
+  "Facebook",
+  "TikTok",
+  "Friend",
+  "Walk-in",
+  "Other",
+] as const;
+
 /** “Good to know before you visit” — no medical claims. */
 export const goodToKnow = [
   "Wear comfortable clothing you can roll up past the knees.",

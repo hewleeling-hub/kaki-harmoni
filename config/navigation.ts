@@ -25,10 +25,20 @@ export const desktopNav: NavItem[] = [
   { label: "Contact", href: "/contact", icon: "user" },
 ];
 
-/** Mobile bottom navigation — four simple tabs. */
+/**
+ * Mobile bottom bar — the INTERNAL tabs only.
+ *
+ * It used to be Home / About / Find Us / Contact: four ways to read more, and
+ * no way to book, on the device most visitors use and in the one strip of
+ * screen that is always visible. MobileBottomNav now renders these two beside
+ * a WhatsApp link and a Reserve button, both of which are special cases rather
+ * than rows here — WhatsApp is an external <a> with no active state, and
+ * Reserve is styled as the primary action, so neither fits the shape of a tab.
+ *
+ * About and Contact are one tap away in the top bar; neither is what someone
+ * standing outside the clubhouse needs.
+ */
 export const mobileNav: NavItem[] = [
   { label: "Home", href: "/", icon: "home" },
-  { label: "About", href: "/about", icon: "info" },
   { label: "Find Us", href: "/location", icon: "mappin" },
-  { label: "Contact", href: "/contact", icon: "user" },
 ];
