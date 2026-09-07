@@ -58,19 +58,30 @@ export default function OurSpaPage() {
         subtitle="A few gentle things that make a Kaki Harmoni soak feel different."
       />
 
-      {/* Cropped to 16:9 AND capped at 620px. Cropping alone wasn't enough:
-          on a wide screen a full-width 16:9 is still around 800px tall, so the
-          photo filled the viewport on its own and the four reasons to come
-          started below the fold. It is a supporting picture, not a banner, so
-          it is sized like one — and the room reads perfectly well small. */}
-      <figure className="mx-auto mt-8 aspect-[16/9] max-w-[620px] overflow-hidden rounded-[24px] border border-line shadow-[var(--shadow-warm)]">
+      {/* A feature panel rather than the room photo, at the owner's direction.
+          Shown at its own 3:2 and given the full column: it carries small
+          printed labels, so the 16:9 crop and 620px cap that suited a
+          photograph would have cut the text and then made what survived
+          unreadable. Nothing here is cropped for that reason.
+
+          It stays on THIS page only. The homepage strip and step 04 of the
+          Your Visit journey still use /shop/spa.png — the journey renders its
+          image in a 176px circle, where a panel of captions would be a
+          smudge, and both of those slots exist to show a guest the room.
+
+          NOTE for whoever edits this next: the panel carries claims this site
+          otherwise avoids — better circulation, removing impurities, ozone
+          and negative ions. Those were raised and the owner chose to publish
+          them; docs/leg-spa-benefits.md still records why the written copy
+          stays clear of them, and that guidance has not changed. */}
+      <figure className="mt-8 overflow-hidden rounded-[24px] border border-line shadow-[var(--shadow-warm)]">
         <Image
-          src="/shop/spa.png"
-          alt="Inside the Kaki Harmoni soaking room — Grand Sun spa stations, comfy chairs and plants"
-          width={1400}
-          height={1050}
-          sizes="(max-width: 640px) 100vw, 620px"
-          className="h-full w-full object-cover"
+          src="/shop/spa-features.png"
+          alt="The Grand Spa foot spa at Kaki Harmoni — warm bubbling water, the removable footrest, and the control unit, alongside a summary of the machine's features"
+          width={1536}
+          height={1024}
+          sizes="(max-width: 768px) 100vw, 768px"
+          className="h-auto w-full"
           priority
         />
       </figure>
