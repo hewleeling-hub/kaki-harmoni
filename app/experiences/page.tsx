@@ -9,7 +9,6 @@ import {
   ArmchairIcon,
   WavesIcon,
   CoffeeIcon,
-  CalendarIcon,
   MessageIcon,
   ArrowRightIcon,
 } from "@/components/ui/icons";
@@ -46,11 +45,10 @@ export default function ExperiencesPage() {
             Fifteen minutes of pure relaxation.
             <br className="hidden sm:block" /> You deserve it.
           </p>
-          <div className="mt-7">
-            <Button href="/#reserve" size="lg" icon={<CalendarIcon size={22} />}>
-              Book Now
-            </Button>
-          </div>
+          {/* No "Book Now" here. The page's job above the fold is to get you
+              looking at the four blends; the closing CTA asks for the booking
+              once you've picked one. Asking at the top means asking before the
+              reader knows what they'd be booking. */}
         </div>
 
         {/* The real room, not the mascot. A drawing of a cartoon foot soak was
