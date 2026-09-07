@@ -58,29 +58,31 @@ export default function OurSpaPage() {
         subtitle="A few gentle things that make a Kaki Harmoni soak feel different."
       />
 
-      {/* Back to the room photo. A feature panel sat here briefly, but its
-          claims — "Healthier Feet", "Better Circulation", "helps remove
-          impurities", "Ozone with Negative Ions", "Promotes circulation" —
-          were printed INTO the artwork, and text baked into a picture can't
-          be edited the way a sentence can. A photograph of the room makes no
-          claim at all, which is the point of this page: show the place and
-          describe how it feels.
+      {/* The feature panel, reworked so nothing on it claims a health effect.
+          An earlier version read "Healthier Feet", "Better Circulation",
+          "helps remove impurities", "Ozone with Negative Ions" and "Promotes
+          circulation" — printed INTO the artwork, where a sentence can't be
+          edited — so it was pulled and the artwork regenerated. It now
+          describes only how a soak feels: fine bubbles, fresh water, gentle
+          radiant warmth.
 
-          If a replacement panel is made without those phrases, drop it in
-          here — but note it will need the full column and no crop, since
-          small printed labels don't survive a 16:9 crop at 620px.
+          KEEP IT THAT WAY. If this panel is ever regenerated, re-read every
+          line rather than only the ones being changed: image models rewrite
+          neighbouring text unprompted, and "promotes circulation" is exactly
+          the phrase that would wander back in. docs/leg-spa-benefits.md has
+          the reasoning.
 
-          Cropped to 16:9 and capped at 620px: at its native 4:3 across the
-          full column the photo stood taller than the four cards below it, so
-          the page opened with a wall of picture. */}
-      <figure className="mx-auto mt-8 aspect-[16/9] max-w-[620px] overflow-hidden rounded-[24px] border border-line shadow-[var(--shadow-warm)]">
+          Full column and no crop. Its captions are ~13px on a 1200px screen,
+          which is legible; the 16:9 crop at 620px used for the room
+          photograph would slice them off and shrink what was left. */}
+      <figure className="mt-8 overflow-hidden rounded-[24px] border border-line shadow-[var(--shadow-warm)]">
         <Image
-          src="/shop/spa.png"
-          alt="Inside the Kaki Harmoni soaking room — spa stations, comfortable chairs and plants"
-          width={1400}
-          height={1050}
-          sizes="(max-width: 640px) 100vw, 620px"
-          className="h-full w-full object-cover"
+          src="/shop/spa-features.png"
+          alt="The Grand Spa foot spa at Kaki Harmoni — warm bubbling water and the roomy basin, with its ultrasonic bubbles, freshly prepared water and gentle radiant warmth"
+          width={1536}
+          height={1024}
+          sizes="(max-width: 1200px) 100vw, 1120px"
+          className="h-auto w-full"
           priority
         />
       </figure>
