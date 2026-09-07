@@ -73,8 +73,7 @@ export default function AboutPage() {
             <blockquote className="mt-2 border-l-2 border-line pl-5 text-[18px] leading-relaxed text-muted">
               My mother is 78. What I kept noticing wasn&apos;t the aches themselves — it was how
               often she and her friends would hang back from an outing, saying they&apos;d only
-              slow everyone down. My aunt said much the same about keeping up with a toddler
-              grandchild.
+              slow everyone down.
             </blockquote>
           </figure>
 
@@ -84,7 +83,14 @@ export default function AboutPage() {
               that comparison has already accepted coming regularly. The bubbles
               line is the only sensory beat on the page. And "travelling is the
               only thing that stops me" stays because an inconvenient exception
-              is what makes a habit read as real rather than as marketing. */}
+              is what makes a habit read as real rather than as marketing.
+
+              The grandchild is her REASON for valuing the habit, not a result
+              of it. "I soak daily and I can keep up with my toddler grandchild"
+              reads as cause and effect — a claim about physical function we
+              cannot make, and the same line we already declined to draw for the
+              ankle and the stroke. Wanting to keep up with him claims nothing
+              and says the warmer thing anyway. */}
           <figure>
             <figcaption className="text-[15px] font-semibold uppercase tracking-wide text-olive">
               Margret
@@ -92,7 +98,9 @@ export default function AboutPage() {
             <blockquote className="mt-2 border-l-2 border-line pl-5 text-[18px] leading-relaxed text-muted">
               I&apos;ve had a spa at home for more than ten years, and I soak every day I&apos;m
               home. It&apos;s become a habit, not unlike brushing my teeth, and the bubbles set
-              the day off in a good mood. Travelling is the only thing that stops me.
+              the day off in a good mood. I&apos;ve a toddler grandchild to keep up with, so
+              those fifteen minutes are ones I don&apos;t skip — travelling is the only thing
+              that stops me.
             </blockquote>
           </figure>
 
