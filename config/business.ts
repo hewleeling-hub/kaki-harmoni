@@ -245,7 +245,7 @@ export const faqs = [
        details to take to their doctor is genuinely useful and claims
        nothing. */
     q: "What if I have a medical condition?",
-    a: "If you have a health condition, we suggest a quick word with your doctor beforehand. Message us on WhatsApp if it helps and we'll talk you through exactly what a soak involves, so you have the details to check with them. Our team is happy to help you feel comfortable on the day.",
+    a: `If you have a health condition, we suggest a quick word with your doctor beforehand. Message us on WhatsApp or call us on ${businessConfig.callDisplay} if it helps, and we'll talk you through exactly what a soak involves, so you have the details to check with them. Our team is happy to help you feel comfortable on the day.`,
   },
   {
     q: "Is coffee included?",
