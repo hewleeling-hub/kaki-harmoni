@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { generateSlotsForDay, MAX_CAPACITY_PER_SLOT } from "@/lib/slots";
+import { seatsBookedByTime } from "@/lib/capacity";
 
 export async function GET(request: NextRequest) {
   const date = request.nextUrl.searchParams.get("date");
@@ -9,23 +10,19 @@ export async function GET(request: NextRequest) {
   }
 
   const supabase = createAdminClient();
-  const { data: bookings, error } = await supabase
-    .from("purchases")
-    .select("booking_time")
-    .eq("booking_date", date);
 
-  if (error) {
+  // People, not bookings — a party of three is three of the four places, not
+  // one. See lib/capacity.ts.
+  let seats: Record<string, number>;
+  try {
+    seats = await seatsBookedByTime(supabase, date);
+  } catch {
     return NextResponse.json({ error: "Could not load availability." }, { status: 500 });
   }
 
-  const counts: Record<string, number> = {};
-  (bookings ?? []).forEach((b) => {
-    if (b.booking_time) counts[b.booking_time] = (counts[b.booking_time] ?? 0) + 1;
-  });
-
   const slots = generateSlotsForDay().map((time) => ({
     time,
-    remaining: Math.max(0, MAX_CAPACITY_PER_SLOT - (counts[time] ?? 0)),
+    remaining: Math.max(0, MAX_CAPACITY_PER_SLOT - (seats[time] ?? 0)),
   }));
 
   return NextResponse.json({ slots });

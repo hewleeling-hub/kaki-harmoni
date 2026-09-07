@@ -5,6 +5,7 @@ import { scoreLead } from "@/lib/scoring";
 import { sendSalesAlert, purchaseConfirmedEmail } from "@/lib/email";
 import { DOOR_SURCHARGE_MYR } from "@/lib/config";
 import { MAX_CAPACITY_PER_SLOT } from "@/lib/slots";
+import { seatsBookedByTime } from "@/lib/capacity";
 import { hasBookedBefore } from "@/lib/customer";
 import { FIRST_VISIT_PRODUCT_ID, PACKAGES_ARE_PREPAY_ONLY } from "@/config/catalogue";
 
@@ -147,13 +148,11 @@ export async function POST(request: NextRequest) {
   const slot_time = body.slot_time?.trim() || null;
 
   if (slot_date && slot_time) {
-    const { count } = await supabase
-      .from("purchases")
-      .select("id", { count: "exact", head: true })
-      .eq("booking_date", slot_date)
-      .eq("booking_time", slot_time);
+    // Counted in people, not bookings — the calendar and this check share
+    // lib/capacity.ts so they cannot disagree about how full a slot is.
+    const seats = await seatsBookedByTime(supabase, slot_date);
 
-    if ((count ?? 0) >= MAX_CAPACITY_PER_SLOT) {
+    if ((seats[slot_time] ?? 0) >= MAX_CAPACITY_PER_SLOT) {
       return NextResponse.json(
         { error: "That time slot just filled up. Please pick another.", slot_taken: true },
         { status: 409 },
