@@ -90,14 +90,13 @@ export default function PricesPage() {
 
   return (
     <PublicShell>
+      {/* No CTA in the header. "Your first visit" sits directly beneath it
+          with the same ask, so the two buttons were within a screen of each
+          other — and the header one came before the price it was quoting. */}
       <PageHeader
         title="Prices & Packages"
         subtitle="Start with one soak. If it suits you, choose how often you'd like to come."
-      >
-        <Button href="/#reserve" size="lg" icon={<CalendarIcon size={22} />} className="hidden sm:inline-flex">
-          {ctaLabels.firstVisit}
-        </Button>
-      </PageHeader>
+      />
 
       {/* ── Start here ──────────────────────────────────────────────────── */}
       <section className="mt-8">
