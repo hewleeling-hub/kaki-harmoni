@@ -112,19 +112,25 @@ export default function AboutPage() {
 
           {/* Kimberly's reason was given as "saw the benefits and wanted to
               bring it to the community". "Benefits" is the same vaguely medical
-              word we removed from Margret's line — a reader fills it in with a
-              health outcome we cannot claim. Her actual motive is ACCESS, which
-              is both safe and more specific: not owning a machine, not driving
-              across town, but the clubhouse people already walk through. */}
+              word removed from Margret's line — a reader fills it in with a
+              health outcome we cannot claim — so this is built on the
+              community half instead.
+
+              It must NOT argue against owning a machine: home spas are
+              something the business wants people to buy, and an earlier draft
+              opened with "I didn't want this to be something you had to buy a
+              machine for", which talked a customer out of a product we sell.
+              The pitch is the clubhouse being a place to sit down, not a
+              cheaper alternative to owning one. */}
           <figure>
             <figcaption className="text-[15px] font-semibold uppercase tracking-wide text-olive">
               Kimberly
             </figcaption>
             <blockquote className="mt-2 border-l-2 border-line pl-5 text-[18px] leading-relaxed text-muted">
-              I didn&apos;t want this to be something you had to buy a machine for, or drive
-              across town for. Desa Cindaimas has the space and it has the people — putting it
-              in our own clubhouse means it&apos;s simply there on an ordinary Tuesday, for
-              neighbours who&apos;d never make a special trip of it.
+              Every neighbourhood should have somewhere to just sit down. I wanted Desa
+              Cindaimas to have a corner where you can kick your feet up for a quarter of an
+              hour, have a coffee and see a familiar face — no planning it, no driving
+              anywhere, right here in our own clubhouse.
             </blockquote>
           </figure>
         </div>
