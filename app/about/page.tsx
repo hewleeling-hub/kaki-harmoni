@@ -101,12 +101,35 @@ export default function AboutPage() {
             the cards come out the same height without stretching.
 
             Nothing is rewritten into words the speaker didn't use. Each block
-            keeps ONE idea and drops the second: Margret's daily habit (not the
-            grandchild), Lee Ling's "shall we?" (not the aches), Kimberly's
+            keeps ONE idea and drops the second: Lee Ling's "shall we?" (not the
+            aches), Margret's daily habit (not the grandchild), Kimberly's
             corner to sit in (not the naming of Desa Cindaimas, which the
             paragraph below already does). Anything added back needs something
-            else taken out, or the cards go ragged again. */}
+            else taken out, or the cards go ragged again.
+
+            ORDER MATTERS HERE: the three cards run left to right in the same
+            order the three of them stand in the photograph above. Someone
+            reading a name and looking up to match it to a face should not have
+            to work it out. Reordering these means reordering the photo too. */}
         <div className="mt-8 grid gap-4 sm:grid-cols-3 sm:gap-5">
+          {/* "Somewhere that makes the answer to 'shall we?' yes a little more
+              often" is the best sentence on this page: it is the only line that
+              names what someone actually gains, and it does it without going
+              anywhere near a health claim. It is kept whole and the setup is
+              trimmed around it — "fifteen minutes, no appointment, no fuss" is
+              gone, because the FAQ and the homepage both say that already,
+              while nothing else on the site says this. */}
+          <Card as="article" className="flex flex-col gap-2.5 bg-ivory">
+            <p className="text-[13px] font-semibold uppercase tracking-[0.1em] text-olive">
+              Lee Ling
+            </p>
+            <blockquote className="text-[16px] leading-relaxed text-muted">
+              My mother is 78. She and her friends would hang back from an outing rather
+              than slow anyone down. I wanted somewhere close by that makes the answer to
+              &ldquo;shall we?&rdquo; yes more often.
+            </blockquote>
+          </Card>
+
           {/* Margret's own words. "Like brushing my teeth" reframes a soak from
               a treat you occasionally justify into an ordinary daily thing —
               precisely what the routine ladder sells, and someone who accepts
@@ -130,24 +153,6 @@ export default function AboutPage() {
               Ten years with a spa at home, and I still soak every day I&apos;m here.
               It&apos;s a habit now, like brushing my teeth — and the bubbles start the
               day in a good mood.
-            </blockquote>
-          </Card>
-
-          {/* "Somewhere that makes the answer to 'shall we?' yes a little more
-              often" is the best sentence on this page: it is the only line that
-              names what someone actually gains, and it does it without going
-              anywhere near a health claim. It is kept whole and the setup is
-              trimmed around it — "fifteen minutes, no appointment, no fuss" is
-              gone, because the FAQ and the homepage both say that already,
-              while nothing else on the site says this. */}
-          <Card as="article" className="flex flex-col gap-2.5 bg-ivory">
-            <p className="text-[13px] font-semibold uppercase tracking-[0.1em] text-olive">
-              Lee Ling
-            </p>
-            <blockquote className="text-[16px] leading-relaxed text-muted">
-              My mother is 78. She and her friends would hang back from an outing rather
-              than slow anyone down. I wanted somewhere close by that makes the answer to
-              &ldquo;shall we?&rdquo; yes more often.
             </blockquote>
           </Card>
 
