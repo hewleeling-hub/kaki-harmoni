@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { PublicShell } from "@/components/layout/PublicShell";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/primitives";
 import { ExperienceList } from "@/components/experiences/ExperienceList";
 import { CustomBlendNote } from "@/components/experiences/CustomBlendNote";
 import {
-  SparklesIcon,
   ArmchairIcon,
   WavesIcon,
   CoffeeIcon,
@@ -26,30 +26,25 @@ const EXPECT = [
 export default function ExperiencesPage() {
   return (
     <PublicShell>
-      {/* Hero — one column. It was a two-column grid with artwork on the right;
-          both the mascot and the photo of the room that replaced her are gone,
-          because this page's job is the four blends and neither picture was
-          about them. A grid with an empty second column would just squeeze the
-          words into half the width. */}
-      <section className="fade-up py-8 sm:py-10">
-        <p className="inline-flex items-center gap-1.5 text-sm font-semibold uppercase tracking-[0.18em] text-teal">
-          <SparklesIcon size={18} className="text-coral" />
-          Signature Experiences
-        </p>
-        <h1 className="mt-3 text-[42px] leading-[0.98] text-olive-dark sm:text-[52px] lg:text-[60px]">
-          Our Signature
-          <br />
-          Experiences
-        </h1>
-        <p className="mt-5 max-w-md text-[18px] leading-relaxed text-muted">
-          Fifteen minutes of pure relaxation.
-          <br className="hidden sm:block" /> You deserve it.
-        </p>
-        {/* No "Book Now" here. The page's job above the fold is to get you
-            looking at the four blends; the closing CTA asks for the booking
-            once you've picked one. Asking at the top means asking before the
-            reader knows what they'd be booking. */}
-      </section>
+      {/* The old hero was an eyebrow reading SIGNATURE EXPERIENCES above a
+          60px headline reading Our Signature Experiences — the same three
+          words twice — then "Fifteen minutes of pure relaxation. You deserve
+          it.", which is a mood, not information. Half a screen saying nothing
+          the nav hadn't already said.
+
+          This says the one thing a first-time reader doesn't know and can't
+          work out from four card titles: the four aren't different treatments
+          at different prices, they're the same soak with a different blend, so
+          you choose by mood rather than by researching them. Same PageHeader
+          as Our Spa and Prices, so it's compact and the cards start high.
+
+          No "Book Now" here either. The closing CTA asks once you've picked
+          one; asking at the top asks before the reader knows what they'd be
+          booking. */}
+      <PageHeader
+        title="Four ways to soak"
+        subtitle="Every visit is the same fifteen minutes in the same warm water — what changes is the blend. Pick whichever matches how you'd like to feel."
+      />
 
       {/* Experience cards + detail modal */}
       <ExperienceList />
