@@ -284,7 +284,11 @@ export default function DashboardClient({ canDelete = false }: { canDelete?: boo
                 <th className="px-4 py-3 font-medium">Visit</th>
                 <th className="px-4 py-3 font-medium">Lead score</th>
                 <th className="px-4 py-3 font-medium">Signed up</th>
-                <th className="px-4 py-3 font-medium text-right">Actions</th>
+                {/* Pinned to the right edge. Scrolling to reach Edit and
+                    Delete on every row is the kind of friction that gets a
+                    tool abandoned on a busy morning — the column staff use
+                    most should never be the one off screen. */}
+                <th className="sticky right-0 z-10 bg-white px-4 py-3 font-medium text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -443,7 +447,7 @@ export default function DashboardClient({ canDelete = false }: { canDelete?: boo
                       {new Date(s.created_at).toLocaleDateString()}
                       <div className="text-black/35">{daysAgo(s.created_at)}</div>
                     </td>
-                    <td className="px-4 py-3 text-right space-x-2 whitespace-nowrap">
+                    <td className="sticky right-0 z-10 bg-white px-4 py-3 text-right space-x-2 whitespace-nowrap">
                       {isEditing ? (
                         <>
                           <button
