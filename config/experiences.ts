@@ -124,6 +124,7 @@ export const experiences: Experience[] = [
     iconBg: "#1c8a8d",
     glowRgb: "28,138,141",
     image: "/experiences/light-legs.png",
+    productImage: "/experiences/light-legs-oil.png",
     accent: "#087c91",
     primaryOil: "Juniper",
     headline: "Feel lighter. Move easier.",
