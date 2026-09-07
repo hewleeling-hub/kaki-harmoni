@@ -105,6 +105,29 @@ existing agentic gate).
 
 ---
 
+## After launch — align the booking grid to the machine cycle
+**Deferred on 7 Sep 2026, deliberately.** Not a bug; the availability maths is correct
+as it stands. This is throughput left on the table.
+
+A soak is 15 minutes and the machine then stands for 30, so one guest occupies one
+machine for **45 minutes**. Slots are offered every **30 minutes**. The two don't divide,
+so a machine that comes free at 11:15 can't be used until 11:30 — 15 minutes wasted every
+cycle. At full occupancy that caps the shop at **4 guests/hour** across the 4 machines.
+
+Moving to 45-minute slots (10:00, 10:45, 11:30, 12:15, …) aligns the grid to the machines:
+**5.3 guests/hour**, roughly 33% more capacity, no idle gap.
+
+- **Change:** `SLOT_INTERVAL_MINUTES` in `lib/slots.ts` from 30 to 45. `blockingSlotsFor()`
+  derives from it, so one guest would then block exactly one slot and `machinesBusyAt()`
+  keeps working untouched.
+- **Why not now:** the 11 Sept booking sits at 10:30, which is not on a 45-minute boundary.
+  Changing the grid strands existing bookings between slots, so it must happen either
+  before any bookings exist or during a quiet period with staff told what moved.
+- **Watch first:** whether the rest period is really 30 minutes in practice. If the machines
+  turn round faster, the interval should follow the real number rather than this one.
+
+---
+
 ## Notes
 - Sprint 7 is the biggest change (touches the public purchase flow, pricing, seed data,
   and the dashboard). Sprint 8 is mostly additive read-only views. Sprint 6 is medium.
