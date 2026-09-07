@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { PublicShell } from "@/components/layout/PublicShell";
 import { Button } from "@/components/ui/primitives";
 import { ExperienceList } from "@/components/experiences/ExperienceList";
@@ -29,8 +28,12 @@ const EXPECT = [
 export default function ExperiencesPage() {
   return (
     <PublicShell>
-      {/* Hero */}
-      <section className="fade-up grid items-center gap-6 py-8 sm:py-10 lg:grid-cols-2 lg:gap-12">
+      {/* Hero — one column. It was a two-column grid with artwork on the right;
+          both the mascot and the photo of the room that replaced her are gone,
+          because this page's job is the four blends and neither picture was
+          about them. A grid with an empty second column would just squeeze the
+          words into half the width. */}
+      <section className="fade-up py-8 sm:py-10">
         <div>
           <p className="inline-flex items-center gap-1.5 text-sm font-semibold uppercase tracking-[0.18em] text-teal">
             <SparklesIcon size={18} className="text-coral" />
@@ -51,20 +54,6 @@ export default function ExperiencesPage() {
               reader knows what they'd be booking. */}
         </div>
 
-        {/* The real room, not the mascot. A drawing of a cartoon foot soak was
-            standing in for the thing this page is selling — four soak blends —
-            on the one page where a guest most wants to see what they're
-            actually booking. */}
-        <figure className="overflow-hidden rounded-[24px] border border-line shadow-[var(--shadow-warm)]">
-          <Image
-            src="/shop/spa.png"
-            alt="Inside the Kaki Harmoni soaking room — spa stations, comfy chairs and plants"
-            width={1448}
-            height={1086}
-            priority
-            className="h-auto w-full object-cover"
-          />
-        </figure>
       </section>
 
       {/* Experience cards + detail modal */}
