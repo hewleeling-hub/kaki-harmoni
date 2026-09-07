@@ -45,41 +45,77 @@ export default function AboutPage() {
       <div className="mx-auto max-w-3xl py-8 md:py-12">
         <p className="text-xs font-semibold uppercase tracking-widest text-olive">About us</p>
         <h1 className="mt-3 text-[34px] leading-tight text-olive-dark sm:text-[44px]">
-          It started with my mother.
+          Why we opened Kaki Harmoni.
         </h1>
 
-        {/* The founder's real reason, told through what he WANTED for her —
-            keeping up with her friends — and not through what the spa did for
-            her. The family stories behind this business include an ankle that
-            recovered and a stroke, and those are deliberately not here: a foot
-            spa claiming to restore mobility is a medical claim, needs Medicine
+        {/* TWO voices, attributed. This was one undifferentiated "I" that said
+            both "my mother" and "I've soaked for ten years" — two different
+            people merged into one narrator, which would have come apart the
+            first time a guest met them both.
+
+            Splitting them also answers a question the reader would otherwise
+            carry unasked — why are there two of you? One saw the need, the
+            other already had the answer at home. And Margret's ten years reads
+            as testimony now it has a name on it, rather than as a claim.
+
+            The family stories behind this business include an ankle that
+            recovered and a stroke. They are deliberately absent: a foot spa
+            claiming to restore mobility is a medical claim, needs Medicine
             Advertisements Board approval in Malaysia, and is the exact thing
-            docs/leg-spa-benefits.md says to keep off the site. Wanting to keep
-            up with the people you love is a feeling, not a cure — it is just as
-            moving, and it is true. Keep it that way. */}
-        <div className="mt-6 space-y-5 text-[18px] leading-relaxed text-muted">
-          <p>
-            She&apos;s 78. What I kept noticing wasn&apos;t the aches themselves — it was how often
-            she and her friends would hang back from an outing, saying they&apos;d only slow
-            everyone down. My aunt said much the same about keeping up with a toddler grandchild.
-          </p>
-          {/* The founder's own ten years is the credibility beat, and it works
-              because it is a fact about what HE does, not a claim about what
-              the soak does. "I've seen the benefits" was the original wording;
-              "benefits" is both vaguely medical and unpersuasive, where a
-              decade of not skipping proves the same point and lets the reader
-              draw their own conclusion. It also matches what we sell: a daily
-              habit, from someone who has kept one. */}
-          {/* "Like brushing my teeth" is the founder's own phrase and worth
-              protecting: it reframes a soak from a treat you occasionally
-              justify into an ordinary daily thing, which is precisely what the
-              routine ladder sells. The bubbles line is the only sensory beat on
-              the page — everything else here is commitment and convenience. */}
-          <p>
-            I&apos;ve had a spa at home for more than ten years, and I soak every day I&apos;m
-            home. It&apos;s become a habit, not unlike brushing my teeth, and the bubbles set the
-            day off in a good mood. Travelling is the only thing that stops me.
-          </p>
+            docs/leg-spa-benefits.md says to keep off this site. Wanting to keep
+            up with the people you love is a feeling, not a cure — just as
+            moving, and defensible. Keep it that way. */}
+        <div className="mt-8 space-y-8">
+          <figure>
+            <figcaption className="text-[15px] font-semibold uppercase tracking-wide text-olive">
+              Lee Ling
+            </figcaption>
+            <blockquote className="mt-2 border-l-2 border-line pl-5 text-[18px] leading-relaxed text-muted">
+              My mother is 78. What I kept noticing wasn&apos;t the aches themselves — it was how
+              often she and her friends would hang back from an outing, saying they&apos;d only
+              slow everyone down. My aunt said much the same about keeping up with a toddler
+              grandchild.
+            </blockquote>
+          </figure>
+
+          {/* Margret's own words. "Like brushing my teeth" reframes a soak from
+              a treat you occasionally justify into an ordinary daily thing —
+              precisely what the routine ladder sells, and someone who accepts
+              that comparison has already accepted coming regularly. The bubbles
+              line is the only sensory beat on the page. And "travelling is the
+              only thing that stops me" stays because an inconvenient exception
+              is what makes a habit read as real rather than as marketing. */}
+          <figure>
+            <figcaption className="text-[15px] font-semibold uppercase tracking-wide text-olive">
+              Margret
+            </figcaption>
+            <blockquote className="mt-2 border-l-2 border-line pl-5 text-[18px] leading-relaxed text-muted">
+              I&apos;ve had a spa at home for more than ten years, and I soak every day I&apos;m
+              home. It&apos;s become a habit, not unlike brushing my teeth, and the bubbles set
+              the day off in a good mood. Travelling is the only thing that stops me.
+            </blockquote>
+          </figure>
+
+          {/* Kimberly's reason was given as "saw the benefits and wanted to
+              bring it to the community". "Benefits" is the same vaguely medical
+              word we removed from Margret's line — a reader fills it in with a
+              health outcome we cannot claim. Her actual motive is ACCESS, which
+              is both safe and more specific: not owning a machine, not driving
+              across town, but the clubhouse people already walk through. */}
+          <figure>
+            <figcaption className="text-[15px] font-semibold uppercase tracking-wide text-olive">
+              Kimberly
+            </figcaption>
+            <blockquote className="mt-2 border-l-2 border-line pl-5 text-[18px] leading-relaxed text-muted">
+              I didn&apos;t want this to be something you had to buy a machine for, or drive
+              across town for. Desa Cindaimas has the space and it has the people — putting it
+              in our own clubhouse means it&apos;s simply there on an ordinary Tuesday, for
+              neighbours who&apos;d never make a special trip of it.
+            </blockquote>
+          </figure>
+        </div>
+
+        <div className="mt-8 space-y-5 text-[18px] leading-relaxed text-muted">
           {/* The founder's reason for opening is, word for word, the argument
               `whyNotAtHome` already makes on the homepage: fresh water, salts
               and oils you wouldn't keep in, nothing to clean up. Worth keeping
@@ -105,7 +141,7 @@ export default function AboutPage() {
             what an About page shouldn't lead with: the point is that real
             people run this. Empty is better than a stand-in. */}
         {founders.length > 0 && (
-          <div className="mt-10 grid gap-6 sm:grid-cols-2">
+          <div className="mt-10 grid gap-6 sm:grid-cols-3">
             {founders.map((person) => (
               <figure key={person.name} className="flex items-center gap-4">
                 <Image
