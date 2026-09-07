@@ -237,8 +237,15 @@ export const faqs = [
     a: "Yes. Our space is gentle and comfortable. Let our team know if you'd like a hand getting settled.",
   },
   {
+    /* The doctor stays FIRST and the WhatsApp offer is deliberately narrow:
+       we describe what a soak involves, we don't say whether it's suitable.
+       "Message us to check" on its own reads as an offer to clear someone
+       medically — which is not something a foot spa can do, and is the same
+       line the rest of the site is careful not to cross. Giving them the
+       details to take to their doctor is genuinely useful and claims
+       nothing. */
     q: "What if I have a medical condition?",
-    a: "If you have a health condition, we suggest a quick word with your doctor beforehand. Our team is happy to help you feel comfortable.",
+    a: "If you have a health condition, we suggest a quick word with your doctor beforehand. Message us on WhatsApp if it helps and we'll talk you through exactly what a soak involves, so you have the details to check with them. Our team is happy to help you feel comfortable on the day.",
   },
   {
     q: "Is coffee included?",
