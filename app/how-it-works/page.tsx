@@ -50,13 +50,12 @@ export default function YourVisitPage() {
             Whether it&rsquo;s your first soak or your regular reset, it&rsquo;s simple.
           </p>
 
-          <div className="mt-6 flex items-center gap-3">
-            <Lotti size={72} alt="Lotti waving hello" className="h-auto w-[62px] shrink-0" />
-            <p className="text-[16px] leading-relaxed text-brown">
-              Fifteen minutes, a warm soak and a good coffee.
-              <br className="hidden sm:block" /> That&rsquo;s the whole thing.
-            </p>
-          </div>
+          {/* The mascot used to sit beside this line. Without her the flex row
+              has nothing to align, so it is back to a plain paragraph. */}
+          <p className="mt-6 text-[16px] leading-relaxed text-brown">
+            Fifteen minutes, a warm soak and a good coffee.
+            <br className="hidden sm:block" /> That&rsquo;s the whole thing.
+          </p>
         </div>
 
         <div className="order-1 lg:order-2">
