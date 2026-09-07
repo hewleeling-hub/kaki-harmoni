@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { PublicShell } from "@/components/layout/PublicShell";
 import { Button } from "@/components/ui/primitives";
 import { ExperienceList } from "@/components/experiences/ExperienceList";
 import { CustomBlendNote } from "@/components/experiences/CustomBlendNote";
-import { Lotti } from "@/components/ui/Lotti";
 import {
   SparklesIcon,
   ArmchairIcon,
@@ -53,19 +53,20 @@ export default function ExperiencesPage() {
           </div>
         </div>
 
-        {/* Decorative Lotti composition */}
-        <div className="relative flex justify-center lg:justify-end">
-          <div className="relative w-full max-w-sm">
-            <div
-              aria-hidden
-              className="absolute inset-0"
-              style={{ background: "radial-gradient(circle at 55% 45%, rgba(221,230,214,0.9), rgba(234,220,197,0.5) 45%, transparent 72%)" }}
-            />
-            <Lotti size={360} priority alt="Lotti relaxing with her feet in a warm soak and a coffee" className="relative mx-auto h-auto w-full max-w-[340px]" />
-            <SparklesIcon size={26} className="absolute right-2 top-3 text-coral/70" />
-            <SparklesIcon size={18} className="absolute left-3 top-16 text-gold/70" />
-          </div>
-        </div>
+        {/* The real room, not the mascot. A drawing of a cartoon foot soak was
+            standing in for the thing this page is selling — four soak blends —
+            on the one page where a guest most wants to see what they're
+            actually booking. */}
+        <figure className="overflow-hidden rounded-[24px] border border-line shadow-[var(--shadow-warm)]">
+          <Image
+            src="/shop/spa.png"
+            alt="Inside the Kaki Harmoni soaking room — spa stations, comfy chairs and plants"
+            width={1448}
+            height={1086}
+            priority
+            className="h-auto w-full object-cover"
+          />
+        </figure>
       </section>
 
       {/* Experience cards + detail modal */}
@@ -77,11 +78,13 @@ export default function ExperiencesPage() {
       {/* Recommendation */}
       <section className="py-8">
         <div className="flex flex-col items-center gap-5 rounded-[24px] border border-line bg-sage-light/60 p-8 text-center sm:p-10">
-          <Lotti size={120} alt="Lotti waving hello" className="h-auto w-28" />
           <div>
             <h2 className="text-[28px] text-olive-dark sm:text-[32px]">Not sure which one feels right today?</h2>
+            {/* Was "tell Lotti how you're feeling" — the button opens WhatsApp
+                to a real person, so naming the mascot promised a chatbot that
+                doesn't exist. */}
             <p className="mx-auto mt-2 max-w-md text-[17px] leading-relaxed text-muted">
-              Tell Lotti how you&apos;re feeling and we&apos;ll help you choose.
+              Tell us how you&apos;re feeling and we&apos;ll help you choose.
             </p>
           </div>
           <Button
@@ -115,25 +118,23 @@ export default function ExperiencesPage() {
       {/* Booking CTA */}
       <section className="py-10">
         <div className="overflow-hidden rounded-[26px] bg-olive p-8 shadow-[var(--shadow-warm)] sm:p-10">
-          <div className="grid items-center gap-6 sm:grid-cols-[1fr_auto]">
-            <div>
-              <h2 className="text-[30px] leading-tight text-ivory sm:text-[36px]">Ready for a little me-time?</h2>
-              <p className="mt-3 text-[18px] leading-relaxed text-ivory/85">
-                15 minutes. A warm soak. Maybe a coffee.
-              </p>
-              <div className="mt-6">
-                <Button
-                  href="/#reserve"
-                  className="!bg-ivory !text-olive-dark hover:!bg-cream"
-                  size="lg"
-                  iconRight={<ArrowRightIcon size={22} />}
-                >
-                  Book Your Experience
-                </Button>
-              </div>
-            </div>
-            <div className="hidden justify-self-end sm:block">
-              <Lotti size={168} alt="Lotti waving" className="h-auto w-40" />
+          {/* Single column since Lotti came out of the right-hand slot — a
+              two-column grid with nothing in the second one just pushes the
+              text into a narrow strip. */}
+          <div>
+            <h2 className="text-[30px] leading-tight text-ivory sm:text-[36px]">Ready for a little me-time?</h2>
+            <p className="mt-3 text-[18px] leading-relaxed text-ivory/85">
+              15 minutes. A warm soak. Maybe a coffee.
+            </p>
+            <div className="mt-6">
+              <Button
+                href="/#reserve"
+                className="!bg-ivory !text-olive-dark hover:!bg-cream"
+                size="lg"
+                iconRight={<ArrowRightIcon size={22} />}
+              >
+                Book Your Experience
+              </Button>
             </div>
           </div>
         </div>

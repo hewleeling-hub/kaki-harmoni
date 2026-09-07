@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { ProductComposition } from "./ProductComposition";
 import {
   CloseIcon,
@@ -174,14 +173,15 @@ export function ExperienceModal({
               </div>
             </Section>
 
-            {/* Lotti says */}
-            <div className="mt-5 flex items-center gap-3 rounded-[18px] border border-line bg-sage-light/50 p-4">
-              <Image src="/lotti.png" alt="Lotti" width={64} height={64} className="h-14 w-14 shrink-0 object-contain" />
+            {/* Our pick — was "Lotti says", with her portrait beside it. The
+                mascot is off this page now, so the line stands as a
+                recommendation from the people who work here. */}
+            <div className="mt-5 rounded-[18px] border border-line bg-sage-light/50 p-4">
               <p className="text-[15px] italic text-brown" style={{ fontFamily: "var(--font-heading)" }}>
                 <span className="mr-1 font-sans text-[12px] font-semibold uppercase not-italic tracking-wide text-olive">
-                  Lotti says
+                  Our pick
                 </span>
-                <br className="hidden sm:block" />“{exp.lottiQuote}”
+                <br className="hidden sm:block" />“{exp.pickQuote}”
               </p>
             </div>
 

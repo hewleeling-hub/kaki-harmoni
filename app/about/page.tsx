@@ -3,7 +3,7 @@ import Image from "next/image";
 import { PublicShell } from "@/components/layout/PublicShell";
 import { Button, Card } from "@/components/ui/primitives";
 import { CalendarIcon, MapPinIcon } from "@/components/ui/icons";
-import { businessConfig, founders } from "@/config/business";
+import { businessConfig } from "@/config/business";
 
 export const metadata: Metadata = {
   title: "About — Kaki Harmoni",
@@ -51,6 +51,22 @@ export default function AboutPage() {
               them, and the blocks below answer the why. */}
           Hello from the three of us.
         </h1>
+
+        {/* One group photo rather than three cropped circles. A drawing used to
+            open this page, which is the wrong thing for the one page whose job
+            is showing that real people run this — and the three of them
+            together says more than three portraits would. Sits under the
+            greeting so you meet them before they each speak. */}
+        <figure className="mt-6 overflow-hidden rounded-[22px] border border-line shadow-[var(--shadow-warm)]">
+          <Image
+            src="/founders/the-three-of-us.png"
+            alt="The three of us outside Kaki Harmoni in our aprons, beside Lotti's welcome sign"
+            width={1448}
+            height={1086}
+            priority
+            className="h-auto w-full object-cover"
+          />
+        </figure>
 
         {/* TWO voices, attributed. This was one undifferentiated "I" that said
             both "my mother" and "I've soaked for ten years" — two different
@@ -154,31 +170,6 @@ export default function AboutPage() {
             welcome.
           </p>
         </div>
-
-        {/* Renders NOTHING until config/business.ts has real photographs —
-            same rule as testimonials and the experience video. The welcome
-            sign used to sit at the top of this page, but a drawing is exactly
-            what an About page shouldn't lead with: the point is that real
-            people run this. Empty is better than a stand-in. */}
-        {founders.length > 0 && (
-          <div className="mt-10 grid gap-6 sm:grid-cols-3">
-            {founders.map((person) => (
-              <figure key={person.name} className="flex items-center gap-4">
-                <Image
-                  src={person.photo}
-                  alt={person.alt ?? person.name}
-                  width={160}
-                  height={160}
-                  className="h-20 w-20 shrink-0 rounded-full border border-line object-cover"
-                />
-                <figcaption>
-                  <p className="text-[17px] font-semibold text-olive-dark">{person.name}</p>
-                  {person.role && <p className="text-[15px] text-muted">{person.role}</p>}
-                </figcaption>
-              </figure>
-            ))}
-          </div>
-        )}
 
         <div className="mt-8 flex flex-wrap gap-3">
           <Button href="/#reserve" icon={<CalendarIcon size={20} />}>

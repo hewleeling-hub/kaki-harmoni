@@ -4,9 +4,12 @@ import type { Experience } from "@/config/experiences";
 /**
  * Left visual for the experience detail modal. Oils + bath salts are the hero.
  * If exp.productImage is set (a real product photo), it fills the panel and is
- * the hero — the icon is overlaid top-left; Lotti stays in the "Lotti says"
- * box, not on the busy photo. Otherwise a stylised SVG bottle + salt jar (with
- * a small supporting Lotti) is drawn, tinted to the experience colour.
+ * the hero, with the icon overlaid top-left. Otherwise a stylised SVG bottle +
+ * salt jar is drawn, tinted to the experience colour.
+ *
+ * The mascot used to sit in the bottom-right corner here and is deliberately
+ * gone: she was appearing on nearly every surface of this page, and what a
+ * guest wants to see in a product panel is the product.
  */
 export function ProductComposition({ exp }: { exp: Experience }) {
   const glow = `rgba(${exp.glowRgb},0.30)`;
@@ -49,15 +52,6 @@ export function ProductComposition({ exp }: { exp: Experience }) {
       )}
 
       <Composition exp={exp} />
-
-      {/* small supporting Lotti */}
-      <Image
-        src="/lotti.png"
-        alt="Lotti"
-        width={110}
-        height={110}
-        className="absolute bottom-2 right-2 z-20 h-auto w-[26%] max-w-[110px] object-contain drop-shadow-[0_6px_14px_rgba(83,66,46,0.18)]"
-      />
     </div>
   );
 }

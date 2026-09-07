@@ -547,28 +547,13 @@ export interface Testimonial {
 
 export const testimonials: readonly Testimonial[] = [];
 
-/**
- * The people behind Kaki Harmoni, shown on About beneath the story.
- *
- * EMPTY BY DESIGN — the section renders nothing at all until there are real
- * photographs, exactly like `testimonials` and `experienceVideo`. A stock
- * portrait or a mascot standing in for a face would undo the thing the About
- * page is there to do, which is show that real people run this.
- *
- * To switch it on: drop the photos in /public/founders/ and add an entry each.
- * `role` is optional — a name alone is fine.
+/*
+ * There was a `founders` array here, waiting on three portrait photographs so
+ * About could render a row of circles. One group photo of the three of them
+ * arrived instead, which says more than three crops would, so About now hardcodes
+ * that single image (/founders/the-three-of-us.png) and the config-driven
+ * version is gone rather than left sitting unused.
  */
-export interface Founder {
-  name: string;
-  /** e.g. "Founder" — optional; omit rather than invent a title. */
-  role?: string;
-  /** Path in /public, e.g. "/founders/name.jpg". */
-  photo: string;
-  /** Describe the person for screen readers; defaults to their name. */
-  alt?: string;
-}
-
-export const founders: readonly Founder[] = [];
 
 /**
  * Real footage of a visit, 15–30 seconds. Empty until the business has filmed

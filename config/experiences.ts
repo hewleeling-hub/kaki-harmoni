@@ -27,7 +27,13 @@ export interface Experience {
   longDescription: string;
   perfectFor: readonly string[];
   feels: readonly string[]; // "what it feels like" pills
-  lottiQuote: string;
+  /**
+   * A short staff recommendation shown in the detail modal. Written in the
+   * mascot's voice until she came off this page — a line about "my little
+   * feet" only worked as a cartoon speaking, so these now read as one of us
+   * telling you when we'd order it.
+   */
+  pickQuote: string;
   benefits?: readonly { readonly title: string; readonly text: string }[]; // from the product poster
   naturalNote?: string;
 }
@@ -53,7 +59,7 @@ export const experiences: Experience[] = [
       "A calming aromatic soak created for days when everything feels a little too busy. Settle in, enjoy the warm water and let yourself slow down for 15 minutes.",
     perfectFor: ["After a long day", "Quiet me-time", "Evening wind-down"],
     feels: ["Soft", "Floral", "Comforting", "Calm"],
-    lottiQuote: "This is my pick when my brain refuses to clock out!",
+    pickQuote: "Our pick for the evenings when your brain won't clock out.",
     benefits: [
       { title: "Relaxes & soothes", text: "Calms the mind and body." },
       { title: "Promotes restful sleep", text: "Helps you unwind naturally." },
@@ -81,7 +87,7 @@ export const experiences: Experience[] = [
       "A comforting soak designed especially for seniors and those who need a little extra care. Warm, soothing and easy on the body.",
     perfectFor: ["Seniors", "Sensitive feet", "Those who need extra care"],
     feels: ["Warm", "Comforting", "Nurturing", "Easy"],
-    lottiQuote: "A warm hug for your feet and your heart.",
+    pickQuote: "A warm hug for your feet and your heart.",
   },
   {
     id: "fresh-start",
@@ -102,7 +108,7 @@ export const experiences: Experience[] = [
       "A refreshing aromatic soak to help you feel clear, light and ready to take on whatever comes next.",
     perfectFor: ["New beginnings", "Midweek refresh", "Days when you need a reset"],
     feels: ["Fresh", "Clean", "Bright", "Uplifting"],
-    lottiQuote: "Like a deep breath for your whole body!",
+    pickQuote: "Like a deep breath for your whole body.",
   },
   {
     id: "light-legs",
@@ -123,6 +129,6 @@ export const experiences: Experience[] = [
       "A refreshing soak for days when your legs have been doing a little too much. Cool, soothing and perfect for tired, heavy legs.",
     perfectFor: ["Active lifestyles", "Long days on your feet", "Tired, heavy legs"],
     feels: ["Refreshing", "Cooling", "Light", "Reviving"],
-    lottiQuote: "My go-to after a busy day on my little feet!",
+    pickQuote: "Our go-to after a long day on your feet.",
   },
 ];
