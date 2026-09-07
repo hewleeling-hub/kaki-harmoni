@@ -50,8 +50,13 @@ export function SiteFooter() {
 
         <div className="space-y-2">
           <p className="text-xs font-semibold uppercase tracking-widest text-ivory/60">Connect</p>
+          {/* Both numbers shown as digits, and both labelled by how you'd use
+              them. These are two different lines — WhatsApp goes to one phone,
+              voice calls to another — so "WhatsApp us" with the number hidden
+              in the href left the more-used of the two invisible to anyone
+              saving the contact or ringing from a different device. */}
           <a href={wa} target="_blank" rel="noopener noreferrer" className="block text-sm hover:text-ivory">
-            WhatsApp us
+            WhatsApp {businessConfig.whatsappDisplay}
           </a>
           <a href={telLink} className="block text-sm hover:text-ivory">
             Call {businessConfig.callDisplay}

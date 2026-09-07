@@ -1,6 +1,13 @@
 // Kaki Harmoni main business WhatsApp number: 019-287 1799 (country-code prefixed, no + or spaces).
 export const BUSINESS_WHATSAPP_NUMBER = "60192871799";
 
+// The same number as a person reads it. WhatsApp links carry the digits in the
+// href, so a "WhatsApp us" link left the number invisible until the chat
+// actually opened — no use to anyone saving the contact, ringing from another
+// phone, or checking they have the right shop. Kept beside the raw number so
+// the two cannot drift.
+export const BUSINESS_WHATSAPP_DISPLAY = "019-287 1799";
+
 // Secondary line for voice calls: 019-623 1799.
 export const BUSINESS_CALL_NUMBER = "60196231799";
 export const BUSINESS_CALL_DISPLAY = "019-623 1799";

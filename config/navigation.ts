@@ -16,6 +16,11 @@ export const desktopNav: NavItem[] = [
   { label: "Our Spa", href: "/our-spa", icon: "waves" },
   { label: "Your Visit", href: "/how-it-works", icon: "info" },
   { label: "Prices", href: "/prices", icon: "gift" },
+  // Sits after Prices and before Find Us: everything to the left is someone
+  // deciding whether to come, everything to the right is someone who already
+  // has. "What does it cost?" and "can I just walk in?" are the same moment.
+  // The page has existed since launch but was only reachable from the footer.
+  { label: "FAQ", href: "/faq", icon: "info" },
   { label: "Find Us", href: "/location", icon: "mappin" },
   { label: "Contact", href: "/contact", icon: "user" },
 ];

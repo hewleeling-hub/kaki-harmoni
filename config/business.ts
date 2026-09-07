@@ -9,6 +9,7 @@
 
 import {
   BUSINESS_WHATSAPP_NUMBER,
+  BUSINESS_WHATSAPP_DISPLAY,
   BUSINESS_CALL_NUMBER,
   BUSINESS_CALL_DISPLAY,
   whatsAppLink,
@@ -30,6 +31,7 @@ export const businessConfig = {
   tagline: "Relax. Refresh. Reconnect.",
 
   whatsappNumber: BUSINESS_WHATSAPP_NUMBER, // 60192871799
+  whatsappDisplay: BUSINESS_WHATSAPP_DISPLAY, // 019-287 1799
   callNumber: BUSINESS_CALL_NUMBER, // 60196231799
   callDisplay: BUSINESS_CALL_DISPLAY, // 019-623 1799
   email: "hello@kakiharmoni.com",
