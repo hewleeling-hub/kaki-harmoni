@@ -193,8 +193,12 @@ export default function PricesPage() {
           ))}
         </div>
         <p className="mt-4 text-[14px] text-muted">
+          {/* Says the whole arrangement, because half of it is a surprise
+              otherwise: you book online but you don't pay online. A guest who
+              expects a payment screen and reaches "settle at the shop" will
+              wonder whether the booking actually went through. */}
           {PACKAGES_ON_SALE
-            ? "Book any package right here — or ask our team in store or on WhatsApp if you'd rather set it up with a person."
+            ? "Book any package right here — we'll hold your first slot, and our team sets the package up and takes payment when you arrive. Message us on WhatsApp if you'd like to talk it through first."
             : "Book your first session online and pay at the shop — our team will set the package up for you there. Message us on WhatsApp if you'd like to talk it through first."}
         </p>
       </section>

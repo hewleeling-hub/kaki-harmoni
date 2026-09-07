@@ -37,19 +37,19 @@ export function productIdForSlug(value: string | null | undefined): string | nul
 
 /**
  * ── LAUNCH SWITCH ────────────────────────────────────────────────────────────
- * Packages are advertised but not sold online yet. Kaki Harmoni opens on
- * 11 September and the multi-visit checkout wasn't ready in time, so launch
- * sells the two single visits only: First Soak (RM25) and Single Soak (RM40).
+ * The full ladder is bookable: First Soak (RM25), Single Soak (RM40), Double
+ * Reset (RM68), 5-Day (RM160), 10-Day (RM300), 30-Day Routine (RM840).
  *
- * NOTHING was deleted to do this. The whole ladder — the ?option= plumbing, the
- * prepay-only rule, the preselect — is intact and covered by the code below.
- * To switch packages back on, BOTH of these must happen together:
- *   1. reactivate the four package rows (revert 0012_first_soak_only.sql), and
- *   2. flip this to true.
- * Doing only (1) leaves the CTAs pointing at /#reserve; doing only (2) sends
- * customers to a checkout that can't sell them what they clicked.
+ * Booking a package online holds the slot ONLY — it is settled and set up at
+ * the counter, see PACKAGES_ARE_DOOR_ONLY below for why that is the shape and
+ * not a limitation to route around.
+ *
+ * This travels with the four package rows in `products`, which were reactivated
+ * on 7 Sep 2026. Both must agree: true here with the rows inactive sends
+ * customers to a checkout that can't sell what they clicked, and false with the
+ * rows active leaves every ladder CTA pointing at a bare /#reserve.
  */
-export const PACKAGES_ON_SALE = false;
+export const PACKAGES_ON_SALE = true;
 
 /**
  * Packages are settled AT THE SHOP, never prepaid online. Booking one online
