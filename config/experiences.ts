@@ -102,6 +102,7 @@ export const experiences: Experience[] = [
     iconBg: "#2f7d46",
     glowRgb: "47,125,70",
     image: "/experiences/fresh-start.png",
+    productImage: "/experiences/fresh-start-oil.png",
     accent: "#477a3c",
     primaryOil: "Eucalyptus",
     headline: "A clean, uplifting reset.",
