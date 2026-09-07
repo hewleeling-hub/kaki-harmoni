@@ -100,7 +100,9 @@ export default function AboutPage() {
             <blockquote className="mt-2 border-l-2 border-line pl-5 text-[18px] leading-relaxed text-muted">
               My mother is 78. What I kept noticing wasn&apos;t the aches themselves — it was how
               often she and her friends would hang back from an outing, saying they&apos;d only
-              slow everyone down.
+              slow everyone down. So I wanted somewhere close by that asked nothing of them:
+              fifteen minutes, no appointment, no fuss. Somewhere that makes the answer to
+              &ldquo;shall we?&rdquo; yes a little more often.
             </blockquote>
           </figure>
 
