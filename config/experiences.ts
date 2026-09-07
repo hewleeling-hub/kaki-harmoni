@@ -80,6 +80,7 @@ export const experiences: Experience[] = [
     iconBg: "#c8952f",
     glowRgb: "200,149,47",
     image: "/experiences/gentle-comfort.png",
+    productImage: "/experiences/gentle-comfort-oil.png",
     accent: "#c06a10",
     primaryOil: "Camomile",
     headline: "Gentle warmth. Extra care.",
