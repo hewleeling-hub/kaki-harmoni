@@ -45,23 +45,29 @@ export async function GET() {
     "Booking time",
   ];
 
-  const rows = (signups ?? []).map((s) => {
-    const p = purchases?.find((pu) => pu.signup_id === s.id);
-    return [
-      s.name,
-      s.email,
-      s.phone,
-      s.referral_source,
-      s.status,
-      s.created_at,
-      s.lead_score,
-      p?.amount_myr ?? "",
-      p?.payment_method ?? "",
-      p?.status ?? "",
-      p?.visit_status ?? "",
-      p?.booking_date ?? "",
-      p?.booking_time ?? "",
-    ];
+  // ONE ROW PER BOOKING. This used to be one row per signup with
+  // purchases.find(), which takes only the FIRST booking a person made — so a
+  // returning guest's second and later visits were silently missing from the
+  // export, and any total taken from it would have been wrong. A signup with no
+  // booking yet still gets a row, with the purchase columns left blank, so
+  // nobody drops out of the file entirely.
+  const rows = (signups ?? []).flatMap((s) => {
+    const person = [s.name, s.email, s.phone, s.referral_source, s.status, s.created_at, s.lead_score];
+    const theirs = (purchases ?? [])
+      .filter((pu) => pu.signup_id === s.id)
+      .sort((a, b) => String(a.booking_date ?? "").localeCompare(String(b.booking_date ?? "")));
+
+    if (theirs.length === 0) return [[...person, "", "", "", "", "", ""]];
+
+    return theirs.map((p) => [
+      ...person,
+      p.amount_myr ?? "",
+      p.payment_method ?? "",
+      p.status ?? "",
+      p.visit_status ?? "",
+      p.booking_date ?? "",
+      p.booking_time ?? "",
+    ]);
   });
 
   const csv = [headers, ...rows]
