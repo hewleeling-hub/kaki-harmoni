@@ -45,7 +45,11 @@ export default function AboutPage() {
       <div className="mx-auto max-w-3xl py-8 md:py-12">
         <p className="text-xs font-semibold uppercase tracking-widest text-olive">About us</p>
         <h1 className="mt-3 text-[34px] leading-tight text-olive-dark sm:text-[44px]">
-          Why we opened Kaki Harmoni.
+          {/* A greeting rather than a statement. "Why we opened Kaki Harmoni"
+              read like a heading in an annual report, and the page that
+              follows is three people talking — so it opens by introducing
+              them, and the blocks below answer the why. */}
+          Hello from the three of us.
         </h1>
 
         {/* TWO voices, attributed. This was one undifferentiated "I" that said
