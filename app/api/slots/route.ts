@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { generateSlotsForDay, MAX_CAPACITY_PER_SLOT } from "@/lib/slots";
+import { generateSlotsForDay, machinesBusyAt, MAX_CAPACITY_PER_SLOT } from "@/lib/slots";
 import { seatsBookedByTime } from "@/lib/capacity";
 
 export async function GET(request: NextRequest) {
@@ -20,9 +20,13 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Could not load availability." }, { status: 500 });
   }
 
+  // A machine is tied up for 45 minutes per guest — 15 in the water, 30
+  // standing — so a booking blocks its own slot AND the next one. Counting
+  // only the bookings made at a slot showed 11:00 as free when 10:30 was
+  // full, and the earliest a machine was actually ready was 11:15.
   const slots = generateSlotsForDay().map((time) => ({
     time,
-    remaining: Math.max(0, MAX_CAPACITY_PER_SLOT - (seats[time] ?? 0)),
+    remaining: Math.max(0, MAX_CAPACITY_PER_SLOT - machinesBusyAt(seats, time)),
   }));
 
   return NextResponse.json({ slots });
