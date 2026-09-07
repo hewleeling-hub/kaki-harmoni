@@ -1,5 +1,4 @@
 import { DropletIcon } from "@/components/ui/icons";
-import { whatsappLink } from "@/config/business";
 
 /**
  * One callout doing the job two used to. There was a "create your own blend"
@@ -7,11 +6,11 @@ import { whatsappLink } from "@/config/business";
  * panel with a Help Me Choose button — two boxes back to back asking a version
  * of the same question, which made the page look like it was nagging.
  *
- * The WhatsApp link is deliberately NOT a button. A button says the website
- * will do something for you; what actually happens is a conversation with a
- * person, who then recommends a blend. Ask on arrival is the primary route
- * anyway — the shop is where the oils are — so messaging first is the smaller
- * of the two options and is sized accordingly.
+ * NO CTA, deliberately, and no WhatsApp link either. Choosing a blend happens
+ * at the counter where the oils actually are; inviting people to message ahead
+ * only creates a queue of "which one should I pick?" for staff to answer twice,
+ * once by phone and again when the guest walks in. Asking on arrival is the
+ * whole instruction, so the copy says only that.
  */
 export function CustomBlendNote() {
   return (
@@ -25,21 +24,15 @@ export function CustomBlendNote() {
             <h3 className="text-[22px] text-olive-dark sm:text-[24px]">
               Not sure which one suits you?
             </h3>
-            <p className="mt-1.5 max-w-2xl text-[16px] leading-relaxed text-brown">
+            {/* No max-width. This paragraph is already inside a padded card in
+                a constrained page shell, so capping it again at 2xl left a
+                ragged margin of empty gradient down the right of every line. */}
+            <p className="mt-1.5 text-[16px] leading-relaxed text-brown">
               Tell us how you&apos;re feeling and we&apos;ll help you choose — or we&apos;ll make
               you something of your own. Beyond the four signature soaks we can mix and match{" "}
               <strong className="text-olive-dark">7 aromatic oils</strong> and{" "}
               <strong className="text-olive-dark">3 herbal spa salts</strong> into a blend just for
-              you. Just ask when you arrive, or{" "}
-              <a
-                href={whatsappLink(
-                  "Hi Kaki Harmoni! I'm not sure which soak suits me — could you help me choose?",
-                )}
-                className="font-semibold text-olive-dark underline decoration-olive/40 underline-offset-4 transition-colors hover:decoration-olive"
-              >
-                message us on WhatsApp
-              </a>{" "}
-              beforehand.
+              you. Just ask when you arrive.
             </p>
           </div>
         </div>
