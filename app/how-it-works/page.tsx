@@ -13,7 +13,13 @@ import {
   UserIcon,
   RepeatIcon,
 } from "@/components/ui/icons";
-import { faqs, goodToKnow, businessConfig, launchOffer } from "@/config/business";
+import {
+  faqs,
+  goodToKnow,
+  businessConfig,
+  launchOffer,
+  SHOW_RETURNING_VISITOR,
+} from "@/config/business";
 
 export const metadata: Metadata = {
   title: "Your Visit — Kaki Harmoni",
@@ -67,9 +73,15 @@ export default function YourVisitPage() {
       {/* ── 2 + 3. Visitor toggle and the five stages (interactive) ──────── */}
       <VisitJourney />
 
-      {/* ── 4. Two ways to book, equally weighted ────────────────────────── */}
+      {/* ── 4. Booking ──────────────────────────────────────────────────────
+          Two cards when returning guests are addressed, one when they aren't.
+          The "Already a regular?" card is hidden by the same switch as the
+          first-time/returning toggle above it — SHOW_RETURNING_VISITOR — so
+          the two can't end up disagreeing about whether this shop has
+          regulars yet. The grid collapses to one column rather than leaving
+          the first card stranded at half width. */}
       <section className="py-10">
-        <div className="grid gap-5 sm:grid-cols-2">
+        <div className={`grid gap-5 ${SHOW_RETURNING_VISITOR ? "sm:grid-cols-2" : "mx-auto max-w-xl"}`}>
           <Card className="flex flex-col gap-3 bg-ivory">
             <span className="flex h-12 w-12 items-center justify-center rounded-full bg-sage-light text-olive">
               <UserIcon size={24} />
@@ -97,20 +109,22 @@ export default function YourVisitPage() {
 
           {/* Same card, same weight, same size button — a regular is not a
               lesser customer, and the layout shouldn't imply otherwise. */}
-          <Card className="flex flex-col gap-3 bg-ivory">
-            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-sage-light text-teal">
-              <RepeatIcon size={24} />
-            </span>
-            <h2 className="text-[23px] text-olive-dark">Already a Kaki Harmoni regular?</h2>
-            <p className="text-[16px] leading-relaxed text-muted">
-              Welcome back. Your next little reset is just a booking away.
-            </p>
-            <div className="mt-auto pt-3">
-              <Button href="/#reserve" full size="lg" icon={<CalendarIcon size={20} />}>
-                Book your next soak
-              </Button>
-            </div>
-          </Card>
+          {SHOW_RETURNING_VISITOR && (
+            <Card className="flex flex-col gap-3 bg-ivory">
+              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-sage-light text-teal">
+                <RepeatIcon size={24} />
+              </span>
+              <h2 className="text-[23px] text-olive-dark">Already a Kaki Harmoni regular?</h2>
+              <p className="text-[16px] leading-relaxed text-muted">
+                Welcome back. Your next little reset is just a booking away.
+              </p>
+              <div className="mt-auto pt-3">
+                <Button href="/#reserve" full size="lg" icon={<CalendarIcon size={20} />}>
+                  Book your next soak
+                </Button>
+              </div>
+            </Card>
+          )}
         </div>
       </section>
 

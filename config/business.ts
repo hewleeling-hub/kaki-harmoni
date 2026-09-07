@@ -545,6 +545,24 @@ export interface Testimonial {
   photo?: string;
 }
 
+/**
+ * Whether the site addresses returning guests as a separate audience — the
+ * first-time/returning toggle on Your Visit, and the "Already a Kaki Harmoni
+ * regular?" card beside it.
+ *
+ * FALSE for launch. Everyone arriving on 11 September is a first-time visitor,
+ * so asking made the site look like it had a history it doesn't have, and put
+ * a "Welcome back" invitation in front of people who have never been.
+ *
+ * A flag rather than a deletion, and one flag rather than two: returning
+ * guests are the entire point of the routine ladder, and the booking system
+ * already handles them properly — the RM25 first-visit price is enforced once
+ * per person server-side whatever this says. Flip it to true once there are
+ * regulars and every returning-visitor surface comes back together, rather
+ * than one of them being found months later still switched off.
+ */
+export const SHOW_RETURNING_VISITOR = false;
+
 export const testimonials: readonly Testimonial[] = [];
 
 /*

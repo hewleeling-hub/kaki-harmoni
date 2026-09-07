@@ -4,23 +4,10 @@ import { useId, useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/primitives";
 import { CalendarIcon, CheckIcon } from "@/components/ui/icons";
-import { businessConfig, launchOffer } from "@/config/business";
+import { businessConfig, launchOffer, SHOW_RETURNING_VISITOR } from "@/config/business";
 
 type Visitor = "first" | "returning";
 
-/**
- * Off for launch: the page shows the first-time panel only, with no choice to
- * make. Every visitor on 11 September is a first-time visitor, so offering the
- * question made the site look like it had a history it doesn't have — and a
- * "Welcome back!" tab that nobody could honestly click.
- *
- * A flag rather than a deletion. Returning guests are the entire point of the
- * routine ladder, and the booking system already handles them properly (the
- * RM25 first-visit price is enforced once per person server-side). Flip this
- * back to true once there are regulars, and the toggle, its panel and the
- * stage-one note all come back together.
- */
-const SHOW_VISITOR_TOGGLE = false;
 
 /**
  * The five stages of a visit: choose a time, choose how to pay, arrive, soak,
@@ -161,7 +148,7 @@ export function VisitJourney() {
       {/* ── Who are you? ────────────────────────────────────────────────── */}
       <section className="py-8">
         <div className="mx-auto flex max-w-2xl flex-col items-center gap-4 text-center">
-          {SHOW_VISITOR_TOGGLE && (
+          {SHOW_RETURNING_VISITOR && (
             <>
               <p className="text-sm font-semibold uppercase tracking-[0.16em] text-olive">I&rsquo;m a…</p>
 
@@ -209,7 +196,7 @@ export function VisitJourney() {
               panel" with no tabs to move between is worse than a plain
               region. */}
           <div
-            {...(SHOW_VISITOR_TOGGLE
+            {...(SHOW_RETURNING_VISITOR
               ? {
                   id: panelId,
                   role: "tabpanel" as const,
