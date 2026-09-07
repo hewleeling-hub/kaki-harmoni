@@ -56,14 +56,19 @@ export default function AboutPage() {
             open this page, which is the wrong thing for the one page whose job
             is showing that real people run this — and the three of them
             together says more than three portraits would. Sits under the
-            greeting so you meet them before they each speak. */}
-        <figure className="mt-6 overflow-hidden rounded-[22px] border border-line shadow-[var(--shadow-warm)]">
+            greeting so you meet them before they each speak.
+
+            Capped at 560px and centred rather than running the full column
+            width: at full width it pushed all three voices below the fold, and
+            the point of the layout below is that you can see them at once. */}
+        <figure className="mx-auto mt-6 max-w-[560px] overflow-hidden rounded-[22px] border border-line shadow-[var(--shadow-warm)]">
           <Image
             src="/founders/the-three-of-us.png"
             alt="The three of us outside Kaki Harmoni in our aprons, beside Lotti's welcome sign"
             width={1448}
             height={1086}
             priority
+            sizes="(max-width: 640px) 100vw, 560px"
             className="h-auto w-full object-cover"
           />
         </figure>
@@ -85,14 +90,24 @@ export default function AboutPage() {
             docs/leg-spa-benefits.md says to keep off this site. Wanting to keep
             up with the people you love is a feeling, not a cure — just as
             moving, and defensible. Keep it that way. */}
-        <div className="mt-8 space-y-8">
+        {/* Three cards side by side, not three stacked quote blocks. Stacked,
+            they were three identical shapes with the same left rule, and Lee
+            Ling's ran long enough that most readers never reached Kimberly.
+            Side by side the whole section is one screen, so nobody is buried.
+
+            The narrower column is what forces the trims below. Each quote is
+            cut to roughly fifty words; nothing was rewritten into words the
+            speaker didn't use, and no line was cut for length alone where it
+            carried the point of that person's block. */}
+        <div className="mt-8 grid gap-4 sm:grid-cols-3 sm:gap-5">
           {/* Margret's own words. "Like brushing my teeth" reframes a soak from
               a treat you occasionally justify into an ordinary daily thing —
               precisely what the routine ladder sells, and someone who accepts
               that comparison has already accepted coming regularly. The bubbles
-              line is the only sensory beat on the page. And "travelling is the
-              only thing that stops me" stays because an inconvenient exception
-              is what makes a habit read as real rather than as marketing.
+              line is the only sensory beat on the page, so it survives the cut.
+              What went is "travelling is the only thing that stops me" — the
+              most expendable clause here, being colour on the habit rather than
+              the habit itself.
 
               The grandchild is her REASON for valuing the habit, not a result
               of it. "I soak daily and I can keep up with my toddler grandchild"
@@ -100,31 +115,36 @@ export default function AboutPage() {
               cannot make, and the same line we already declined to draw for the
               ankle and the stroke. Wanting to keep up with him claims nothing
               and says the warmer thing anyway. */}
-          <figure>
-            <figcaption className="text-[15px] font-semibold uppercase tracking-wide text-olive">
+          <Card as="article" className="flex flex-col gap-2.5 bg-ivory">
+            <p className="text-[13px] font-semibold uppercase tracking-[0.1em] text-olive">
               Margret
-            </figcaption>
-            <blockquote className="mt-2 border-l-2 border-line pl-5 text-[18px] leading-relaxed text-muted">
-              I&apos;ve had a spa at home for more than ten years, and I soak every day I&apos;m
-              home. It&apos;s become a habit, not unlike brushing my teeth, and the bubbles set
-              the day off in a good mood. I&apos;ve a toddler grandchild to keep up with, so
-              those fifteen minutes are ones I don&apos;t skip — travelling is the only thing
-              that stops me.
+            </p>
+            <blockquote className="text-[16px] leading-relaxed text-muted">
+              I&apos;ve had a spa at home for more than ten years, and I soak every day
+              I&apos;m home. It&apos;s a habit now, like brushing my teeth, and the bubbles
+              set the day off in a good mood. I&apos;ve a toddler grandchild to keep up
+              with — those fifteen minutes I don&apos;t skip.
             </blockquote>
-          </figure>
+          </Card>
 
-          <figure>
-            <figcaption className="text-[15px] font-semibold uppercase tracking-wide text-olive">
+          {/* "Somewhere that makes the answer to 'shall we?' yes a little more
+              often" is the best sentence on this page: it is the only line that
+              names what someone actually gains, and it does it without going
+              anywhere near a health claim. It is kept whole and the setup is
+              trimmed around it — "fifteen minutes, no appointment, no fuss" is
+              gone, because the FAQ and the homepage both say that already,
+              while nothing else on the site says this. */}
+          <Card as="article" className="flex flex-col gap-2.5 bg-ivory">
+            <p className="text-[13px] font-semibold uppercase tracking-[0.1em] text-olive">
               Lee Ling
-            </figcaption>
-            <blockquote className="mt-2 border-l-2 border-line pl-5 text-[18px] leading-relaxed text-muted">
-              My mother is 78. What I kept noticing wasn&apos;t the aches themselves — it was how
-              often she and her friends would hang back from an outing, saying they&apos;d only
-              slow everyone down. So I wanted somewhere close by that asked nothing of them:
-              fifteen minutes, no appointment, no fuss. Somewhere that makes the answer to
-              &ldquo;shall we?&rdquo; yes a little more often.
+            </p>
+            <blockquote className="text-[16px] leading-relaxed text-muted">
+              My mother is 78. What I noticed wasn&apos;t the aches — it was how often she
+              and her friends hung back from an outing, saying they&apos;d only slow everyone
+              down. I wanted somewhere close by that asked nothing of them, and makes the
+              answer to &ldquo;shall we?&rdquo; yes a little more often.
             </blockquote>
-          </figure>
+          </Card>
 
           {/* Kimberly's reason was given as "saw the benefits and wanted to
               bring it to the community". "Benefits" is the same vaguely medical
@@ -138,17 +158,16 @@ export default function AboutPage() {
               machine for", which talked a customer out of a product we sell.
               The pitch is the clubhouse being a place to sit down, not a
               cheaper alternative to owning one. */}
-          <figure>
-            <figcaption className="text-[15px] font-semibold uppercase tracking-wide text-olive">
+          <Card as="article" className="flex flex-col gap-2.5 bg-ivory">
+            <p className="text-[13px] font-semibold uppercase tracking-[0.1em] text-olive">
               Kimberly
-            </figcaption>
-            <blockquote className="mt-2 border-l-2 border-line pl-5 text-[18px] leading-relaxed text-muted">
+            </p>
+            <blockquote className="text-[16px] leading-relaxed text-muted">
               Every neighbourhood should have somewhere to just sit down. I wanted Desa
               Cindaimas to have a corner where you can kick your feet up for a quarter of an
-              hour, have a coffee and see a familiar face — no planning it, no driving
-              anywhere, right here in our own clubhouse.
+              hour, have a coffee and see a familiar face — right here in our own clubhouse.
             </blockquote>
-          </figure>
+          </Card>
         </div>
 
         <div className="mt-8 space-y-5 text-[18px] leading-relaxed text-muted">
