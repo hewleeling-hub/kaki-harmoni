@@ -18,14 +18,14 @@ import {
 export const metadata: Metadata = {
   title: "Our Spa — What Makes It Different",
   description:
-    "Kaki Harmoni uses a Grand Sun hydrosonic spa — fine ultrasonic bubbles and warm, oxygen-rich water for a soak that feels different from an ordinary basin at home.",
+    "Kaki Harmoni uses a Grand Sun hydrosonic spa — fine bubbles and gentle, even warmth for a soak that feels different from an ordinary basin at home.",
 };
 
 const FEATURES = [
   {
     icon: WavesIcon,
     title: "A true hydrosonic soak",
-    text: "Our Grand Sun spa isn't just warm water. Fine sound waves fill the water with millions of tiny bubbles, for a soft, fizzy, gently massaging soak you won't get from a basin at home.",
+    text: "Our Grand Sun spa isn't just warm water. Fine sound waves fill the water with millions of tiny bubbles, for a soft, fizzy, gently swirling soak you won't get from a basin at home.",
   },
   {
     icon: HeartIcon,
@@ -35,12 +35,12 @@ const FEATURES = [
   {
     icon: DropletIcon,
     title: "Clean, fresh water",
-    text: "Oxygen-rich, freshly prepared water for every guest, so your soak always feels clean, light and refreshing.",
+    text: "Freshly prepared water for every guest, so your soak always feels clean, light and refreshing.",
   },
   {
     icon: SunIcon,
-    title: "A soft far-infrared warmth",
-    text: "The spa also gives off a gentle far-infrared warmth — a soft, radiant heat that wraps around you and makes the whole soak feel especially cosy, right down to your toes.",
+    title: "A soft, radiant warmth",
+    text: "The spa also gives off a gentle radiant warmth — a soft heat that wraps around you and makes the whole soak feel especially cosy, right down to your toes.",
   },
   {
     icon: SparklesIcon,
@@ -58,30 +58,29 @@ export default function OurSpaPage() {
         subtitle="A few gentle things that make a Kaki Harmoni soak feel different."
       />
 
-      {/* A feature panel rather than the room photo, at the owner's direction.
-          Shown at its own 3:2 and given the full column: it carries small
-          printed labels, so the 16:9 crop and 620px cap that suited a
-          photograph would have cut the text and then made what survived
-          unreadable. Nothing here is cropped for that reason.
+      {/* Back to the room photo. A feature panel sat here briefly, but its
+          claims — "Healthier Feet", "Better Circulation", "helps remove
+          impurities", "Ozone with Negative Ions", "Promotes circulation" —
+          were printed INTO the artwork, and text baked into a picture can't
+          be edited the way a sentence can. A photograph of the room makes no
+          claim at all, which is the point of this page: show the place and
+          describe how it feels.
 
-          It stays on THIS page only. The homepage strip and step 04 of the
-          Your Visit journey still use /shop/spa.png — the journey renders its
-          image in a 176px circle, where a panel of captions would be a
-          smudge, and both of those slots exist to show a guest the room.
+          If a replacement panel is made without those phrases, drop it in
+          here — but note it will need the full column and no crop, since
+          small printed labels don't survive a 16:9 crop at 620px.
 
-          NOTE for whoever edits this next: the panel carries claims this site
-          otherwise avoids — better circulation, removing impurities, ozone
-          and negative ions. Those were raised and the owner chose to publish
-          them; docs/leg-spa-benefits.md still records why the written copy
-          stays clear of them, and that guidance has not changed. */}
-      <figure className="mt-8 overflow-hidden rounded-[24px] border border-line shadow-[var(--shadow-warm)]">
+          Cropped to 16:9 and capped at 620px: at its native 4:3 across the
+          full column the photo stood taller than the four cards below it, so
+          the page opened with a wall of picture. */}
+      <figure className="mx-auto mt-8 aspect-[16/9] max-w-[620px] overflow-hidden rounded-[24px] border border-line shadow-[var(--shadow-warm)]">
         <Image
-          src="/shop/spa-features.png"
-          alt="The Grand Spa foot spa at Kaki Harmoni — warm bubbling water, the removable footrest, and the control unit, alongside a summary of the machine's features"
-          width={1536}
-          height={1024}
-          sizes="(max-width: 768px) 100vw, 768px"
-          className="h-auto w-full"
+          src="/shop/spa.png"
+          alt="Inside the Kaki Harmoni soaking room — spa stations, comfortable chairs and plants"
+          width={1400}
+          height={1050}
+          sizes="(max-width: 640px) 100vw, 620px"
+          className="h-full w-full object-cover"
           priority
         />
       </figure>
@@ -122,7 +121,7 @@ export default function OurSpaPage() {
             {[
               "Thousands of soft bubbles, not still water",
               "Warmth that stays gentle and even",
-              "Fresh, oxygen-rich water each time",
+              "Fresh, clean water each time",
               "A calm place to switch off — with a coffee before or after",
             ].map((item) => (
               <li key={item} className="flex items-start gap-2.5 text-[15.5px] text-olive-dark">
