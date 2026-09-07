@@ -66,17 +66,6 @@ export default function AboutPage() {
             up with the people you love is a feeling, not a cure — just as
             moving, and defensible. Keep it that way. */}
         <div className="mt-8 space-y-8">
-          <figure>
-            <figcaption className="text-[15px] font-semibold uppercase tracking-wide text-olive">
-              Lee Ling
-            </figcaption>
-            <blockquote className="mt-2 border-l-2 border-line pl-5 text-[18px] leading-relaxed text-muted">
-              My mother is 78. What I kept noticing wasn&apos;t the aches themselves — it was how
-              often she and her friends would hang back from an outing, saying they&apos;d only
-              slow everyone down.
-            </blockquote>
-          </figure>
-
           {/* Margret's own words. "Like brushing my teeth" reframes a soak from
               a treat you occasionally justify into an ordinary daily thing —
               precisely what the routine ladder sells, and someone who accepts
@@ -101,6 +90,17 @@ export default function AboutPage() {
               the day off in a good mood. I&apos;ve a toddler grandchild to keep up with, so
               those fifteen minutes are ones I don&apos;t skip — travelling is the only thing
               that stops me.
+            </blockquote>
+          </figure>
+
+          <figure>
+            <figcaption className="text-[15px] font-semibold uppercase tracking-wide text-olive">
+              Lee Ling
+            </figcaption>
+            <blockquote className="mt-2 border-l-2 border-line pl-5 text-[18px] leading-relaxed text-muted">
+              My mother is 78. What I kept noticing wasn&apos;t the aches themselves — it was how
+              often she and her friends would hang back from an outing, saying they&apos;d only
+              slow everyone down.
             </blockquote>
           </figure>
 
