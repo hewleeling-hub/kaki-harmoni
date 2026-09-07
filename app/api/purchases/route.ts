@@ -7,7 +7,7 @@ import { DOOR_SURCHARGE_MYR } from "@/lib/config";
 import { machinesBusyAt, MAX_CAPACITY_PER_SLOT } from "@/lib/slots";
 import { seatsBookedByTime } from "@/lib/capacity";
 import { hasBookedBefore } from "@/lib/customer";
-import { FIRST_VISIT_PRODUCT_ID, PACKAGES_ARE_PREPAY_ONLY } from "@/config/catalogue";
+import { FIRST_VISIT_PRODUCT_ID, PACKAGES_ARE_DOOR_ONLY } from "@/config/catalogue";
 
 // Legacy default used when no items are sent or the catalogue isn't available yet.
 const DEFAULT_ITEM_NAME = "First Visit — Foot Soak + Coffee";
@@ -189,12 +189,17 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // Packages are settled at the shop. Booking one online holds the slot; the
+  // money and the package setup happen at the counter, because the app has no
+  // visit-credit table and taking RM840 online would record one booking and
+  // leave every later visit untracked. Rejected server-side as well as hidden
+  // in the form, so a hand-built request can't take the payment either.
   const hasPackage = lines.some((l) => l.category === "package");
-  if (PACKAGES_ARE_PREPAY_ONLY && hasPackage && payTiming === "door") {
+  if (PACKAGES_ARE_DOOR_ONLY && hasPackage && payTiming === "prepay") {
     return NextResponse.json(
       {
         error:
-          "Packages are prepaid — please choose prepay, or pick a single visit to pay at the door.",
+          "Packages are set up and paid for at the shop — we'll hold this slot for you, and you can settle it when you arrive.",
       },
       { status: 400 },
     );

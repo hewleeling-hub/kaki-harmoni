@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { whatsAppLink, BUSINESS_WHATSAPP_NUMBER } from "@/lib/whatsapp";
 import { PRELAUNCH_MODE, DOOR_SURCHARGE_MYR, PREPAY_PRICE_MYR } from "@/lib/config";
-import { withOption, PACKAGES_ARE_PREPAY_ONLY, FIRST_VISIT_PRODUCT_ID } from "@/config/catalogue";
+import { withOption, PACKAGES_ARE_DOOR_ONLY, FIRST_VISIT_PRODUCT_ID } from "@/config/catalogue";
 
 type Product = {
   id: string;
@@ -68,12 +68,12 @@ export default function PurchaseForm({
   const selected = mainItems.find((p) => p.id === selectedId) ?? null;
   const hasCatalogue = mainItems.length > 0;
 
-  // Packages may be settled on arrival like a single visit — see
-  // PACKAGES_ARE_PREPAY_ONLY, which is the one switch governing this and the
-  // matching server-side rule.
+  // A package is settled at the shop, never prepaid here — see
+  // PACKAGES_ARE_DOOR_ONLY, the one switch governing this and the matching
+  // server-side rule, and the reasoning behind it.
   const isPackage = selected?.category === "package";
-  const prepayOnly = PACKAGES_ARE_PREPAY_ONLY && isPackage;
-  const effectiveTiming: PayTiming = prepayOnly ? "prepay" : payTiming;
+  const doorOnly = PACKAGES_ARE_DOOR_ONLY && isPackage;
+  const effectiveTiming: PayTiming = doorOnly ? "door" : payTiming;
 
   const subtotal = selected ? Number(selected.price_myr) : 0;
 
@@ -241,9 +241,9 @@ export default function PurchaseForm({
                     {p.description && (
                       <span className="mt-0.5 block text-xs text-black/50">{p.description}</span>
                     )}
-                    {PACKAGES_ARE_PREPAY_ONLY && p.category === "package" && (
+                    {PACKAGES_ARE_DOOR_ONLY && p.category === "package" && (
                       <span className="mt-1 inline-block text-[10px] font-bold uppercase tracking-wider text-black/45">
-                        Prepay only
+                        Pay at the shop
                       </span>
                     )}
                   </span>
@@ -267,14 +267,14 @@ export default function PurchaseForm({
       {/* ── How to pay ────────────────────────────────────────────────── */}
       <div>
         <label className="block text-sm font-medium mb-1.5">How would you like to pay?</label>
-        {prepayOnly ? (
+        {doorOnly ? (
           /* Not a hidden rule: say plainly why there is no choice here, so the
-             missing "pay at the door" card doesn't look like a broken page. */
+             missing "prepay" card doesn't look like a broken page. */
           <div className="rounded-xl border-2 px-4 py-3" style={{ borderColor: "var(--lagoon)", background: "rgba(46,125,123,0.07)" }}>
-            <span className="text-sm font-semibold">Prepay</span>
+            <span className="text-sm font-semibold">Pay at the shop</span>
             <p className="mt-1 text-xs text-black/55">
-              Packages are prepaid so your visits are credited to you from the start. Single
-              visits can still be paid at the door.
+              We set packages up in person so your visits are recorded properly and you know
+              exactly what you have left. Nothing to pay now — we&apos;ll hold this slot for you.
             </p>
           </div>
         ) : (

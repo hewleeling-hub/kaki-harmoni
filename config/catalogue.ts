@@ -51,6 +51,30 @@ export function productIdForSlug(value: string | null | undefined): string | nul
  */
 export const PACKAGES_ON_SALE = false;
 
+/**
+ * Packages are settled AT THE SHOP, never prepaid online. Booking one online
+ * reserves the slot; the money and the package itself are set up at the
+ * counter.
+ *
+ * This is the deliberate answer to the one thing the app cannot do: a package
+ * is several visits, and there is no table of visit credits — `purchases`,
+ * `order_items` and `signups` are all there is. Taking RM68 or RM840 online
+ * would record a single booking and leave every later visit untracked, with
+ * the customer's receipt in the app saying nothing about what they are still
+ * owed.
+ *
+ * Paying in person puts the tracking where it can actually happen: a member of
+ * staff takes the money, sets the package up however the shop records it, and
+ * the guest leaves knowing what they have bought. The app's job stops at
+ * holding the first slot.
+ *
+ * The cost is an unpaid no-show, and on a 30-Day Routine that is RM840 of
+ * nobody arriving. Watch it. If it starts hurting, the fix is credit tracking
+ * and then prepayment — not prepayment on its own, which would only move the
+ * problem to the customer.
+ */
+export const PACKAGES_ARE_DOOR_ONLY = true;
+
 /** The slugs gated by PACKAGES_ON_SALE. Singles are always sellable. */
 const PACKAGE_SLUGS: CatalogueSlug[] = [
   "double-reset",
@@ -80,22 +104,6 @@ export function reserveHref(slug?: CatalogueSlug): string {
 export function withOption(path: string, slug: string | null | undefined): string {
   return isCatalogueSlug(slug) ? `${path}${path.includes("?") ? "&" : "?"}option=${slug}` : path;
 }
-
-/**
- * Whether a package must be prepaid, or may be settled on arrival like a
- * single visit.
- *
- * FALSE, because packages are signed up for at the shop and paid there — the
- * site's own copy says "book your first session online and pay at the shop",
- * and refusing pay-at-the-door in checkout would contradict it.
- *
- * The argument for true is real and worth keeping in view: an unpaid RM840
- * routine that no-shows costs far more than an unpaid RM30 first visit. If
- * packages ever go on sale online AND no-shows become a problem, flip this
- * back — one switch, read by both the checkout form and POST /api/purchases,
- * so the two can't disagree.
- */
-export const PACKAGES_ARE_PREPAY_ONLY = false;
 
 /**
  * The discounted first visit, which is exactly that: a first visit. It is an
