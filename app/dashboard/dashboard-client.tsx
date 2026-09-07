@@ -475,29 +475,91 @@ export default function DashboardClient({ canDelete = false }: { canDelete?: boo
                             const busy = updatingPurchaseId === p?.id;
                             return (
                               <>
-                                {p && p.status === "pending_payment" && (
+                                {/* Same trap as the visit buttons below: this
+                                    used to vanish once tapped, so money marked
+                                    received in error stayed that way. It now
+                                    reads "Paid" when confirmed and taking it
+                                    back is one tap. */}
+                                {p && (
                                   <button
-                                    onClick={() => updatePurchase(p.id, { status: "confirmed" })}
+                                    onClick={() =>
+                                      updatePurchase(p.id, {
+                                        status:
+                                          p.status === "confirmed" ? "pending_payment" : "confirmed",
+                                      })
+                                    }
                                     disabled={busy}
-                                    className="text-xs font-medium px-2 py-1 rounded text-white disabled:opacity-60"
-                                    style={{ background: "var(--lagoon)" }}
+                                    title={
+                                      p.status === "confirmed"
+                                        ? "Tap to undo — back to awaiting payment"
+                                        : "Mark this payment as received"
+                                    }
+                                    aria-pressed={p.status === "confirmed"}
+                                    className="text-xs font-medium px-2 py-1 rounded border border-transparent text-white disabled:opacity-60"
+                                    style={{
+                                      background:
+                                        p.status === "confirmed" ? "var(--lagoon-dark)" : "var(--lagoon)",
+                                    }}
                                   >
-                                    {busy ? "…" : "Mark paid"}
+                                    {busy ? "…" : p.status === "confirmed" ? "Paid ✓" : "Mark paid"}
                                   </button>
                                 )}
-                                {p && p.visit_status === "upcoming" && (
+                                {/* Attended / No-show used to appear ONLY while
+                                    a visit was still "upcoming", so the first
+                                    tap was permanent — mark someone attended by
+                                    mistake and there was no way back from this
+                                    screen. That is the worst possible shape for
+                                    a control staff use on a busy morning with a
+                                    queue at the counter.
+
+                                    Both buttons now stay visible whatever the
+                                    status, with the current one filled in, and
+                                    tapping the one already set puts the visit
+                                    back to upcoming. Every state is reachable
+                                    from every other. */}
+                                {p && (
                                   <>
                                     <button
-                                      onClick={() => updatePurchase(p.id, { visit_status: "attended" })}
+                                      onClick={() =>
+                                        updatePurchase(p.id, {
+                                          visit_status:
+                                            p.visit_status === "attended" ? "upcoming" : "attended",
+                                        })
+                                      }
                                       disabled={busy}
-                                      className="text-xs font-medium px-2 py-1 rounded border border-green-200 text-green-700 disabled:opacity-60"
+                                      title={
+                                        p.visit_status === "attended"
+                                          ? "Tap to undo — back to upcoming"
+                                          : "Mark this visit as attended"
+                                      }
+                                      aria-pressed={p.visit_status === "attended"}
+                                      className={`text-xs font-medium px-2 py-1 rounded border disabled:opacity-60 ${
+                                        p.visit_status === "attended"
+                                          ? "border-green-600 bg-green-600 text-white"
+                                          : "border-green-200 text-green-700"
+                                      }`}
                                     >
                                       Attended
                                     </button>
                                     <button
-                                      onClick={() => updatePurchase(p.id, { visit_status: "no_show" })}
+                                      onClick={() =>
+                                        updatePurchase(p.id, {
+                                          visit_status:
+                                            p.visit_status === "no_show" ? "upcoming" : "no_show",
+                                        })
+                                      }
                                       disabled={busy}
-                                      className="text-xs font-medium px-2 py-1 rounded border border-red-200 text-red-700 disabled:opacity-60"
+                                      title={
+                                        p.visit_status === "no_show"
+                                          ? "Tap to undo — back to upcoming"
+                                          : "Mark this visit as a no-show"
+                                      }
+                                      aria-pressed={p.visit_status === "no_show"}
+                                      className={`text-xs font-medium px-2 py-1 rounded border disabled:opacity-60 ${
+                                        p.visit_status === "no_show"
+                                          ? "border-red-600 bg-red-600 text-white"
+                                          : "border-red-200 text-red-700"
+                                      }`}
                                     >
                                       No-show
                                     </button>
