@@ -34,7 +34,20 @@ export function PageHeader({
       <div className="flex items-center gap-4 sm:gap-8">
         <div className="flex-1">
           <h1 className="text-[30px] leading-tight text-olive-dark sm:text-[38px]">{title}</h1>
-          {subtitle && <p className="mt-2 max-w-xl text-[18px] leading-relaxed text-muted">{subtitle}</p>}
+          {/* No max-width when the header has no picture beside it. The xl cap
+              was there to keep the subtitle clear of Lotti or the shopfront
+              photo, but most headers now carry neither — and on those the text
+              broke at roughly half the box, leaving the sentence hanging in the
+              middle of a wide empty panel. */}
+          {subtitle && (
+            <p
+              className={`mt-2 text-[18px] leading-relaxed text-muted ${
+                image || showLotti ? "max-w-xl" : ""
+              }`}
+            >
+              {subtitle}
+            </p>
+          )}
           {/* Children sit in the text column, not in a band beneath the whole
               row. Below it they left a void: a tall portrait photo sets the
               row's height, and a short title and subtitle can't fill it, so

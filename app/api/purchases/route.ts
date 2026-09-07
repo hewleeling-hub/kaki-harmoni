@@ -4,10 +4,14 @@ import { logActivity, logAudit } from "@/lib/activity";
 import { scoreLead } from "@/lib/scoring";
 import { sendSalesAlert, purchaseConfirmedEmail } from "@/lib/email";
 import { DOOR_SURCHARGE_MYR } from "@/lib/config";
-import { machinesBusyAt, MAX_CAPACITY_PER_SLOT } from "@/lib/slots";
-import { seatsBookedByTime } from "@/lib/capacity";
+import { remainingFor } from "@/lib/slots";
+import { occupancyForDate } from "@/lib/capacity";
 import { hasBookedBefore } from "@/lib/customer";
-import { FIRST_VISIT_PRODUCT_ID, PACKAGES_ARE_DOOR_ONLY } from "@/config/catalogue";
+import {
+  FIRST_VISIT_PRODUCT_ID,
+  PACKAGES_ARE_DOOR_ONLY,
+  soaksForProductId,
+} from "@/config/catalogue";
 
 // Legacy default used when no items are sent or the catalogue isn't available yet.
 const DEFAULT_ITEM_NAME = "First Visit — Foot Soak + Coffee";
@@ -147,13 +151,25 @@ export async function POST(request: NextRequest) {
   const slot_date = body.slot_date?.trim() || null;
   const slot_time = body.slot_time?.trim() || null;
 
-  if (slot_date && slot_time) {
-    // Counted in people, not bookings, and across the machine cycle rather
-    // than the slot alone — the calendar and this check share the same two
-    // functions so they cannot disagree about how full a slot is.
-    const seats = await seatsBookedByTime(supabase, slot_date);
+  const lines = await resolveLines(supabase, body.items);
 
-    if (machinesBusyAt(seats, slot_time) >= MAX_CAPACITY_PER_SLOT) {
+  // Capacity is re-checked AFTER the lines are priced, because how much room a
+  // booking needs depends on what it is: a Double Reset is two soaks back to
+  // back and holds two machines, so a slot with one place left is full for it.
+  // Checking before the lines were known would have waved that through.
+  //
+  // Nothing reserves the slot between picking it and paying, so this is the
+  // real gate — someone else may have taken the last machine meanwhile.
+  if (slot_date && slot_time) {
+    const occupancy = await occupancyForDate(supabase, slot_date);
+    // resolveLines guarantees exactly one main item at quantity 1, so the
+    // booking's shape is that line's: one soak, or two for a Double Reset.
+    // Add-ons occupy no machine.
+    const soaks = lines
+      .filter((l) => l.category === "service" || l.category === "package")
+      .reduce((most, l) => Math.max(most, soaksForProductId(l.product_id)), 1);
+
+    if (remainingFor(occupancy, slot_time, soaks) < 1) {
       return NextResponse.json(
         { error: "That time slot just filled up. Please pick another.", slot_taken: true },
         { status: 409 },
@@ -161,13 +177,6 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  const lines = await resolveLines(supabase, body.items);
-
-  // Off by default — packages are settled at the shop, so refusing
-  // pay-at-the-door here would contradict the site's own instruction. Kept as
-  // a switch: carrying an unpaid RM840 routine through to the
-  // day is a real loss if the guest doesn't arrive, where an unpaid RM30 first
-  // visit is not. The form doesn't offer the choice; this is what enforces it.
   // The first visit is priced below the standard single as an acquisition
   // offer, so it is available once per person. The checkout doesn't show it to
   // a returning guest; this is what makes that a rule rather than a hint.

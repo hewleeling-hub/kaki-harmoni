@@ -25,6 +25,40 @@ export const CATALOGUE_PRODUCT_IDS = {
 
 export type CatalogueSlug = keyof typeof CATALOGUE_PRODUCT_IDS;
 
+/**
+ * How many soaks one unit of this product uses IN A SINGLE VISIT.
+ *
+ * Double Reset is "two soaks back to back", which is one appointment, not two
+ * bookings — and it cannot be one machine used twice, because a machine has to
+ * stand for 30 minutes between runs. So it occupies a second machine starting
+ * as the first soak ends, and a Double Reset takes two of the four.
+ *
+ * The multi-visit packages are NOT here. A 5-Day Reset is five separate
+ * appointments on five separate days; booking it holds one slot for the first
+ * of them, so it uses one machine like any other single visit. Putting 5 here
+ * would block the whole shop for one customer.
+ */
+const SOAKS_PER_UNIT: Partial<Record<CatalogueSlug, number>> = {
+  "double-reset": 2,
+};
+
+// Typed as plain strings on the key side: product ids arrive from the database
+// and from request bodies, not as the literal union this object infers.
+const SLUG_BY_PRODUCT_ID = new Map<string, CatalogueSlug>(
+  Object.entries(CATALOGUE_PRODUCT_IDS).map(([slug, id]) => [id as string, slug as CatalogueSlug]),
+);
+
+/** Soaks per unit for a product id — 1 for anything unrecognised. */
+export function soaksForProductId(productId: string | null | undefined): number {
+  const slug = productId ? SLUG_BY_PRODUCT_ID.get(productId) : undefined;
+  return (slug && SOAKS_PER_UNIT[slug]) || 1;
+}
+
+/** Soaks per unit for a slug — used when availability is checked before checkout. */
+export function soaksForSlug(value: string | null | undefined): number {
+  return (isCatalogueSlug(value) && SOAKS_PER_UNIT[value]) || 1;
+}
+
 /** True for a slug this file knows, so a hand-typed `?option=` can be ignored. */
 export function isCatalogueSlug(value: string | null | undefined): value is CatalogueSlug {
   return !!value && Object.prototype.hasOwnProperty.call(CATALOGUE_PRODUCT_IDS, value);

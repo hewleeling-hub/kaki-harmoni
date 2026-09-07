@@ -58,18 +58,18 @@ export default function OurSpaPage() {
         subtitle="A few gentle things that make a Kaki Harmoni soak feel different."
       />
 
-      {/* Cropped to a banner rather than shown at its native 4:3. At full
-          column width the photo stood taller than the four feature cards put
-          together, so the page opened with a wall of picture and the reasons
-          to come started below the fold. The room shot has ceiling and floor
-          to spare, so 16:9 takes the crop off the parts carrying nothing. */}
-      <figure className="mt-8 aspect-[16/9] overflow-hidden rounded-[24px] border border-line shadow-[var(--shadow-warm)]">
+      {/* Cropped to 16:9 AND capped at 620px. Cropping alone wasn't enough:
+          on a wide screen a full-width 16:9 is still around 800px tall, so the
+          photo filled the viewport on its own and the four reasons to come
+          started below the fold. It is a supporting picture, not a banner, so
+          it is sized like one — and the room reads perfectly well small. */}
+      <figure className="mx-auto mt-8 aspect-[16/9] max-w-[620px] overflow-hidden rounded-[24px] border border-line shadow-[var(--shadow-warm)]">
         <Image
           src="/shop/spa.png"
           alt="Inside the Kaki Harmoni soaking room — Grand Sun spa stations, comfy chairs and plants"
           width={1400}
           height={1050}
-          sizes="(max-width: 768px) 100vw, 768px"
+          sizes="(max-width: 640px) 100vw, 620px"
           className="h-full w-full object-cover"
           priority
         />

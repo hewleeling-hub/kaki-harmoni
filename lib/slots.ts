@@ -26,62 +26,97 @@ const toMinutes = (time: string): number => {
   return parseInt(h, 10) * 60 + parseInt(m, 10);
 };
 
-const toTime = (minutes: number): string =>
-  `${String(Math.floor(minutes / 60)).padStart(2, "0")}:${String(minutes % 60).padStart(2, "0")}`;
-
 /**
- * How many machines are in use at the instant `atMinutes` — every slot that
- * started within one cycle of it still has its machine occupied.
+ * Which machines one guest occupies, as [start, end) offsets in minutes from
+ * the moment their booking begins.
+ *
+ * One soak is one machine for a full cycle. TWO soaks back to back cannot be
+ * the same machine twice — it has to stand for 30 minutes in between — so a
+ * Double Reset takes a second machine, starting as the first soak ends:
+ *
+ *   soaks = 1   [0, 45)
+ *   soaks = 2   [0, 45)  and  [15, 60)
+ *
+ * That 15-minute stagger is why the booking grid alone can't express this, and
+ * why occupancy is tracked on a 15-minute lattice below.
  */
-function concurrentAt(seatsByTime: Record<string, number>, atMinutes: number): number {
-  let total = 0;
-  for (let back = 0; back < MACHINE_CYCLE_MINUTES; back += SLOT_INTERVAL_MINUTES) {
-    const started = atMinutes - back;
-    if (started >= 0) total += seatsByTime[toTime(started)] ?? 0;
+export function footprintFor(soaks: number): Array<[number, number]> {
+  const spans: Array<[number, number]> = [];
+  for (let i = 0; i < Math.max(1, soaks); i++) {
+    const from = i * SESSION_MINUTES;
+    spans.push([from, from + MACHINE_CYCLE_MINUTES]);
   }
-  return total;
+  return spans;
 }
 
 /**
- * The most machines that will be in use at any moment during a soak beginning
- * at `time` — so `MAX_CAPACITY_PER_SLOT` minus this is how many more people
- * can actually start then.
- *
- * The rule has to look BOTH WAYS, which two simpler versions get wrong:
- *
- *  - Counting only the bookings made AT a slot treats the machines as if they
- *    reset instantly. A full 10:30 left 11:00 looking wide open, when every
- *    machine is mid-cycle until 11:15.
- *
- *  - Looking only backwards is still wrong, and it is the subtler failure.
- *    Three booked at 10:00 and one at 10:30 commits all four machines across
- *    10:00–10:45: a fourth 10:00 booking would take the very machine the 10:30
- *    guest is waiting for. The later booking has to close the earlier slot.
- *
- *  - Simply adding the slot before and the slot after over-blocks instead. Two
- *    at 09:30 and two at 10:30 never overlap each other, so 10:00 still has a
- *    machine free even though those four sum to capacity.
- *
- * What is actually being asked is whether a machine is free for the whole of
- * the new guest's 45 minutes, so this takes the PEAK number in use across that
- * window rather than a sum. Machine assignment is an interval-graph colouring
- * with equal-length intervals, where a peak of N is exactly the condition for
- * N machines to suffice — so this is not a heuristic, and a brute-force check
- * over every reachable arrangement of five consecutive slots agrees with it in
- * every case.
- *
- * Everything derives from SESSION_MINUTES, MACHINE_REST_MINUTES and
- * SLOT_INTERVAL_MINUTES, so changing the rest period or moving to a 45-minute
- * grid can't leave a stale assumption behind.
+ * Machines in use at each 15-minute tick of the day. Every interval edge is a
+ * multiple of the soak length, so ticking at 15 loses nothing.
  */
-export function machinesBusyAt(seatsByTime: Record<string, number>, time: string): number {
+export type Occupancy = Map<number, number>;
+
+export function addToOccupancy(
+  occupancy: Occupancy,
+  startTime: string,
+  soaks: number,
+  quantity: number,
+): void {
+  const start = toMinutes(startTime);
+  for (const [from, to] of footprintFor(soaks)) {
+    for (let t = start + from; t < start + to; t += SESSION_MINUTES) {
+      occupancy.set(t, (occupancy.get(t) ?? 0) + quantity);
+    }
+  }
+}
+
+/**
+ * How many more bookings of this shape will fit at `time` — 0 means the slot
+ * is full for it.
+ *
+ * A slot can have room for a single soak and no room for a Double Reset, since
+ * the Double needs two machines and holds the second one a quarter of an hour
+ * longer. So availability genuinely depends on WHAT is being booked, which is
+ * why /api/slots takes the chosen option.
+ *
+ * Machine assignment is interval-graph colouring, and interval graphs are
+ * perfect: N machines suffice exactly when no instant needs more than N. So
+ * checking every tick the new booking would touch is the real answer, not an
+ * approximation of it — confirmed against a brute-force allocator over every
+ * reachable arrangement of singles and doubles across five slots.
+ */
+export function remainingFor(
+  occupancy: Occupancy,
+  time: string,
+  soaks: number,
+  capacity: number = MAX_CAPACITY_PER_SLOT,
+): number {
   const start = toMinutes(time);
-  let peak = 0;
-  for (let ahead = 0; ahead < MACHINE_CYCLE_MINUTES; ahead += SLOT_INTERVAL_MINUTES) {
-    peak = Math.max(peak, concurrentAt(seatsByTime, start + ahead));
+
+  // How many machines one booking of this shape needs at each tick it touches.
+  const need = new Map<number, number>();
+  for (const [from, to] of footprintFor(soaks)) {
+    for (let t = start + from; t < start + to; t += SESSION_MINUTES) {
+      need.set(t, (need.get(t) ?? 0) + 1);
+    }
   }
-  return peak;
+
+  let room = Infinity;
+  for (const [tick, machines] of need) {
+    const free = capacity - (occupancy.get(tick) ?? 0);
+    room = Math.min(room, Math.floor(free / machines));
+  }
+  return Math.max(0, room === Infinity ? capacity : room);
 }
+
+/*
+ * `machinesBusyAt(seatsByTime, time)` used to live here — a peak-concurrency
+ * count over 30-minute slots. It was right for singles and is superseded by
+ * `remainingFor` above, which works on the 15-minute lattice and so can also
+ * express a Double Reset's second, staggered machine. The reasoning it carried
+ * is preserved in remainingFor's comment; the two failed alternatives it warned
+ * about — counting only the slot itself, and summing neighbouring slots — are
+ * still the mistakes to avoid.
+ */
 
 export function generateSlotsForDay(): string[] {
   const slots: string[] = [];

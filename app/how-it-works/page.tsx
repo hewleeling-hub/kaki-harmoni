@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { PublicShell } from "@/components/layout/PublicShell";
 import { Card, Button } from "@/components/ui/primitives";
 import { FAQAccordion } from "@/components/ui/FAQAccordion";
@@ -36,8 +35,14 @@ export default function YourVisitPage() {
   return (
     <PublicShell>
       {/* ── 1. Hero — the experience, not the booking form ───────────────── */}
-      <section className="fade-up grid items-center gap-8 py-6 sm:py-8 lg:grid-cols-2 lg:gap-12 lg:py-10">
-        <div className="order-2 lg:order-1">
+      {/* One column. The right-hand slot held a photo of the soaking room,
+          which is coming out until there's a picture that belongs here — it
+          showed the room rather than the visit this page describes, and the
+          same shot is already on Our Spa. Drop a replacement into a figure
+          after this section and restore `lg:grid-cols-2` with the two order-*
+          wrappers when there is one. */}
+      <section className="fade-up py-6 sm:py-8 lg:py-10">
+        <div>
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-olive">Your visit</p>
           <h1 className="mt-3 text-[36px] leading-[1.06] text-olive-dark sm:text-[46px] lg:text-[54px]">
             Your Kaki Harmoni
@@ -56,19 +61,6 @@ export default function YourVisitPage() {
             Fifteen minutes, a warm soak and a good coffee.
             <br className="hidden sm:block" /> That&rsquo;s the whole thing.
           </p>
-        </div>
-
-        <div className="order-1 lg:order-2">
-          <figure className="overflow-hidden rounded-[28px] border border-line shadow-[var(--shadow-warm-lg)]">
-            <Image
-              src="/shop/spa.png"
-              alt="The Kaki Harmoni soaking room — warm foot soaks, comfortable chairs and soft lighting"
-              width={1456}
-              height={1092}
-              priority
-              className="h-auto w-full object-cover"
-            />
-          </figure>
         </div>
       </section>
 

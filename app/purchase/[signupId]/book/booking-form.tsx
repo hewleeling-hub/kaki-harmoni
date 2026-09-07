@@ -34,7 +34,12 @@ export default function BookingForm({
       setSelectedTime(null);
       setError(null);
       try {
-        const res = await fetch(`/api/slots?date=${date}`);
+        // The chosen tier goes with the date: a Double Reset is two soaks
+        // back to back and needs two machines, so a slot with one place left
+        // is full for it and must not be offered.
+        const query = new URLSearchParams({ date });
+        if (option) query.set("option", option);
+        const res = await fetch(`/api/slots?${query}`);
         const data = await res.json();
         if (!cancelled) {
           if (!res.ok) throw new Error(data.error);
@@ -50,7 +55,7 @@ export default function BookingForm({
     return () => {
       cancelled = true;
     };
-  }, [date]);
+  }, [date, option]);
 
   // The slot isn't written here any more — it travels to the payment step and
   // is saved with the purchase, so an abandoned checkout leaves no orphan

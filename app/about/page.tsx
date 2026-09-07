@@ -175,19 +175,13 @@ export default function AboutPage() {
           </Card>
         </div>
 
+        {/* The "a home spa is a serious outlay, and even then there's water to
+            run and salts to measure" paragraph used to sit here. It is the
+            homepage's `whyNotAtHome` argument almost word for word, and after
+            three short quotes it arrived as a block of sales copy where the
+            page had just finished being personal. The homepage still makes the
+            case; About doesn't need to make it twice. */}
         <div className="mt-8 space-y-5 text-[18px] leading-relaxed text-muted">
-          {/* The founder's reason for opening is, word for word, the argument
-              `whyNotAtHome` already makes on the homepage: fresh water, salts
-              and oils you wouldn't keep in, nothing to clean up. Worth keeping
-              the two in step — a sales point lands differently when it turns
-              out to be why the place exists. */}
-          <p>
-            But a home spa is a serious outlay, and even once you have one there&apos;s water to
-            run, salts and oils to measure out, and the whole lot to clean up afterwards. Kaki
-            Harmoni is the same fifteen minutes without any of that — the water&apos;s ready, the
-            blend is made up for you, there&apos;s a coffee waiting, and someone else clears it
-            all away.
-          </p>
           <p>
             You&apos;ll find us inside the Desa Cindaimas clubhouse. No appointment weeks ahead,
             no whole afternoon set aside, and you don&apos;t need to live here — everyone is
