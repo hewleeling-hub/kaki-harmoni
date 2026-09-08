@@ -91,6 +91,27 @@ export async function POST(request: NextRequest) {
     }
   }
 
+  /* One number per PERSON, not per row. Signups dedupe on email only, so
+     somebody who signs up again without an email — or with a different one —
+     creates a second row; without this they would collect a second customer
+     number and the one written on their card would stop being theirs alone.
+     Matching on phone_normalised is the same identity the first-visit rule
+     and hasBookedBefore() already use. No phone, no match: the column default
+     issues a fresh number. */
+  const phoneKey = phoneKeyFor(phone);
+  let customer_no: number | null = null;
+  if (phoneKey) {
+    const { data: known } = await supabase
+      .from("signups")
+      .select("customer_no")
+      .eq("phone_normalised", phoneKey)
+      .not("customer_no", "is", null)
+      .order("customer_no", { ascending: true })
+      .limit(1)
+      .maybeSingle();
+    customer_no = (known?.customer_no as number | undefined) ?? null;
+  }
+
   const score = scoreLead({ referralSource: referral_source, hasPhone: !!phone, hoursToPurchase: null });
 
   const { data: signup, error } = await supabase
@@ -101,7 +122,9 @@ export async function POST(request: NextRequest) {
       phone,
       // Written on insert so returning guests can be recognised by the field
       // we always have. Email is optional since 0008; phone is not.
-      phone_normalised: phoneKeyFor(phone),
+      phone_normalised: phoneKey,
+      // Omitted for a new person, so the column default issues the next number.
+      ...(customer_no === null ? {} : { customer_no }),
       referral_source,
       status: "signed_up",
       lead_score: score.lead_score,

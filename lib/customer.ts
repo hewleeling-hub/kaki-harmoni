@@ -58,3 +58,19 @@ async function relatedSignupIds(
 export function phoneKeyFor(phone: string | null | undefined): string | null {
   return phone?.trim() ? normalisePhoneForWhatsApp(phone) : null;
 }
+
+/**
+ * The customer number as staff say and write it: KH001.
+ *
+ * Padded to three digits so the common case lines up in a column; past 999 it
+ * simply grows to KH1000 rather than breaking. The stored value is a plain
+ * integer — the "KH" and the padding are presentation, so the prefix can
+ * change without rewriting anyone's identity.
+ *
+ * Null only for a row written before migration 0015, which is nothing in
+ * practice; rendered as "—" rather than "KH000".
+ */
+export function customerRef(customerNo: number | null | undefined): string {
+  if (customerNo === null || customerNo === undefined) return "—";
+  return `KH${String(customerNo).padStart(3, "0")}`;
+}

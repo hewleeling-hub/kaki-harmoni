@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { whatsAppLink } from "@/lib/whatsapp";
 import { formatSlotTime } from "@/lib/slots";
+import { customerRef } from "@/lib/customer";
 import { draftFollowup } from "@/lib/followup";
 
 interface Signup {
@@ -15,6 +16,7 @@ interface Signup {
   status: string;
   lead_score: number | null;
   lead_score_review_status: string | null;
+  customer_no: number | null;
 }
 
 interface Purchase {
@@ -314,6 +316,12 @@ export default function DashboardClient({ canDelete = false }: { canDelete?: boo
                         />
                       ) : (
                         <>
+                          {/* The permanent customer number, above the name so
+                              it reads first when you're looking someone up
+                              from a card or over the phone. */}
+                          <span className="block font-mono text-[11px] font-semibold tracking-wide text-black/45">
+                            {customerRef(s.customer_no)}
+                          </span>
                           <span className="block font-medium">{s.name}</span>
                           {s.email && (
                             <span className="block text-xs text-black/50 break-words">{s.email}</span>

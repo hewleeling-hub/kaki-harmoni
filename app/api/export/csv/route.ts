@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { requireStaff } from "@/lib/auth";
+import { customerRef } from "@/lib/customer";
 
 function csvEscape(value: unknown): string {
   const str = value === null || value === undefined ? "" : String(value);
@@ -30,6 +31,9 @@ export async function GET() {
   const { data: purchases } = await supabase.from("purchases").select("*");
 
   const headers = [
+    // First column: it is the stable key across every export, where name and
+    // phone can both be edited.
+    "Customer no",
     "Name",
     "Email",
     "Phone",
@@ -52,7 +56,16 @@ export async function GET() {
   // booking yet still gets a row, with the purchase columns left blank, so
   // nobody drops out of the file entirely.
   const rows = (signups ?? []).flatMap((s) => {
-    const person = [s.name, s.email, s.phone, s.referral_source, s.status, s.created_at, s.lead_score];
+    const person = [
+      customerRef(s.customer_no),
+      s.name,
+      s.email,
+      s.phone,
+      s.referral_source,
+      s.status,
+      s.created_at,
+      s.lead_score,
+    ];
     const theirs = (purchases ?? [])
       .filter((pu) => pu.signup_id === s.id)
       .sort((a, b) => String(a.booking_date ?? "").localeCompare(String(b.booking_date ?? "")));
