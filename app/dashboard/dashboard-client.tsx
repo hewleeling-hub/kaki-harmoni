@@ -270,12 +270,17 @@ export default function DashboardClient({ canDelete = false }: { canDelete?: boo
           </div>
         ) : (
           <div className="overflow-x-auto">
-            {/* Eight columns, with Edit/Delete last. Without this scroll
-                container the Actions column was pushed off the right edge of
-                the viewport and simply could not be reached — no editing and
-                no deleting on any screen narrower than the whole table. */}
-            <table className="w-full min-w-[720px] text-sm">
-            <thead>
+            {/* ONE table, two shapes. Seven columns need 720px, which is twice
+                a phone; below md every row restacks into a card, each cell
+                labelled by the header it lost. Same markup either way — a
+                separate mobile list would be a second place to update, and
+                sooner or later one of them would be missing a column.
+
+                On md and up the scroll container still matters: without it the
+                Actions column was pushed off the right edge and could not be
+                reached at all. */}
+            <table className="block w-full text-sm md:table md:min-w-[720px]">
+            <thead className="hidden md:table-header-group">
               <tr className="text-left text-black/50 border-b border-black/5">
                 {/* Email lives under the name rather than in its own column.
                     Eight columns did not fit, and pinning Actions to the right
@@ -290,14 +295,17 @@ export default function DashboardClient({ canDelete = false }: { canDelete?: boo
                 <th className="px-4 py-3 font-medium text-right">Actions</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="block space-y-3 p-3 md:table-row-group md:space-y-0 md:p-0">
               {visibleSignups.map((s) => {
                 const isEditing = editingId === s.id;
                 const reviewStatus = s.lead_score_review_status ?? "unreviewed";
                 const reviewBusy = updatingReviewId === s.id;
                 return (
-                  <tr key={s.id} className="border-b border-black/5 last:border-0">
-                    <td className="px-4 py-3 max-w-[220px]">
+                  <tr
+                    key={s.id}
+                    className="block rounded-xl border border-black/10 bg-white p-1 shadow-sm md:table-row md:rounded-none md:border-0 md:border-b md:border-black/5 md:bg-transparent md:p-0 md:shadow-none md:last:border-0"
+                  >
+                    <Cell label="Name" className="md:max-w-[220px]">
                       {isEditing ? (
                         <input
                           value={draft.name}
@@ -312,9 +320,9 @@ export default function DashboardClient({ canDelete = false }: { canDelete?: boo
                           )}
                         </>
                       )}
-                    </td>
-                    <td className="px-4 py-3 text-black/70">{s.referral_source ?? "—"}</td>
-                    <td className="px-4 py-3">
+                    </Cell>
+                    <Cell label="Source" className="text-black/70">{s.referral_source ?? "—"}</Cell>
+                    <Cell label="Status">
                       {isEditing ? (
                         <select
                           value={draft.status}
@@ -335,8 +343,8 @@ export default function DashboardClient({ canDelete = false }: { canDelete?: boo
                           className="mt-1 rounded border border-black/10 px-2 py-1 w-full text-xs"
                         />
                       )}
-                    </td>
-                    <td className="px-4 py-3 text-black/70 text-xs">
+                    </Cell>
+                    <Cell label="Visit" className="text-black/70 text-xs">
                       {(() => {
                         const p = purchases.find((pu) => pu.signup_id === s.id);
                         if (!p) return "—";
@@ -403,8 +411,8 @@ export default function DashboardClient({ canDelete = false }: { canDelete?: boo
                           </div>
                         );
                       })()}
-                    </td>
-                    <td className="px-4 py-3">
+                    </Cell>
+                    <Cell label="Lead score">
                       <div className="space-y-1.5">
                         <ScoreBadge score={s.lead_score} />
                         <div className="flex items-center gap-1">
@@ -445,12 +453,12 @@ export default function DashboardClient({ canDelete = false }: { canDelete?: boo
                           )}
                         </div>
                       </div>
-                    </td>
-                    <td className="px-4 py-3 text-black/50 text-xs">
+                    </Cell>
+                    <Cell label="Signed up" className="text-black/50 text-xs">
                       {new Date(s.created_at).toLocaleDateString()}
                       <div className="text-black/35">{daysAgo(s.created_at)}</div>
-                    </td>
-                    <td className="px-4 py-3 text-right space-x-2 whitespace-nowrap">
+                    </Cell>
+                    <Cell label="Actions" className="space-x-2 whitespace-nowrap md:text-right">
                       {isEditing ? (
                         <>
                           <button
@@ -593,7 +601,7 @@ export default function DashboardClient({ canDelete = false }: { canDelete?: boo
                           )}
                         </>
                       )}
-                    </td>
+                    </Cell>
                   </tr>
                 );
               })}
@@ -737,6 +745,35 @@ function DownloadIcon() {
       <path d="M7 10l5 5 5-5" />
       <path d="M4 19h16" />
     </svg>
+  );
+}
+
+/**
+ * One table cell that becomes one labelled line of a card on a phone.
+ *
+ * The header row is hidden below md, so each cell carries its own label there
+ * — without it a stacked card is a column of values with nothing saying which
+ * is the lead score and which is the date. Above md the label disappears and
+ * this is an ordinary <td>.
+ */
+function Cell({
+  label,
+  className = "",
+  children,
+}: {
+  label?: string;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <td className={`block px-3 py-1.5 md:table-cell md:px-4 md:py-3 ${className}`}>
+      {label && (
+        <span className="mb-0.5 block text-[10px] font-semibold uppercase tracking-wide text-black/35 md:hidden">
+          {label}
+        </span>
+      )}
+      {children}
+    </td>
   );
 }
 
