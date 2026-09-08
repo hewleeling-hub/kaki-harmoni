@@ -38,6 +38,7 @@ import {
   launchOfferBadge,
   offerForSlug,
   packageValidityLabel,
+  coffeeIncludedNote,
 } from "@/config/business";
 import { isCatalogueSlug, isOnSale } from "@/config/catalogue";
 
@@ -345,6 +346,7 @@ export default async function Home({
                   {[
                     "No account needed",
                     "Pick your visit time from the calendar",
+                    coffeeIncludedNote,
                     chosen.visits > 1
                       ? `Set up and paid for at the shop — valid ${packageValidityLabel}`
                       : "Pay online or at the door",
@@ -367,7 +369,8 @@ export default async function Home({
               <>
                 <SectionHeading eyebrow="Start here" title={`Try your first soak — RM${pricing.prepay}`} />
                 <p className="mt-4 text-[18px] leading-relaxed text-muted">
-                  An easy way to find out whether fifteen minutes suits you. Your first visit is{" "}
+                  A warm 15-minute leg soak and a freshly made coffee — an easy way to find out
+                  whether fifteen minutes suits you. Your first visit is{" "}
                   <strong className="text-olive-dark">RM{pricing.prepay} when you prepay</strong> online
                   (or RM{pricing.walkin} at the door), instead of the usual RM{pricing.normal}. Reserve,
                   pick your time, then pay to confirm — first visits from {bookingStartLabel}.

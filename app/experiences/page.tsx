@@ -22,7 +22,7 @@ export const metadata: Metadata = pageMetadata({
 const EXPECT = [
   { icon: ArmchairIcon, title: "Get Comfortable", text: "Sit back, settle in and choose your experience." },
   { icon: WavesIcon, title: "Soak & Relax", text: "Enjoy your warm 15-minute Kaki Harmoni soak." },
-  { icon: CoffeeIcon, title: "Stay a Little Longer", text: "Enjoy coffee, conversation or simply take your time." },
+  { icon: CoffeeIcon, title: "Stay a Little Longer", text: "Your coffee is included — have it before or after, and take your time." },
 ];
 
 export default function ExperiencesPage() {
@@ -45,7 +45,7 @@ export default function ExperiencesPage() {
           booking. */}
       <PageHeader
         title="Four ways to soak"
-        subtitle="Every visit is the same fifteen minutes in the same warm water — what changes is the blend. Pick whichever matches how you'd like to feel."
+        subtitle="Every visit is the same fifteen minutes in the same warm water, with a freshly made coffee — what changes is the blend. Pick whichever matches how you'd like to feel."
       />
 
       {/* Experience cards + detail modal */}
@@ -82,8 +82,12 @@ export default function ExperiencesPage() {
               text into a narrow strip. */}
           <div>
             <h2 className="text-[30px] leading-tight text-ivory sm:text-[36px]">Ready for a little me-time?</h2>
+            {/* Was "Maybe a coffee", which actively said the opposite of the
+                truth: the coffee is included in every price on the site. A
+                guest fed back that they couldn't tell whether it came with the
+                soak, and this line is why. */}
             <p className="mt-3 text-[18px] leading-relaxed text-ivory/85">
-              15 minutes. A warm soak. Maybe a coffee.
+              15 minutes. A warm soak. And a coffee on us.
             </p>
             <div className="mt-6">
               <Button

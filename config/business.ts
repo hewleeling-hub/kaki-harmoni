@@ -133,6 +133,22 @@ export const referralOptions = [
   "Other",
 ] as const;
 
+/**
+ * A coffee comes with every soak, at every price on the ladder.
+ *
+ * It was in the prose — the hero, the FAQ, the first-visit cards — but never
+ * on the surfaces where someone is deciding what a price actually buys: the
+ * ladder cards, the package descriptions in checkout, the experiences. A
+ * guest fed back that they couldn't tell whether coffee was included, which
+ * is a real cost: it is a third of the reason to come rather than fill a
+ * basin at home, and it was being left out of the pitch at the moment of the
+ * decision.
+ *
+ * One string, so the day a package stops including it there is one place to
+ * change and no stale promise left behind on a card somewhere.
+ */
+export const coffeeIncludedNote = "Freshly made coffee included" as const;
+
 /** “Good to know before you visit” — no medical claims. */
 export const goodToKnow = [
   "Wear comfortable clothing you can roll up past the knees.",
