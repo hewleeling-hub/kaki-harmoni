@@ -54,16 +54,46 @@ const one = (value: FormDataEntryValue | null, allowed: readonly string[]): stri
 const many = (values: FormDataEntryValue[], allowed: readonly string[]): string[] =>
   allowed.filter((option) => values.includes(option));
 
-export async function GET() {
+/**
+ * The forms on file. With `customer_no`, just that one person's.
+ *
+ * Keyed on the customer number rather than the signup row, because a person and
+ * a signup row are not the same thing. Signups dedupe on email, so somebody who
+ * comes back and signs up again without one has two rows — and their history
+ * would be split in half by a signup_id lookup, which is exactly the visit you
+ * need when they are standing at the counter. `customer_no` is shared across
+ * every row belonging to that phone number (see 0015), so it finds all of it.
+ */
+export async function GET(request: NextRequest) {
   const user = await requireStaff();
   if (!user) return NextResponse.json({ error: "Please sign in." }, { status: 401 });
 
   const supabase = createAdminClient();
-  const { data, error } = await supabase
-    .from("spa_survey_forms")
-    .select(INTAKE_COLUMNS)
-    .order("created_at", { ascending: false })
-    .limit(200);
+
+  const rawCustomerNo = request.nextUrl.searchParams.get("customer_no");
+  let signupIds: string[] | null = null;
+
+  if (rawCustomerNo !== null) {
+    const customerNo = Number.parseInt(rawCustomerNo, 10);
+    if (!Number.isInteger(customerNo) || customerNo < 1) {
+      return NextResponse.json({ error: "Not a customer number." }, { status: 400 });
+    }
+
+    const { data: rows } = await supabase
+      .from("signups")
+      .select("id")
+      .eq("customer_no", customerNo);
+
+    signupIds = (rows ?? []).map((row) => row.id as string);
+
+    // No rows means nobody holds that number — an empty history, not everyone's.
+    if (signupIds.length === 0) return NextResponse.json({ forms: [] });
+  }
+
+  let query = supabase.from("spa_survey_forms").select(INTAKE_COLUMNS);
+  if (signupIds) query = query.in("signup_id", signupIds);
+
+  const { data, error } = await query.order("created_at", { ascending: false }).limit(200);
 
   if (error) {
     // The table exists in production but 0018 adds columns this reads.

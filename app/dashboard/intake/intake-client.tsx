@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { customerRef } from "@/lib/customer";
 import {
@@ -73,6 +73,15 @@ export default function IntakeClient({
 
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string>("");
+  const [listQuery, setListQuery] = useState("");
+
+  // What this customer had before. Fetched rather than read out of `forms`,
+  // which is only the most recent hundred — a regular from opening week would
+  // have fallen off it by the time they came back, which is the one moment
+  // this needs to work.
+  const formRef = useRef<HTMLFormElement>(null);
+  const [history, setHistory] = useState<IntakeForm[] | null>(null);
+  const [historyLoading, setHistoryLoading] = useState(false);
   // Set after mount rather than at render: the server runs on UTC and the shop
   // is on +8, so rendering "today" in both places is a hydration mismatch
   // waiting for someone to open this after 8am.
@@ -82,6 +91,68 @@ export default function IntakeClient({
   }, []);
 
   const selected = signups.find((s) => s.id === selectedId) ?? null;
+  const customerNo = selected?.customer_no ?? null;
+
+  useEffect(() => {
+    if (customerNo === null) {
+      setHistory(null);
+      return;
+    }
+
+    let cancelled = false;
+    setHistoryLoading(true);
+
+    fetch(`/api/intake?customer_no=${customerNo}`)
+      .then((res) => (res.ok ? res.json() : { forms: [] }))
+      .then((payload) => {
+        if (!cancelled) setHistory((payload?.forms ?? []) as IntakeForm[]);
+      })
+      .catch(() => {
+        if (!cancelled) setHistory([]);
+      })
+      .finally(() => {
+        if (!cancelled) setHistoryLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [customerNo]);
+
+  const lastVisit = history?.[0] ?? null;
+
+  /**
+   * Copy a previous blend into the boxes.
+   *
+   * Reaches into the form element rather than turning forty inputs into
+   * controlled state. The whole form is uncontrolled by design — it posts as
+   * one FormData — and this is the only thing that ever writes to it, so a ref
+   * is the honest way to do it rather than the shortcut.
+   */
+  const applyBlend = useCallback(
+    (oils: string[], salt: string | null, settings: IntakeForm | null) => {
+      const el = formRef.current;
+      if (!el) return;
+
+      el.querySelectorAll<HTMLInputElement>('input[name="aroma_oils"]').forEach((box) => {
+        box.checked = oils.includes(box.value);
+      });
+
+      const setSelect = (name: string, value: string | null) => {
+        const field = el.querySelector<HTMLSelectElement>(`select[name="${name}"]`);
+        if (field) field.value = value ?? "";
+      };
+
+      setSelect("salt_used", salt);
+      if (settings) {
+        setSelect("water_level", settings.water_level);
+        setSelect("water_temp", settings.water_temp);
+        setSelect("intensity", settings.intensity);
+        setSelect("duration_min", settings.duration_min);
+      }
+    },
+    [],
+  );
 
   const matches = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -100,6 +171,32 @@ export default function IntakeClient({
     () => new Map(signups.map((s) => [s.id, s] as const)),
     [signups],
   );
+
+  /**
+   * The filed list, narrowed to one customer.
+   *
+   * Searches the name written on the form as well as the name on the signup:
+   * a walk-in with no signup row has only the former, and would otherwise be
+   * unfindable the moment there are more than a screenful of forms.
+   */
+  const visibleForms = useMemo(() => {
+    const q = listQuery.trim().toLowerCase();
+    if (!q) return forms;
+
+    return forms.filter((form) => {
+      const signup = form.signup_id ? signupById.get(form.signup_id) : null;
+      return [
+        form.guest_name ?? "",
+        form.contact_no ?? "",
+        signup?.name ?? "",
+        signup?.phone ?? "",
+        customerRef(signup?.customer_no),
+      ]
+        .join(" ")
+        .toLowerCase()
+        .includes(q);
+    });
+  }, [forms, listQuery, signupById]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -153,6 +250,7 @@ export default function IntakeClient({
         </button>
       ) : (
         <form
+          ref={formRef}
           onSubmit={handleSubmit}
           className="space-y-6 rounded-2xl border border-black/10 bg-white p-4 sm:p-6"
         >
@@ -160,7 +258,7 @@ export default function IntakeClient({
           <Fieldset title="Whose form is this?">
             <input type="hidden" name="signup_id" value={selectedId} />
 
-            {selected ? (
+            {selected && (
               <div className="flex flex-wrap items-center gap-3 rounded-xl border border-black/10 bg-black/[0.03] px-3 py-2.5 text-sm">
                 <span className="rounded-md bg-white px-2 py-0.5 font-mono text-xs">
                   {customerRef(selected.customer_no)}
@@ -175,7 +273,105 @@ export default function IntakeClient({
                   Change
                 </button>
               </div>
-            ) : (
+            )}
+
+            {/* Been before? Then what they had last time belongs here, at the
+                moment you are filling this in — not on another screen you would
+                have to go and look at while they wait. */}
+            {selected && (historyLoading || lastVisit) && (
+              <div className="mt-3 rounded-xl border border-black/10 bg-black/[0.02] p-3.5 text-sm">
+                {historyLoading ? (
+                  <p className="text-black/45">Looking up their last visit…</p>
+                ) : (
+                  lastVisit && (
+                    <>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-black/45">
+                        Been before — {history!.length}{" "}
+                        {history!.length === 1 ? "visit" : "visits"} on file, last on{" "}
+                        {shortDate(lastVisit.survey_date ?? lastVisit.created_at)}
+                      </p>
+
+                      {(lastVisit.health_conditions ?? []).length > 0 && (
+                        <p className="mt-2 rounded-lg bg-amber-100 px-2.5 py-1.5 text-amber-900">
+                          Last time they noted:{" "}
+                          {(lastVisit.health_conditions ?? []).join(" · ")}
+                        </p>
+                      )}
+
+                      <dl className="mt-2 space-y-1">
+                        <HistoryLine
+                          label="Had"
+                          value={[
+                            (lastVisit.aroma_oils ?? []).join(", "),
+                            lastVisit.salt_used && `${lastVisit.salt_used} salt`,
+                          ]
+                            .filter(Boolean)
+                            .join(" · ")}
+                        />
+                        <HistoryLine
+                          label="Setup"
+                          value={[
+                            lastVisit.water_level && `${lastVisit.water_level} water`,
+                            lastVisit.water_temp,
+                            lastVisit.intensity,
+                            lastVisit.duration_min && `${lastVisit.duration_min} min`,
+                          ]
+                            .filter(Boolean)
+                            .join(" · ")}
+                        />
+                        <HistoryLine
+                          label="We suggested"
+                          value={[
+                            (lastVisit.recommended_oils ?? []).join(", "),
+                            lastVisit.recommended_salt && `${lastVisit.recommended_salt} salt`,
+                          ]
+                            .filter(Boolean)
+                            .join(" · ")}
+                        />
+                        <HistoryLine label="Notes" value={lastVisit.notes} />
+                      </dl>
+
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            applyBlend(
+                              lastVisit.aroma_oils ?? [],
+                              lastVisit.salt_used,
+                              lastVisit,
+                            )
+                          }
+                          className="rounded-lg border border-black/15 bg-white px-3 py-1.5 text-xs font-medium hover:bg-black/5"
+                        >
+                          Same as last time
+                        </button>
+                        {((lastVisit.recommended_oils ?? []).length > 0 ||
+                          lastVisit.recommended_salt) && (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              applyBlend(
+                                lastVisit.recommended_oils ?? [],
+                                lastVisit.recommended_salt,
+                                lastVisit,
+                              )
+                            }
+                            className="rounded-lg border border-black/15 bg-white px-3 py-1.5 text-xs font-medium hover:bg-black/5"
+                          >
+                            Use what we suggested
+                          </button>
+                        )}
+                      </div>
+                      <p className="mt-1.5 text-xs text-black/40">
+                        Fills in the boxes below — change anything before saving.
+                      </p>
+                    </>
+                  )
+                )}
+              </div>
+            )}
+
+            {!selected && (
               <>
                 <input
                   type="search"
@@ -324,18 +520,36 @@ export default function IntakeClient({
 
       {/* ── Filed forms ───────────────────────────────────────────────── */}
       <section>
-        <h2 className="mb-3 text-sm font-semibold text-black/70">
-          Filed {forms.length > 0 && <span className="font-normal text-black/40">({forms.length})</span>}
-        </h2>
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-sm font-semibold text-black/70">
+            Filed{" "}
+            <span className="font-normal text-black/40">
+              ({listQuery ? `${visibleForms.length} of ${forms.length}` : forms.length})
+            </span>
+          </h2>
+          {forms.length > 0 && (
+            <input
+              type="search"
+              value={listQuery}
+              onChange={(e) => setListQuery(e.target.value)}
+              placeholder="Find a customer"
+              className="w-full rounded-xl border border-black/15 px-3 py-2 text-sm sm:w-64"
+            />
+          )}
+        </div>
 
         {forms.length === 0 ? (
           <p className="rounded-2xl border border-dashed border-black/15 px-4 py-8 text-center text-sm text-black/50">
             Nothing filed yet. Print a stack of blank forms for the counter, and record them here
             once they come back signed.
           </p>
+        ) : visibleForms.length === 0 ? (
+          <p className="rounded-2xl border border-dashed border-black/15 px-4 py-8 text-center text-sm text-black/50">
+            No forms for “{listQuery}”.
+          </p>
         ) : (
           <ul className="space-y-2">
-            {forms.map((form) => (
+            {visibleForms.map((form) => (
               <FormRow
                 key={form.id}
                 form={form}
@@ -428,6 +642,16 @@ function FormRow({ form, signup }: { form: IntakeForm; signup: IntakeSignup | nu
         </div>
       </details>
     </li>
+  );
+}
+
+function HistoryLine({ label, value }: { label: string; value: string | null | undefined }) {
+  if (!value) return null;
+  return (
+    <div className="flex flex-col gap-0.5 sm:flex-row sm:gap-3">
+      <dt className="w-28 shrink-0 text-xs uppercase tracking-wide text-black/40">{label}</dt>
+      <dd className="text-black/75">{value}</dd>
+    </div>
   );
 }
 
