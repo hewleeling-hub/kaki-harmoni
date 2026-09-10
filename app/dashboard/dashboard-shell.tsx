@@ -22,6 +22,10 @@ export default function DashboardShell({
 
   const navItems = [
     { href: "/dashboard", label: "Dashboard", icon: DashboardIcon },
+    // Every role, not just owners: whoever is on the floor is the one holding
+    // the signed sheet. It sits inside the dashboard, so it is behind the same
+    // login as everything else here and there is no public route to it.
+    { href: "/dashboard/intake", label: "Intake", icon: IntakeIcon },
     ...(role === "owner" || role === "manager"
       ? [
           { href: "/dashboard/retention", label: "Retention", icon: RetentionIcon },
@@ -82,13 +86,20 @@ export default function DashboardShell({
 
   return (
     <div className="min-h-screen">
-      {/* Desktop sidebar */}
-      <aside className="hidden md:flex fixed inset-y-0 left-0 w-60 bg-white/70 backdrop-blur border-r border-black/5 flex-col z-40">
+      {/* Desktop sidebar. data-dashboard-chrome is what the printable intake
+          form hides — a sidebar has no business on a sheet handed to a guest. */}
+      <aside
+        data-dashboard-chrome
+        className="hidden md:flex fixed inset-y-0 left-0 w-60 bg-white/70 backdrop-blur border-r border-black/5 flex-col z-40"
+      >
         {nav}
       </aside>
 
       {/* Mobile top bar */}
-      <header className="md:hidden sticky top-0 z-40 flex items-center justify-between bg-white/80 backdrop-blur border-b border-black/5 px-4 py-3">
+      <header
+        data-dashboard-chrome
+        className="md:hidden sticky top-0 z-40 flex items-center justify-between bg-white/80 backdrop-blur border-b border-black/5 px-4 py-3"
+      >
         <Logo size="sm" />
         <button
           onClick={() => setDrawerOpen(true)}
@@ -126,7 +137,7 @@ export default function DashboardShell({
       )}
 
       {/* Main content */}
-      <main className="md:pl-60">
+      <main data-dashboard-main className="md:pl-60">
         <div className="p-6 md:p-10 max-w-5xl mx-auto">{children}</div>
       </main>
     </div>
@@ -140,6 +151,17 @@ function DashboardIcon() {
       <rect x="14" y="3" width="7" height="5" rx="1" />
       <rect x="14" y="12" width="7" height="9" rx="1" />
       <rect x="3" y="16" width="7" height="5" rx="1" />
+    </svg>
+  );
+}
+
+function IntakeIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M8 3h8a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" />
+      <path d="M9.5 8.5h5" />
+      <path d="M9.5 12h5" />
+      <path d="M9.5 15.5h3" />
     </svg>
   );
 }
