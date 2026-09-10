@@ -1,3 +1,5 @@
+import { redirect } from "next/navigation";
+import { requireStaff } from "@/lib/auth";
 import { businessConfig } from "@/config/business";
 import {
   HEALTH_CONDITIONS,
@@ -25,6 +27,13 @@ export const metadata = {
  *
  * Lives under /dashboard, so it is behind the login like everything else here.
  * Nothing about it is customer-facing until it comes out of a printer.
+ *
+ * It checks the login itself as well as inheriting the layout's, and that is
+ * not belt-and-braces here — it is load-bearing. Every other page in the
+ * dashboard awaits a query, so the layout's redirect lands before anything
+ * renders. This page awaits nothing, so it rendered its whole body into the
+ * response alongside the 307 and served the blank form to anyone who guessed
+ * the URL. Awaiting the guard here is what stops that.
  */
 
 function Box({ label }: { label: string }) {
@@ -56,7 +65,10 @@ function Section({ n, title, children }: { n: string; title: string; children: R
   );
 }
 
-export default function IntakePrintPage() {
+export default async function IntakePrintPage() {
+  const user = await requireStaff();
+  if (!user) redirect("/login");
+
   return (
     <>
       {/* Print rules live here rather than in globals.css: they are only ever
