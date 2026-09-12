@@ -294,7 +294,12 @@ export default function IntakeClient({
     setSaved(false);
 
     try {
-      const res = await fetch("/api/intake", { method: "POST", body: new FormData(formEl) });
+      // The scan comes from state, not from the form element: the two file
+      // inputs deliberately have no name, so this is what puts it on the wire.
+      const body = new FormData(formEl);
+      if (scanFile) body.set("scan", scanFile);
+
+      const res = await fetch("/api/intake", { method: "POST", body });
       const payload = await res.json().catch(() => ({}));
 
       if (!res.ok) {
@@ -528,18 +533,54 @@ export default function IntakeClient({
 
           {/* ── The scan ────────────────────────────────────────────────── */}
           <Fieldset title="The signed sheet">
-            <input
-              type="file"
-              name="scan"
-              accept={INTAKE_SCAN_TYPES.join(",")}
-              capture="environment"
-              onChange={(e) => {
-                setScanFile(e.target.files?.[0] ?? null);
-                setUnclear(null);
-                setReadError(null);
-              }}
-              className="block w-full text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-black/[0.06] file:px-3 file:py-2 file:text-sm file:font-medium"
-            />
+            {/* Two ways in, on purpose. `capture` makes a phone open the camera
+                straight away, which is what you want with the sheet in front of
+                you — but on many Android browsers it opens the camera and
+                NOTHING else, so a photo already in the gallery becomes
+                unattachable. The second input has no `capture` and reaches the
+                gallery and the file system. Neither carries name="scan": the
+                submit appends the chosen file from state, so two inputs can't
+                post an empty one over a real one. */}
+            <div className="flex flex-wrap gap-2">
+              <PickFile
+                label="Take a photo"
+                capture
+                onPick={(file) => {
+                  setScanFile(file);
+                  setUnclear(null);
+                  setReadError(null);
+                }}
+              />
+              <PickFile
+                label="Choose a file"
+                onPick={(file) => {
+                  setScanFile(file);
+                  setUnclear(null);
+                  setReadError(null);
+                }}
+              />
+            </div>
+
+            {scanFile && (
+              <p className="mt-2 flex flex-wrap items-center gap-2 text-sm">
+                <span className="font-medium">{scanFile.name}</span>
+                <span className="text-black/45">
+                  {(scanFile.size / (1024 * 1024)).toFixed(1)} MB
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setScanFile(null);
+                    setUnclear(null);
+                    setReadError(null);
+                  }}
+                  className="text-xs font-medium text-black/60 underline"
+                >
+                  Remove
+                </button>
+              </p>
+            )}
+
             <p className="mt-1.5 text-xs text-black/50">
               A photo of the sheet is fine. Up to 12 MB — JPG, PNG, WEBP or PDF. You can save
               without one and add the scan later.
@@ -811,6 +852,36 @@ function FormRow({ form, signup }: { form: IntakeForm; signup: IntakeSignup | nu
         </div>
       </details>
     </li>
+  );
+}
+
+/**
+ * A file input dressed as a button.
+ *
+ * The input is hidden inside the label rather than styled, because a bare file
+ * input renders differently in every browser and reads as "No file chosen" even
+ * when one has been. The chosen file is shown once, above, by the caller.
+ */
+function PickFile({
+  label,
+  capture,
+  onPick,
+}: {
+  label: string;
+  capture?: boolean;
+  onPick: (file: File | null) => void;
+}) {
+  return (
+    <label className="cursor-pointer rounded-lg border border-black/15 bg-white px-3.5 py-2 text-sm font-medium hover:bg-black/5">
+      {label}
+      <input
+        type="file"
+        accept={INTAKE_SCAN_TYPES.join(",")}
+        {...(capture ? { capture: "environment" as const } : {})}
+        onChange={(e) => onPick(e.target.files?.[0] ?? null)}
+        className="hidden"
+      />
+    </label>
   );
 }
 
