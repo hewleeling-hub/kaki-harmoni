@@ -13,6 +13,9 @@ import {
   INTENSITIES,
   DURATIONS,
   INTAKE_SCAN_TYPES,
+  MAX_AROMA_OILS,
+  AROMA_OIL_PURPOSE,
+  HEALTH_STOP_NOTE,
 } from "@/config/intake";
 
 export type IntakeSignup = {
@@ -82,6 +85,12 @@ export default function IntakeClient({
   const formRef = useRef<HTMLFormElement>(null);
   const [history, setHistory] = useState<IntakeForm[] | null>(null);
   const [historyLoading, setHistoryLoading] = useState(false);
+
+  // The oils live up here rather than inside their tick lists, because two
+  // things write to them: the server, and "Same as last time". One source, so
+  // the three-oil limit counts what is actually ticked either way.
+  const [oilsUsed, setOilsUsed] = useState<string[]>([]);
+  const [oilsNext, setOilsNext] = useState<string[]>([]);
   // Set after mount rather than at render: the server runs on UTC and the shop
   // is on +8, so rendering "today" in both places is a hydration mismatch
   // waiting for someone to open this after 8am.
@@ -134,9 +143,10 @@ export default function IntakeClient({
       const el = formRef.current;
       if (!el) return;
 
-      el.querySelectorAll<HTMLInputElement>('input[name="aroma_oils"]').forEach((box) => {
-        box.checked = oils.includes(box.value);
-      });
+      // Trimmed to the blending limit. A record from before the limit existed
+      // can carry more than three, and copying it forward would quietly create
+      // a blend the shop doesn't pour.
+      setOilsUsed(oils.slice(0, MAX_AROMA_OILS));
 
       const setSelect = (name: string, value: string | null) => {
         const field = el.querySelector<HTMLSelectElement>(`select[name="${name}"]`);
@@ -215,7 +225,10 @@ export default function IntakeClient({
         return;
       }
 
+      // form.reset() only clears what the DOM owns; the oils are React state.
       formEl.reset();
+      setOilsUsed([]);
+      setOilsNext([]);
       setSelectedId("");
       setQuery("");
       setSurveyDate(localToday());
@@ -450,6 +463,9 @@ export default function IntakeClient({
           {/* ── What the guest ticked ───────────────────────────────────── */}
           <Fieldset title="Anything to take care with">
             <CheckGroup name="health_conditions" options={HEALTH_CONDITIONS} />
+            <p className="mt-2 rounded-lg bg-amber-50 px-3 py-2 text-xs leading-relaxed text-amber-900">
+              {HEALTH_STOP_NOTE}
+            </p>
           </Fieldset>
 
           <Fieldset title="What they came for">
@@ -469,12 +485,31 @@ export default function IntakeClient({
 
             <div className="mt-4 space-y-4">
               <div>
-                <p className="mb-1.5 text-xs font-medium text-black/55">Oils used</p>
-                <CheckGroup name="aroma_oils" options={AROMA_OILS} />
+                <p className="mb-1.5 text-xs font-medium text-black/55">
+                  Oils used <span className="text-black/35">— up to {MAX_AROMA_OILS}</span>
+                </p>
+                <CheckGroup
+                  name="aroma_oils"
+                  options={AROMA_OILS}
+                  hints={AROMA_OIL_PURPOSE}
+                  max={MAX_AROMA_OILS}
+                  value={oilsUsed}
+                  onChange={setOilsUsed}
+                />
               </div>
               <div>
-                <p className="mb-1.5 text-xs font-medium text-black/55">Oils suggested next time</p>
-                <CheckGroup name="recommended_oils" options={AROMA_OILS} />
+                <p className="mb-1.5 text-xs font-medium text-black/55">
+                  Oils suggested next time{" "}
+                  <span className="text-black/35">— up to {MAX_AROMA_OILS}</span>
+                </p>
+                <CheckGroup
+                  name="recommended_oils"
+                  options={AROMA_OILS}
+                  hints={AROMA_OIL_PURPOSE}
+                  max={MAX_AROMA_OILS}
+                  value={oilsNext}
+                  onChange={setOilsNext}
+                />
               </div>
             </div>
 
@@ -738,19 +773,68 @@ function Select({
  * Tick boxes as tappable chips. Same values as the printed sheet, so keying in
  * a form is reading down the page rather than translating it — and the server
  * only accepts values from these same lists.
+ *
+ * `max` enforces a blending rule rather than a UI preference: the pads say
+ * MAX 3 OILS. Once three are on, the rest grey out instead of vanishing, so
+ * what's available is still legible — and unticking one frees a slot again.
  */
-function CheckGroup({ name, options }: { name: string; options: readonly string[] }) {
+function CheckGroup({
+  name,
+  options,
+  hints,
+  max,
+  value,
+  onChange,
+}: {
+  name: string;
+  options: readonly string[];
+  hints?: Record<string, string>;
+  max?: number;
+  value?: string[];
+  onChange?: (next: string[]) => void;
+}) {
+  // Controlled when the parent passes value/onChange — which the oils do,
+  // because "Same as last time" writes into them from outside. Left
+  // uncontrolled otherwise, so the plain tick lists stay plain.
+  const [own, setOwn] = useState<string[]>([]);
+  const chosen = value ?? own;
+  const setChosen = onChange ?? setOwn;
+  const full = max !== undefined && chosen.length >= max;
+
   return (
     <div className="flex flex-wrap gap-2">
-      {options.map((option) => (
-        <label
-          key={option}
-          className="flex cursor-pointer items-center gap-2 rounded-xl border border-black/12 px-3 py-2 text-sm has-[:checked]:border-black/40 has-[:checked]:bg-black/[0.05]"
-        >
-          <input type="checkbox" name={name} value={option} className="h-4 w-4 accent-black/70" />
-          {option}
-        </label>
-      ))}
+      {options.map((option) => {
+        const on = chosen.includes(option);
+        const locked = full && !on;
+        return (
+          <label
+            key={option}
+            className={`flex items-center gap-2 rounded-xl border border-black/12 px-3 py-2 text-sm has-[:checked]:border-black/40 has-[:checked]:bg-black/[0.05] ${
+              locked ? "cursor-not-allowed opacity-40" : "cursor-pointer"
+            }`}
+          >
+            <input
+              type="checkbox"
+              name={name}
+              value={option}
+              disabled={locked}
+              checked={on}
+              onChange={(e) =>
+                setChosen(
+                  e.target.checked ? [...chosen, option] : chosen.filter((v) => v !== option),
+                )
+              }
+              className="h-4 w-4 accent-black/70"
+            />
+            <span>
+              {option}
+              {hints?.[option] && (
+                <span className="ml-1.5 text-xs text-black/40">{hints[option]}</span>
+              )}
+            </span>
+          </label>
+        );
+      })}
     </div>
   );
 }

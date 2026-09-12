@@ -18,22 +18,37 @@
  */
 
 /**
- * Screening questions, worded as things a guest would recognise about
- * themselves rather than as diagnoses. Their purpose is for the team to know
- * when to check before someone puts their feet in warm water — the FAQ already
- * tells people to have a word with their doctor — so "none of these" is a real
- * answer and the list stays short enough to read in a waiting area.
+ * The screening list from the SPA SURVEY FORM pads in use at the counter, in
+ * the order the boxes are printed. An earlier version of this list was written
+ * from scratch and shared only six of these ten — it invented Epilepsy and
+ * "cuts and sores", and left out Asthma, Lack of exercise, Insomnia, Arthritis
+ * and Breathing problems. Staff would have been ticking a paper box with no
+ * screen box to put it in.
+ *
+ * English only here. The pads are bilingual and the Chinese is what many guests
+ * actually read; this list is the staff-facing half, so it stays in the
+ * language the dashboard is in.
  */
 export const HEALTH_CONDITIONS = [
-  "Pregnant",
-  "Heart condition or pacemaker",
-  "High or low blood pressure",
+  "Heart or blood vessel problems",
+  "High / low blood pressure",
   "Diabetes",
-  "Cuts, sores or skin conditions on the feet or legs",
-  "Recent surgery or injury",
-  "Epilepsy",
-  "Something else — I'll mention it",
+  "Asthma",
+  "Lack of exercise",
+  "Insomnia",
+  "Arthritis",
+  "Breathing problems",
+  "Digestion problems",
+  "Pregnancy (4 months & below)",
 ] as const;
+
+/**
+ * The one hard stop on the form, printed under the tick boxes. Not a tick box
+ * itself — it is a rule the team applies, so it is shown as a warning rather
+ * than something anyone can tick and move past.
+ */
+export const HEALTH_STOP_NOTE =
+  "Customers who have had an operation within the past 2 months should not spa. For safety reasons, please check if unsure.";
 
 /**
  * Why they came, in the words the site uses. Deliberately about how someone
@@ -49,25 +64,77 @@ export const HEALTH_GOALS = [
   "Trying it for the first time",
 ] as const;
 
-/** The seven aromatic oils. Matches what /experiences promises. */
+/**
+ * Every oil the shop pours — nine, from two sources that disagree.
+ *
+ * The supplier's SPA SURVEY FORM pads print seven: Pine, Juniper, Rosemary,
+ * Hayseed, Lavender, Camomile, Eucalyptus. The product posters carry Melissa
+ * and Lemon, which are not on the pads. Both are real, so both are here, with
+ * the pad's seven first and in the pad's printed order — that way keying in a
+ * signed sheet is reading straight down the numbered boxes.
+ *
+ * "Pine" rather than "Pine Needle": the pads and /experiences both say Pine,
+ * and this file was the only place using the longer name.
+ */
 export const AROMA_OILS = [
+  "Pine",
+  "Juniper",
+  "Rosemary",
+  "Hayseed",
   "Lavender",
   "Camomile",
-  "Melissa",
   "Eucalyptus",
-  "Juniper",
-  "Pine Needle",
+  "Melissa",
   "Lemon",
 ] as const;
 
-/** The three herbal spa salts. */
+/**
+ * What each oil is for, as printed beside the boxes on the pads. Shown as a
+ * hint when choosing, so a server suggesting something for tired legs doesn't
+ * have to have the chart memorised. The two poster-only oils have no printed
+ * purpose, so they get none invented for them.
+ */
+export const AROMA_OIL_PURPOSE: Record<string, string> = {
+  Pine: "energy",
+  Juniper: "muscles",
+  Rosemary: "circulation, alertness",
+  Hayseed: "bones",
+  Lavender: "nerves",
+  Camomile: "skin",
+  Eucalyptus: "breathing",
+};
+
+/**
+ * Three at once, no more — the pads say "AROMA OIL (MAX 3 OILS)" and that is a
+ * blending rule, not a layout note. Enforced on the screen so a record can't
+ * claim a blend the shop would never actually run.
+ */
+export const MAX_AROMA_OILS = 3;
+
+/**
+ * The three herbal spa salts.
+ *
+ * These are ours, from the product range — the supplier's SPA SURVEY FORM has
+ * no salt section at all. So the paper pads and this screen genuinely differ
+ * here, and that is deliberate rather than drift.
+ */
 export const SPA_SALTS = ["Melissa", "Seaweed", "Lemon"] as const;
 
-/** Machine settings, as the dials are actually marked. */
-export const WATER_LEVELS = ["Low", "Medium", "High"] as const;
-export const WATER_TEMPS = ["Warm", "Medium", "Hot"] as const;
-export const INTENSITIES = ["Gentle", "Medium", "Strong"] as const;
-export const DURATIONS = ["15", "30", "45"] as const;
+/**
+ * Machine settings, taken from the SPA SURVEY FORM pads actually in use at the
+ * counter rather than invented. An earlier version of this file guessed at
+ * Low/Medium/High water, Warm/Medium/Hot temperature and 15/30/45 minutes, and
+ * every one of those was wrong — the pads mark degrees and the cycle is five to
+ * fifteen minutes, not fifteen to forty-five.
+ *
+ * Worth keeping in mind when reading these: the TIME here is the machine cycle
+ * on the form, which is not the "15-minute soak" the public copy sells. A guest
+ * booked for a fifteen-minute visit can be set to 10 on the dial.
+ */
+export const WATER_LEVELS = ["70% full", "Below chest"] as const;
+export const WATER_TEMPS = ["35°C", "38°C", "40°C"] as const;
+export const INTENSITIES = ["Low", "Medium", "High"] as const;
+export const DURATIONS = ["5", "10", "15"] as const;
 
 /**
  * Where signed scans go. A PRIVATE Supabase Storage bucket — these are

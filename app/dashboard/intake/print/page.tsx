@@ -10,6 +10,9 @@ import {
   WATER_TEMPS,
   INTENSITIES,
   DURATIONS,
+  MAX_AROMA_OILS,
+  AROMA_OIL_PURPOSE,
+  HEALTH_STOP_NOTE,
 } from "@/config/intake";
 
 export const metadata = {
@@ -149,10 +152,11 @@ export default async function IntakePrintPage() {
               <Box key={c} label={c} />
             ))}
           </div>
-          <p className="mt-2 text-[10.5px] leading-relaxed text-black/70">
-            None of these stops you having a soak. We ask so our team knows when to take extra
-            care, and so we can suggest what suits you. If you have a health condition, we&apos;d
-            suggest a quick word with your doctor beforehand.
+          <p className="mt-2 text-[10.5px] font-semibold leading-relaxed">{HEALTH_STOP_NOTE}</p>
+          <p className="mt-1 text-[10.5px] leading-relaxed text-black/70">
+            Otherwise none of these stops you having a soak. We ask so our team knows when to take
+            extra care, and so we can suggest what suits you. If you have a health condition,
+            we&apos;d suggest a quick word with your doctor beforehand.
           </p>
         </Section>
 
@@ -208,9 +212,12 @@ export default async function IntakePrintPage() {
             </div>
 
             <div className="flex flex-wrap items-baseline gap-x-5 gap-y-1.5">
-              <span className="font-semibold">Oils used:</span>
+              <span className="font-semibold">Oils used (max {MAX_AROMA_OILS}):</span>
               {AROMA_OILS.map((o) => (
-                <Box key={o} label={o} />
+                <Box
+                  key={o}
+                  label={AROMA_OIL_PURPOSE[o] ? `${o} (${AROMA_OIL_PURPOSE[o]})` : o}
+                />
               ))}
             </div>
 
