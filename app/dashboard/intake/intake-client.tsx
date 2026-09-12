@@ -57,16 +57,22 @@ export type IntakeForm = {
  * is optional: a half-legible handwritten form should still get saved with its
  * scan rather than being rejected over a blank box.
  *
- * Uncontrolled inputs on purpose. The whole thing posts as one multipart
- * request built straight from the form element, so the scan and the fields
- * arrive together and a record can never exist without the consent it refers to.
+ * The text boxes are uncontrolled on purpose: the whole thing posts as one
+ * multipart request built straight from the form element, so the scan and the
+ * fields arrive together and a record can never exist without the consent it
+ * refers to. The tick lists are controlled, because three things write to them
+ * — the person ticking, "Same as last time", and reading a photo — and one
+ * source of truth is what keeps the three-oil limit honest.
  */
 export default function IntakeClient({
   signups,
   forms,
+  canExtract,
 }: {
   signups: IntakeSignup[];
   forms: IntakeForm[];
+  /** Whether reading a photo is switched on. False keeps the screen entirely manual. */
+  canExtract: boolean;
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -91,6 +97,77 @@ export default function IntakeClient({
   // the three-oil limit counts what is actually ticked either way.
   const [oilsUsed, setOilsUsed] = useState<string[]>([]);
   const [oilsNext, setOilsNext] = useState<string[]>([]);
+  // Same reason as the oils: reading a photo writes into these, so they can't
+  // own their own state or the two would disagree.
+  const [conditions, setConditions] = useState<string[]>([]);
+  const [goals, setGoals] = useState<string[]>([]);
+
+  // Reading the photo. A suggestion only — nothing is saved until Save is
+  // pressed, so this fills the boxes and then gets out of the way.
+  const [scanFile, setScanFile] = useState<File | null>(null);
+  const [reading, setReading] = useState(false);
+  const [readError, setReadError] = useState<string | null>(null);
+  const [unclear, setUnclear] = useState<string[] | null>(null);
+
+  const setField = useCallback((name: string, value: string | null) => {
+    const el = formRef.current?.elements.namedItem(name);
+    if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
+      el.value = value ?? "";
+    } else if (el instanceof HTMLSelectElement) {
+      el.value = value ?? "";
+    }
+  }, []);
+
+  async function readPhoto() {
+    if (!scanFile) return;
+    setReading(true);
+    setReadError(null);
+    setUnclear(null);
+
+    try {
+      const body = new FormData();
+      body.append("scan", scanFile);
+      const res = await fetch("/api/intake/extract", { method: "POST", body });
+      const payload = await res.json().catch(() => ({}));
+
+      if (!res.ok || !payload?.fields) {
+        setReadError(payload?.error ?? "Could not read that photo.");
+        return;
+      }
+
+      const f = payload.fields;
+      for (const name of [
+        "guest_name",
+        "contact_no",
+        "ic_passport_no",
+        "sponsor_name",
+        "voucher_no",
+        "server_name",
+        "notes",
+        "water_level",
+        "water_temp",
+        "intensity",
+        "duration_min",
+        "salt_used",
+        "recommended_salt",
+      ]) {
+        setField(name, f[name] ?? null);
+      }
+      if (f.survey_date) setSurveyDate(f.survey_date);
+      setConditions(f.health_conditions ?? []);
+      setGoals(f.health_goals ?? []);
+      setOilsUsed(f.aroma_oils ?? []);
+      setOilsNext(f.recommended_oils ?? []);
+
+      const flags: string[] = [...(f.unclear ?? [])];
+      if (f.signature_present === false) flags.push("no signature in the guest's box");
+      setUnclear(flags);
+    } catch {
+      setReadError("Could not reach the server.");
+    } finally {
+      setReading(false);
+    }
+  }
   // Set after mount rather than at render: the server runs on UTC and the shop
   // is on +8, so rendering "today" in both places is a hydration mismatch
   // waiting for someone to open this after 8am.
@@ -133,10 +210,10 @@ export default function IntakeClient({
   /**
    * Copy a previous blend into the boxes.
    *
-   * Reaches into the form element rather than turning forty inputs into
-   * controlled state. The whole form is uncontrolled by design — it posts as
-   * one FormData — and this is the only thing that ever writes to it, so a ref
-   * is the honest way to do it rather than the shortcut.
+   * Reaches into the form element for the selects rather than turning every
+   * input into controlled state; the oils go through their own state, which is
+   * what the three-oil limit counts. Reading a photo (readPhoto) writes to the
+   * same places by the same means.
    */
   const applyBlend = useCallback(
     (oils: string[], salt: string | null, settings: IntakeForm | null) => {
@@ -229,6 +306,10 @@ export default function IntakeClient({
       formEl.reset();
       setOilsUsed([]);
       setOilsNext([]);
+      setConditions([]);
+      setGoals([]);
+      setScanFile(null);
+      setUnclear(null);
       setSelectedId("");
       setQuery("");
       setSurveyDate(localToday());
@@ -452,24 +533,77 @@ export default function IntakeClient({
               name="scan"
               accept={INTAKE_SCAN_TYPES.join(",")}
               capture="environment"
+              onChange={(e) => {
+                setScanFile(e.target.files?.[0] ?? null);
+                setUnclear(null);
+                setReadError(null);
+              }}
               className="block w-full text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-black/[0.06] file:px-3 file:py-2 file:text-sm file:font-medium"
             />
             <p className="mt-1.5 text-xs text-black/50">
               A photo of the sheet is fine. Up to 12 MB — JPG, PNG, WEBP or PDF. You can save
               without one and add the scan later.
             </p>
+
+            {canExtract && scanFile && scanFile.type !== "application/pdf" && (
+              <div className="mt-3">
+                <button
+                  type="button"
+                  onClick={readPhoto}
+                  disabled={reading}
+                  className="rounded-lg border border-black/15 bg-white px-3.5 py-2 text-sm font-medium hover:bg-black/5 disabled:opacity-60"
+                >
+                  {reading ? "Reading the photo…" : "Read the form for me"}
+                </button>
+                <p className="mt-1.5 text-xs text-black/45">
+                  Fills in the boxes below from the photo. Check them before saving — nothing is
+                  saved until you press Save.
+                </p>
+              </div>
+            )}
+
+            {readError && (
+              <p className="mt-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-900">
+                {readError}
+              </p>
+            )}
+
+            {/* What the reading was unsure about. Named fields, so staff know
+                where to look rather than being told to check everything. */}
+            {unclear && (
+              <div className="mt-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+                {unclear.length > 0 ? (
+                  <>
+                    <span className="font-semibold">Worth checking against the paper:</span>{" "}
+                    {unclear.join(" · ")}
+                  </>
+                ) : (
+                  <>Read it cleanly. Still worth a glance before you save.</>
+                )}
+              </div>
+            )}
           </Fieldset>
 
           {/* ── What the guest ticked ───────────────────────────────────── */}
           <Fieldset title="Anything to take care with">
-            <CheckGroup name="health_conditions" options={HEALTH_CONDITIONS} />
+            <CheckGroup
+              name="health_conditions"
+              options={HEALTH_CONDITIONS}
+              value={conditions}
+              onChange={setConditions}
+            />
             <p className="mt-2 rounded-lg bg-amber-50 px-3 py-2 text-xs leading-relaxed text-amber-900">
               {HEALTH_STOP_NOTE}
             </p>
           </Fieldset>
 
           <Fieldset title="What they came for">
-            <CheckGroup name="health_goals" options={HEALTH_GOALS} />
+            <CheckGroup
+              name="health_goals"
+              options={HEALTH_GOALS}
+              value={goals}
+              onChange={setGoals}
+            />
           </Fieldset>
 
           {/* ── What the team did ───────────────────────────────────────── */}
