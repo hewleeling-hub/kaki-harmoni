@@ -1,8 +1,9 @@
 -- Spa intake: a signed paper form, scanned, with the essentials keyed in.
 --
--- ⚠️ NOT APPLIED. Every other migration in this folder is already live on the
--- production database; this one is deliberately not. Apply it to a dev branch
--- or run it yourself against production when you are ready.
+-- APPLIED to production on 12 September 2026, on request, after the pads in use
+-- at the counter were photographed. Verified afterwards: all five added columns
+-- present, three indexes, the status check in place, RLS on with no policies,
+-- and the table's existing row count unchanged at zero.
 --
 -- `spa_survey_forms` ALREADY EXISTS in production with most of these columns.
 -- It was created directly against the database, holds no rows, and no code has

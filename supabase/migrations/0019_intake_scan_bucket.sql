@@ -1,8 +1,9 @@
 -- Private storage for signed intake scans.
 --
--- ⚠️ NOT APPLIED, and separate from 0018 on purpose: this one creates
--- infrastructure rather than altering a table, and creating a bucket on the
--- production project is the kind of change worth doing with your eyes on it.
+-- APPLIED to production on 12 September 2026, on request. It stays a separate
+-- file from 0018 because it creates infrastructure rather than altering a
+-- table. Verified afterwards: the bucket exists, public = false, the 12 MB
+-- limit is set, and storage.objects still carries no policies.
 --
 -- PRIVATE (public = false). These are photographs of a signed form carrying
 -- health answers and an IC or passport number. A public bucket in Supabase
