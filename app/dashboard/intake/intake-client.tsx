@@ -102,6 +102,10 @@ export default function IntakeClient({
   const [conditions, setConditions] = useState<string[]>([]);
   const [goals, setGoals] = useState<string[]>([]);
 
+  // Records saved in this session, held so the list can show them at once
+  // rather than after the server round trip. See allForms below.
+  const [justSaved, setJustSaved] = useState<IntakeForm[]>([]);
+
   // Reading the photo. A suggestion only — nothing is saved until Save is
   // pressed, so this fills the boxes and then gets out of the way.
   const [scanFile, setScanFile] = useState<File | null>(null);
@@ -266,11 +270,26 @@ export default function IntakeClient({
    * a walk-in with no signup row has only the former, and would otherwise be
    * unfindable the moment there are more than a screenful of forms.
    */
+  /**
+   * The filed list, with anything saved in this session put straight in front.
+   *
+   * router.refresh() alone was not enough: it re-runs the server component, but
+   * the new record only appears once that round trip lands, and on a slow
+   * counter connection the screen sits there looking as though the save did
+   * nothing — which is exactly how a member of staff ends up saving twice.
+   * Deduped by id, so the copy the refresh brings back replaces this one rather
+   * than doubling it.
+   */
+  const allForms = useMemo(() => {
+    const fromServer = new Set(forms.map((f) => f.id));
+    return [...justSaved.filter((f) => !fromServer.has(f.id)), ...forms];
+  }, [forms, justSaved]);
+
   const visibleForms = useMemo(() => {
     const q = listQuery.trim().toLowerCase();
-    if (!q) return forms;
+    if (!q) return allForms;
 
-    return forms.filter((form) => {
+    return allForms.filter((form) => {
       const signup = form.signup_id ? signupById.get(form.signup_id) : null;
       return [
         form.guest_name ?? "",
@@ -283,7 +302,7 @@ export default function IntakeClient({
         .toLowerCase()
         .includes(q);
     });
-  }, [forms, listQuery, signupById]);
+  }, [allForms, listQuery, signupById]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -306,6 +325,8 @@ export default function IntakeClient({
         setError(payload?.error ?? "Could not save that. Please try again.");
         return;
       }
+
+      if (payload?.form) setJustSaved((prev) => [payload.form as IntakeForm, ...prev]);
 
       // form.reset() only clears what the DOM owns; the oils are React state.
       formEl.reset();
@@ -734,10 +755,10 @@ export default function IntakeClient({
           <h2 className="text-sm font-semibold text-black/70">
             Filed{" "}
             <span className="font-normal text-black/40">
-              ({listQuery ? `${visibleForms.length} of ${forms.length}` : forms.length})
+              ({listQuery ? `${visibleForms.length} of ${allForms.length}` : allForms.length})
             </span>
           </h2>
-          {forms.length > 0 && (
+          {allForms.length > 0 && (
             <input
               type="search"
               value={listQuery}
@@ -748,7 +769,7 @@ export default function IntakeClient({
           )}
         </div>
 
-        {forms.length === 0 ? (
+        {allForms.length === 0 ? (
           <p className="rounded-2xl border border-dashed border-black/15 px-4 py-8 text-center text-sm text-black/50">
             Nothing filed yet. Print a stack of blank forms for the counter, and record them here
             once they come back signed.

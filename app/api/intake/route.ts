@@ -206,10 +206,13 @@ export async function POST(request: NextRequest) {
     completed_at: new Date().toISOString(),
   };
 
+  // Returns the whole row, not just the id: the screen puts it straight into
+  // the filed list so the record appears the instant it is saved, rather than
+  // waiting on a refetch that may or may not have landed yet.
   const { data: saved, error } = await supabase
     .from("spa_survey_forms")
     .insert(record)
-    .select("id")
+    .select(INTAKE_COLUMNS)
     .single();
 
   if (error || !saved) {
@@ -221,15 +224,17 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Could not save that." }, { status: 500 });
   }
 
+  const savedRow = saved as unknown as { id: string };
+
   await logActivity(supabase, {
     entity_type: "signup",
-    entity_id: signup?.id ?? saved.id,
+    entity_id: signup?.id ?? savedRow.id,
     action: "intake_recorded",
     actor: user.email ?? "staff",
     // Deliberately NOT the answers. Activity rows are read all over the
     // dashboard; health information belongs in one place only.
-    metadata: { intake_id: saved.id, has_scan: !!scanPath },
+    metadata: { intake_id: savedRow.id, has_scan: !!scanPath },
   });
 
-  return NextResponse.json({ ok: true, id: saved.id }, { status: 201 });
+  return NextResponse.json({ ok: true, id: savedRow.id, form: saved }, { status: 201 });
 }
