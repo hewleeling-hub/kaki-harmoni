@@ -389,10 +389,10 @@ export default async function Home({
                     has already accepted; read first, it simply sets the terms
                     before the offer is made. Disappears with the promotion. */}
                 {promo && (
-                  <p className="mb-5 rounded-xl bg-[#FBEFD6] px-4 py-3 text-[15px] leading-relaxed text-[#7a5410]">
+                  <p className="mb-5 rounded-xl bg-[#FBEFD6] px-5 py-4 text-[17px] leading-relaxed text-[#7a5410] sm:text-[18px]">
                     <strong>Except on {promo.badge.replace(" only", "")}</strong> — that day we&rsquo;re
                     serving the {promo.title} only: {promo.price} for your soak, any drink and a slice
-                    of cake, whether it&rsquo;s your first visit or your fiftieth.
+                    of cake.
                   </p>
                 )}
                 <SectionHeading eyebrow="Start here" title={`Try your first soak — RM${pricing.prepay}`} />
