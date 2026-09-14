@@ -81,6 +81,25 @@ export function activePromotion(now: Date = new Date()): Promotion | null {
   return ALL.find((p) => now >= p.showsFrom && now < p.endsAt) ?? null;
 }
 
+/**
+ * The day normal pricing comes back, in words — the day after the offer.
+ *
+ * Derived rather than written down, so moving the offer's date can't leave the
+ * site promising a resumption on a day that no longer follows it. Formatted in
+ * UTC because `dateISO` is a calendar date, not an instant: letting the server's
+ * zone interpret it would shift the label by a day either side of midnight.
+ */
+export function resumesLabel(promo: Promotion): string {
+  const next = new Date(`${promo.dateISO}T00:00:00Z`);
+  next.setUTCDate(next.getUTCDate() + 1);
+  return next.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+}
+
 /** Whether the offer runs today, for copy that says "today" rather than a date. */
 export function isRunningToday(promo: Promotion, now: Date = new Date()): boolean {
   const dayStart = new Date(promo.endsAt.getTime() - 24 * 60 * 60 * 1000);

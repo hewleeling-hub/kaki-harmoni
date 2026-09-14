@@ -1,6 +1,11 @@
 import Link from "next/link";
 import { businessConfig, whatsappLink } from "@/config/business";
-import { activePromotion, isRunningToday, type Promotion } from "@/config/promotions";
+import {
+  activePromotion,
+  isRunningToday,
+  resumesLabel,
+  type Promotion,
+} from "@/config/promotions";
 
 /**
  * The band that announces a short-run offer.
@@ -79,9 +84,8 @@ function PromoBand({ promo, today }: { promo: Promotion; today: boolean }) {
       </div>
 
       <p className="mt-4 text-[13px] leading-relaxed text-muted">
-        {promo.whenLabel}, at {businessConfig.address.name}. Book online or walk in — places are
-        limited, so the day does fill up. It&apos;s the only thing we&apos;re serving that day, so our
-        usual prices and the first-visit offer are paused.
+        {promo.whenLabel}, at {businessConfig.address.name}. Places are limited, so book in advance
+        to secure your slot. First experience offer will resume on {resumesLabel(promo)}.
       </p>
     </section>
   );
