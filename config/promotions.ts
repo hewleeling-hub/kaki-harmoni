@@ -14,6 +14,21 @@
 
 export interface Promotion {
   id: string;
+  /**
+   * The day it runs, as a booking date (yyyy-mm-dd, Kuala Lumpur).
+   *
+   * Separate from the instants below on purpose: those decide when the site
+   * ADVERTISES the offer, this decides which booking date the offer IS. They
+   * answer different questions and conflating them is how an offer stays
+   * bookable after it has stopped being advertised.
+   */
+  dateISO: string;
+  /**
+   * The catalogue row this offer sells. On its day this is the only thing
+   * bookable, so the price a customer pays still comes from the products table
+   * like every other line — never from the copy above.
+   */
+  productId: string;
   /** Short label for the coloured pill. */
   badge: string;
   /** The headline. Kept to the words on the poster. */
@@ -41,6 +56,8 @@ export interface Promotion {
  */
 export const MALAYSIA_DAY: Promotion = {
   id: "malaysia-day-2026",
+  dateISO: "2026-09-16",
+  productId: "c0000000-0000-0000-0000-000000000009",
   badge: "16 September only",
   title: "Malaysia Day Harmoni",
   price: "RM33",
@@ -68,4 +85,24 @@ export function activePromotion(now: Date = new Date()): Promotion | null {
 export function isRunningToday(promo: Promotion, now: Date = new Date()): boolean {
   const dayStart = new Date(promo.endsAt.getTime() - 24 * 60 * 60 * 1000);
   return now >= dayStart && now < promo.endsAt;
+}
+
+/**
+ * The offer that OWNS a booking date, or null.
+ *
+ * On its day nothing else is bookable — not the RM25 first visit, not a
+ * package. This is what both the checkout screen and the purchases API ask, so
+ * the menu a customer sees and the rule the server enforces cannot drift apart.
+ *
+ * Deliberately not time-bounded like activePromotion: a date either is Malaysia
+ * Day or it isn't, regardless of when someone happens to be looking.
+ */
+export function promotionForBookingDate(dateISO: string | null | undefined): Promotion | null {
+  if (!dateISO) return null;
+  return ALL.find((p) => p.dateISO === dateISO) ?? null;
+}
+
+/** Is this product one that only exists for a promotion day? */
+export function isPromotionProduct(productId: string | null | undefined): boolean {
+  return !!productId && ALL.some((p) => p.productId === productId);
 }

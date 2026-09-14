@@ -79,8 +79,9 @@ function PromoBand({ promo, today }: { promo: Promotion; today: boolean }) {
       </div>
 
       <p className="mt-4 text-[13px] leading-relaxed text-muted">
-        {promo.whenLabel}, at {businessConfig.address.name}. Walk in or reserve ahead — places are
-        limited, so the day does fill up. Pay at the shop.
+        {promo.whenLabel}, at {businessConfig.address.name}. Book online or walk in — places are
+        limited, so the day does fill up. It&apos;s the only thing we&apos;re serving that day, so our
+        usual prices and the first-visit offer are paused.
       </p>
     </section>
   );

@@ -6,6 +6,7 @@ import { PRELAUNCH_MODE, LAUNCH_WINDOW } from "@/lib/config";
 import { formatSlotTime } from "@/lib/slots";
 import { productIdForSlug, FIRST_VISIT_PRODUCT_ID } from "@/config/catalogue";
 import { hasBookedBefore } from "@/lib/customer";
+import { promotionForBookingDate, isPromotionProduct } from "@/config/promotions";
 
 export default async function PurchasePage({
   params,
@@ -46,9 +47,17 @@ export default async function PurchasePage({
   // The first visit is a one-per-person offer, so it simply isn't on the menu
   // for someone who already has a booking. The API enforces this too — hiding
   // a radio button is presentation, not a rule.
-  const products = (allProducts ?? []).filter(
-    (p) => !(isReturning && p.id === FIRST_VISIT_PRODUCT_ID),
-  );
+  // On a promotion day the offer is the entire menu — the first visit is paused
+  // and no package is bookable, for everyone. On every other day the promotion
+  // product isn't on the menu at all, so it can't be bought for the wrong date.
+  // The API applies the same rule; this is the half the customer sees.
+  const promo = promotionForBookingDate(slotDate);
+
+  const products = (allProducts ?? []).filter((p) => {
+    if (promo) return p.id === promo.productId;
+    if (isPromotionProduct(p.id)) return false;
+    return !(isReturning && p.id === FIRST_VISIT_PRODUCT_ID);
+  });
 
   // The tier they clicked on /prices, resolved to a real catalogue row. An
   // unrecognised or withdrawn option falls through to null and the form simply
@@ -93,6 +102,13 @@ export default async function PurchasePage({
               at {formatSlotTime(slotTime)}
             </p>
             <p className="mt-1 text-xs text-black/50">Confirmed once your payment is received.</p>
+            {promo && (
+              <p className="mt-2 rounded-lg bg-[#FBEFD6] px-3 py-2 text-xs leading-relaxed text-[#7a5410]">
+                <span className="font-semibold">{promo.title} — {promo.price}.</span> It&apos;s the one
+                thing we&apos;re serving on {promo.badge.toLowerCase().replace(" only", "")}, so our
+                usual prices and first-visit offer are paused for the day.
+              </p>
+            )}
           </div>
         )}
         <PurchaseForm

@@ -12,6 +12,7 @@ import {
   PACKAGES_ARE_DOOR_ONLY,
   soaksForProductId,
 } from "@/config/catalogue";
+import { promotionForBookingDate, isPromotionProduct } from "@/config/promotions";
 
 // Legacy default used when no items are sent or the catalogue isn't available yet.
 const DEFAULT_ITEM_NAME = "First Visit — Foot Soak + Coffee";
@@ -186,6 +187,32 @@ export async function POST(request: NextRequest) {
   // introductory price again, every visit.
   const isFirstVisitLine = (l: { product_id: string | null }) =>
     l.product_id === FIRST_VISIT_PRODUCT_ID || l.product_id === null;
+
+  // ── Promotion days ────────────────────────────────────────────────────────
+  // On Malaysia Day the offer is the only thing bookable, for everyone: the
+  // first visit is paused and no package goes through. And the offer is only
+  // bookable ON its day. Both directions are checked, because the checkout
+  // hides the wrong options but a stale tab, a shared link or a hand-made
+  // request would otherwise walk straight past that.
+  const bookingPromo = promotionForBookingDate(slot_date);
+  const mainLine = lines.find((l) => isMainCategory(l.category));
+
+  if (bookingPromo && mainLine?.product_id !== bookingPromo.productId) {
+    return NextResponse.json(
+      {
+        error: `On ${bookingPromo.dateISO === "2026-09-16" ? "Malaysia Day" : "that day"} we're serving the ${bookingPromo.title} only — ${bookingPromo.price}, soak, any drink and a slice of cake. Please reload and pick it, or choose another date.`,
+        promotion_only: true,
+      },
+      { status: 409 },
+    );
+  }
+
+  if (!bookingPromo && isPromotionProduct(mainLine?.product_id)) {
+    return NextResponse.json(
+      { error: "That offer runs on one day only. Please pick its date, or choose another option." },
+      { status: 409 },
+    );
+  }
 
   if (isReturning && lines.some(isFirstVisitLine)) {
     return NextResponse.json(
