@@ -6,6 +6,7 @@ import { PublicShell } from "@/components/layout/PublicShell";
 import { Button, Card, SectionHeading } from "@/components/ui/primitives";
 import { PromotionCard } from "@/components/ui/cards";
 import { PromoBanner } from "@/components/ui/PromoBanner";
+import { activePromotion } from "@/config/promotions";
 import { Lotti } from "@/components/ui/Lotti";
 import { ExperiencePreview } from "@/components/experiences/ExperiencePreview";
 import {
@@ -88,6 +89,11 @@ export default async function Home({
   const { option } = await searchParams;
   const chosenSlug = isCatalogueSlug(option) && isOnSale(option) ? option : null;
   const chosen = chosenSlug ? offerForSlug(chosenSlug) : null;
+
+  /* The running offer, resolved once. Used below to qualify the RM25 promise —
+     that copy sits a long way down from the offer band, and on its day RM25 is
+     not available at all. */
+  const promo = activePromotion();
 
   return (
     <PublicShell>
@@ -387,6 +393,17 @@ export default async function Home({
                 <p className="mt-2 text-[15px] text-muted">
                   {launchOfferNote} After it ends, a first visit is the usual RM{pricing.normal}.
                 </p>
+                {/* The RM25 promise sits a long way down the page from the offer
+                    band, so somebody reading this on the 15th and planning to
+                    come on the 16th would otherwise only find out at checkout.
+                    Disappears with the promotion, like everything else. */}
+                {promo && (
+                  <p className="mt-3 rounded-xl bg-[#FBEFD6] px-4 py-3 text-[15px] leading-relaxed text-[#7a5410]">
+                    <strong>Except on {promo.badge.replace(" only", "")}</strong> — that day we&rsquo;re
+                    serving the {promo.title} only: {promo.price} for your soak, any drink and a slice
+                    of cake, whether it&rsquo;s your first visit or your fiftieth.
+                  </p>
+                )}
                 <ul className="mt-5 space-y-2 text-[16px] text-brown">
                   {["No account needed", "Pick your visit time from the calendar", "Pay online or at the door"].map((t) => (
                     <li key={t} className="flex items-center gap-2">
