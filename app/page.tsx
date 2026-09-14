@@ -97,6 +97,16 @@ export default async function Home({
 
   return (
     <PublicShell>
+      {/* ── A short-run offer, when one is running ─────────────────────── */}
+      {/* First thing on the page, above the hero. A one-day offer is only worth
+          running if people know before they arrive, and the hero is a tall
+          block — below it, most of the traffic that lands on a phone never
+          reaches this. Renders nothing outside its dates, so the hero is back
+          at the top of its own accord once the day passes. */}
+      <div className="pt-2">
+        <PromoBanner />
+      </div>
+
       {/* ── Hero — the proposition, in a few seconds ───────────────────── */}
       <section className="fade-up grid items-center gap-8 py-8 sm:py-10 lg:grid-cols-2 lg:gap-12 lg:py-14">
         <div className="order-1">
@@ -157,14 +167,6 @@ export default async function Home({
           </div>
         </div>
       </section>
-
-      {/* ── A short-run offer, when one is running ─────────────────────── */}
-      {/* Renders nothing outside its dates, so it needs no minding. Sits under
-          the hero rather than above it: the hero has to explain what this place
-          is before a price means anything to somebody arriving cold. */}
-      <div className="pt-4">
-        <PromoBanner />
-      </div>
 
       {/* ── Benefit strip ──────────────────────────────────────────────── */}
       <section className="grid gap-4 py-6 sm:grid-cols-3 sm:gap-5">
