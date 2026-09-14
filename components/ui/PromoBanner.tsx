@@ -30,13 +30,18 @@ function PromoBand({ promo, today }: { promo: Promotion; today: boolean }) {
       aria-labelledby="promo-title"
       className="rounded-[22px] border border-gold/40 bg-[linear-gradient(150deg,#FBEFD6_0%,#F3E3C4_100%)] p-6 shadow-[var(--shadow-warm)] sm:p-8"
     >
-      <div className="flex flex-wrap items-center gap-3">
-        <span className="rounded-full bg-[#7a5410] px-3 py-1 text-[13px] font-semibold uppercase tracking-wide text-[#FBEFD6]">
+      {/* The date and the line carry the offer, so they are sized to be read
+          rather than skimmed past — this band is the first thing on the page
+          and a 13px pill was quieter than the nav above it. */}
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2.5">
+        <span className="rounded-full bg-[#7a5410] px-4 py-1.5 text-[15px] font-bold uppercase tracking-wide text-[#FBEFD6] sm:text-[16px]">
           {/* "Today only" the day it runs; the date before that. Same fact, but
               the day itself is the one time urgency is literally true. */}
           {today ? "Today only" : promo.badge}
         </span>
-        <p className="text-[15px] text-brown">{promo.line}</p>
+        <p className="text-[18px] font-medium leading-snug text-brown sm:text-[20px]">
+          {promo.line}
+        </p>
       </div>
 
       <div className="mt-4 flex flex-wrap items-baseline gap-x-4 gap-y-1">
