@@ -61,7 +61,9 @@ export const MALAYSIA_DAY: Promotion = {
   badge: "16 September only",
   title: "Malaysia Day Harmoni",
   price: "RM33",
-  includes: ["Foot relaxation soak", "Any drink", "A slice of cake, free"],
+  // "free" said of one item inside a single price invites the question of what
+  // the other two cost. Everything here is the RM33.
+  includes: ["Foot relaxation soak", "Any drink", "A slice of cake"],
   line: "A little time for you. A big love for Malaysia.",
   whenLabel: "Wednesday 16 September 2026, open 10:00am – 8:00pm",
   showsFrom: new Date("2026-09-13T16:00:00Z"), // 14 Sept, midnight in KL
