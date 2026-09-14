@@ -384,6 +384,17 @@ export default async function Home({
               </>
             ) : (
               <>
+                {/* Above the RM25 pitch, not below it. Read after the promise,
+                    the exception lands as a retraction of something the reader
+                    has already accepted; read first, it simply sets the terms
+                    before the offer is made. Disappears with the promotion. */}
+                {promo && (
+                  <p className="mb-5 rounded-xl bg-[#FBEFD6] px-4 py-3 text-[15px] leading-relaxed text-[#7a5410]">
+                    <strong>Except on {promo.badge.replace(" only", "")}</strong> — that day we&rsquo;re
+                    serving the {promo.title} only: {promo.price} for your soak, any drink and a slice
+                    of cake, whether it&rsquo;s your first visit or your fiftieth.
+                  </p>
+                )}
                 <SectionHeading eyebrow="Start here" title={`Try your first soak — RM${pricing.prepay}`} />
                 <p className="mt-4 text-[18px] leading-relaxed text-muted">
                   A warm 15-minute leg soak and a freshly made coffee — an easy way to find out
@@ -395,17 +406,6 @@ export default async function Home({
                 <p className="mt-2 text-[15px] text-muted">
                   {launchOfferNote} After it ends, a first visit is the usual RM{pricing.normal}.
                 </p>
-                {/* The RM25 promise sits a long way down the page from the offer
-                    band, so somebody reading this on the 15th and planning to
-                    come on the 16th would otherwise only find out at checkout.
-                    Disappears with the promotion, like everything else. */}
-                {promo && (
-                  <p className="mt-3 rounded-xl bg-[#FBEFD6] px-4 py-3 text-[15px] leading-relaxed text-[#7a5410]">
-                    <strong>Except on {promo.badge.replace(" only", "")}</strong> — that day we&rsquo;re
-                    serving the {promo.title} only: {promo.price} for your soak, any drink and a slice
-                    of cake, whether it&rsquo;s your first visit or your fiftieth.
-                  </p>
-                )}
                 <ul className="mt-5 space-y-2 text-[16px] text-brown">
                   {["No account needed", "Pick your visit time from the calendar", "Pay online or at the door"].map((t) => (
                     <li key={t} className="flex items-center gap-2">
