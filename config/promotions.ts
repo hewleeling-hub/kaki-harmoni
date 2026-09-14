@@ -1,0 +1,71 @@
+/**
+ * One-day and short-run promotions.
+ *
+ * DATE-DRIVEN, NOT A SWITCH. A one-day offer that needs a person to remember to
+ * take it down is still on the site in October, quoting a price the shop no
+ * longer honours. These appear and disappear on their own; the only way to be
+ * wrong is to get the dates wrong, which is visible here in one place.
+ *
+ * Times are stored as UTC instants rather than local dates, because the site
+ * renders on servers running UTC while the shop lives in Kuala Lumpur (+08:00,
+ * no daylight saving). Writing "2026-09-16" and comparing it to a server clock
+ * is how a Malaysia Day offer disappears at 8am on the day it runs.
+ */
+
+export interface Promotion {
+  id: string;
+  /** Short label for the coloured pill. */
+  badge: string;
+  /** The headline. Kept to the words on the poster. */
+  title: string;
+  /** The price, as it appears on the poster. */
+  price: string;
+  /** What the price includes, one item per chip. */
+  includes: string[];
+  /** The line under the headline — the poster's own words. */
+  line: string;
+  /** When the offer actually runs, in plain words, for the terms line. */
+  whenLabel: string;
+  /** Visible from this instant. */
+  showsFrom: Date;
+  /** Hidden from this instant — the moment the offer stops being true. */
+  endsAt: Date;
+}
+
+/**
+ * Malaysia Day, 16 September 2026. One day only.
+ *
+ * Ends at 2026-09-16T16:00:00Z, which is midnight at the end of the 16th in
+ * Kuala Lumpur. Not 00:00Z on the 16th, which would be 8am local and would pull
+ * the offer off the site while the shop was still honouring it.
+ */
+export const MALAYSIA_DAY: Promotion = {
+  id: "malaysia-day-2026",
+  badge: "16 September only",
+  title: "Malaysia Day Harmoni",
+  price: "RM33",
+  includes: ["Foot relaxation soak", "Any drink", "A slice of cake, free"],
+  line: "A little time for you. A big love for Malaysia.",
+  whenLabel: "Wednesday 16 September 2026, open 10:00am – 8:00pm",
+  showsFrom: new Date("2026-09-13T16:00:00Z"), // 14 Sept, midnight in KL
+  endsAt: new Date("2026-09-16T16:00:00Z"), // midnight at the end of the 16th, KL
+};
+
+const ALL: Promotion[] = [MALAYSIA_DAY];
+
+/**
+ * The promotion to show right now, or null.
+ *
+ * Takes `now` so the behaviour can be tested at a chosen instant rather than
+ * only on the day — a one-day offer is otherwise untestable until it is too
+ * late to fix.
+ */
+export function activePromotion(now: Date = new Date()): Promotion | null {
+  return ALL.find((p) => now >= p.showsFrom && now < p.endsAt) ?? null;
+}
+
+/** Whether the offer runs today, for copy that says "today" rather than a date. */
+export function isRunningToday(promo: Promotion, now: Date = new Date()): boolean {
+  const dayStart = new Date(promo.endsAt.getTime() - 24 * 60 * 60 * 1000);
+  return now >= dayStart && now < promo.endsAt;
+}

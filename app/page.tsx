@@ -5,6 +5,7 @@ import SignupForm from "./signup-form";
 import { PublicShell } from "@/components/layout/PublicShell";
 import { Button, Card, SectionHeading } from "@/components/ui/primitives";
 import { PromotionCard } from "@/components/ui/cards";
+import { PromoBanner } from "@/components/ui/PromoBanner";
 import { Lotti } from "@/components/ui/Lotti";
 import { ExperiencePreview } from "@/components/experiences/ExperiencePreview";
 import {
@@ -150,6 +151,14 @@ export default async function Home({
           </div>
         </div>
       </section>
+
+      {/* ── A short-run offer, when one is running ─────────────────────── */}
+      {/* Renders nothing outside its dates, so it needs no minding. Sits under
+          the hero rather than above it: the hero has to explain what this place
+          is before a price means anything to somebody arriving cold. */}
+      <div className="pt-4">
+        <PromoBanner />
+      </div>
 
       {/* ── Benefit strip ──────────────────────────────────────────────── */}
       <section className="grid gap-4 py-6 sm:grid-cols-3 sm:gap-5">

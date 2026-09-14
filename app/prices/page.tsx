@@ -4,6 +4,7 @@ import { PublicShell } from "@/components/layout/PublicShell";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { SectionHeading, Card, Button, Badge } from "@/components/ui/primitives";
 import { PromotionCard } from "@/components/ui/cards";
+import { PromoBanner } from "@/components/ui/PromoBanner";
 import { RoutineLadder, PackagePicker, NextStep } from "@/components/ui/conversion";
 import { CalendarIcon, CheckIcon } from "@/components/ui/icons";
 import {
@@ -17,6 +18,13 @@ import {
   telLink,
 } from "@/config/business";
 import { reserveHref, isOnSale, PACKAGES_ON_SALE, type CatalogueSlug } from "@/config/catalogue";
+
+/**
+ * Re-rendered every ten minutes so the short-run offer band appears and
+ * disappears on its own. This page is otherwise static, which would freeze the
+ * date check at build time — the offer would either never show or never stop.
+ */
+export const revalidate = 600;
 
 export const metadata: Metadata = pageMetadata({
   title: "Prices & Packages — Kaki Harmoni",
@@ -99,6 +107,13 @@ export default function PricesPage() {
         title="Prices & Packages"
         subtitle="Start with one soak. If it suits you, choose how often you'd like to come."
       />
+
+      {/* Above the standing prices on this page only: somebody who came here
+          came to compare prices, and a one-day price they'd miss by scrolling
+          past is the one thing worth interrupting that for. */}
+      <div className="mt-8">
+        <PromoBanner />
+      </div>
 
       {/* ── Start here ──────────────────────────────────────────────────── */}
       <section className="mt-8">
