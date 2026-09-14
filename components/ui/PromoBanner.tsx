@@ -88,7 +88,10 @@ function PromoBand({ promo, today }: { promo: Promotion; today: boolean }) {
         </a>
       </div>
 
-      <p className="mt-4 text-[13px] leading-relaxed text-muted">
+      {/* Not small print. It carries the two things somebody has to act on —
+          book ahead, and when normal pricing returns — so it is sized to be
+          read, in the band's own brown rather than the lighter muted grey. */}
+      <p className="mt-4 text-[15px] leading-relaxed text-brown sm:text-[16px]">
         {promo.whenLabel}, at {businessConfig.address.name}. Places are limited, so book in advance
         to secure your slot. First experience offer will resume on {resumesLabel(promo)}.
       </p>
