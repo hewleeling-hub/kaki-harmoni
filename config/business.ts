@@ -60,12 +60,21 @@ export const businessConfig = {
     mapQuery: "Desa Cindaimas Condominium, Kuala Lumpur",
   },
 
+  /**
+   * THE opening hours. Everything derives from here — the copy on every page,
+   * the JSON-LD Google reads, and the booking slots themselves (lib/slots.ts
+   * imports closeHour rather than keeping its own copy, which it used to).
+   *
+   * `closeHour` is exclusive and slots run every 30 minutes, so 19 makes 18:30
+   * the last one a guest can take — which is what `lastSoak` says out loud.
+   * Change the number and the sentence together.
+   */
   hours: {
     label: "Open daily",
-    display: "10:00am – 8:00pm",
-    lastSoak: "Last soak begins at 7:30pm.",
+    display: "10:00am – 7:00pm",
+    lastSoak: "Last soak begins at 6:30pm.",
     openHour: 10,
-    closeHour: 20,
+    closeHour: 19,
     timezone: "Asia/Kuala_Lumpur",
   },
 

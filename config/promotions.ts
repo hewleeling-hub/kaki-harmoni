@@ -65,7 +65,7 @@ export const MALAYSIA_DAY: Promotion = {
   // the other two cost. Everything here is the RM33.
   includes: ["Foot relaxation soak", "Any drink", "A slice of cake"],
   line: "A little time for you. A big love for Malaysia.",
-  whenLabel: "Wednesday 16 September 2026, open 10:00am – 8:00pm",
+  whenLabel: "Wednesday 16 September 2026",
   showsFrom: new Date("2026-09-13T16:00:00Z"), // 14 Sept, midnight in KL
   endsAt: new Date("2026-09-16T16:00:00Z"), // midnight at the end of the 16th, KL
 };

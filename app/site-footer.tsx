@@ -5,6 +5,7 @@ import {
   BUSINESS_CALL_DISPLAY,
   whatsAppLink,
 } from "@/lib/whatsapp";
+import { businessConfig } from "@/config/business";
 
 const IG_URL = "https://www.instagram.com/kakiharmoni/";
 const FB_URL = "https://facebook.com/KakiHarmoni";
@@ -53,7 +54,9 @@ export default function SiteFooter() {
             <br />
             58200 Kuala Lumpur, Wilayah Persekutuan Kuala Lumpur
           </p>
-          <p className="text-sm">Open daily · 10:00am – 8:00pm</p>
+          <p className="text-sm">
+            {businessConfig.hours.label} · {businessConfig.hours.display}
+          </p>
           <Link href="/location" className="text-sm underline underline-offset-4 hover:text-white">
             Get directions
           </Link>

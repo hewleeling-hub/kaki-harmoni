@@ -1,7 +1,18 @@
 import { BOOKING_START_DATE, BOOKING_WINDOW_DAYS } from "@/lib/config";
+import { businessConfig } from "@/config/business";
 
-// TODO: adjust to Kaki Harmoni's real operating hours if different.
-export const BUSINESS_HOURS = { openHour: 10, closeHour: 20 }; // 10:00 – 20:00
+/**
+ * The shop's hours, taken from config/business.ts rather than repeated.
+ *
+ * This file used to keep its own `{ openHour: 10, closeHour: 20 }`, which meant
+ * the hours existed in two places that nothing forced to agree: changing the
+ * hours on the website would have left the booking calendar still offering
+ * slots after closing time, and nothing would have complained.
+ */
+export const BUSINESS_HOURS = {
+  openHour: businessConfig.hours.openHour,
+  closeHour: businessConfig.hours.closeHour,
+};
 
 export const SLOT_INTERVAL_MINUTES = 30;
 
