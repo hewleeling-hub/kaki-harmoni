@@ -3,7 +3,6 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { logActivity, logAudit } from "@/lib/activity";
 import { scoreLead } from "@/lib/scoring";
 import { sendSalesAlert, purchaseConfirmedEmail } from "@/lib/email";
-import { DOOR_SURCHARGE_MYR } from "@/lib/config";
 import { remainingFor } from "@/lib/slots";
 import { occupancyForDate } from "@/lib/capacity";
 import { hasBookedBefore } from "@/lib/customer";
@@ -241,16 +240,10 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const subtotal = lines.reduce((sum, l) => sum + l.line_total_myr, 0);
-  // The surcharge belongs to the FIRST VISIT ONLY. It is defined in lib/config
-  // as WALKIN_PRICE_MYR - PREPAY_PRICE_MYR — RM30 at the door against RM25
-  // prepaid — so it is the shape of the launch offer, not a general fee for
-  // paying in person. Everything else costs the same either way: a Single Soak
-  // is RM40 online or at the counter, and there is no RM45 rate anywhere on
-  // the site to justify adding it.
-  const surcharge =
-    payTiming === "door" && lines.some(isFirstVisitLine) ? DOOR_SURCHARGE_MYR : 0;
-  const orderTotal = Math.round((subtotal + surcharge) * 100) / 100;
+  // No surcharge anywhere: a first visit is RM30 online or at the door, and a
+  // Single Soak was always RM40 either way. The old prepay/door gap is gone,
+  // so the order total is simply what the catalogue says.
+  const orderTotal = Math.round(lines.reduce((sum, l) => sum + l.line_total_myr, 0) * 100) / 100;
 
   // Nothing is actually collected at the moment of checkout — cash is paid in person at the
   // visit, and transfer/e-wallet need staff to verify receipt. Everything starts pending;

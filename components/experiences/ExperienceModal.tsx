@@ -205,7 +205,7 @@ export function ExperienceModal({
                     {price} <span className="text-muted">• {exp.duration}</span>
                   </p>
                   <p className="mt-0.5 text-[12.5px] text-muted">
-                    First visit RM{businessConfig.pricing.prepay} · save with a package
+                    First visit RM{businessConfig.pricing.firstVisit} · save with a package
                   </p>
                 </div>
                 <Link

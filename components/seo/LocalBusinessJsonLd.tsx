@@ -40,23 +40,23 @@ export function LocalBusinessJsonLd() {
       addressCountry: "MY",
     },
     openingHoursSpecification: [
+      // Two specs, because the shop closes earlier at the weekend. One
+      // all-week entry would tell Google we're open until 6pm on a Sunday.
       {
         "@type": "OpeningHoursSpecification",
-        dayOfWeek: [
-          "Monday",
-          "Tuesday",
-          "Wednesday",
-          "Thursday",
-          "Friday",
-          "Saturday",
-          "Sunday",
-        ],
+        dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
         opens: `${String(hours.openHour).padStart(2, "0")}:00`,
-        closes: `${String(hours.closeHour).padStart(2, "0")}:00`,
+        closes: `${String(hours.closeHourWeekday).padStart(2, "0")}:00`,
+      },
+      {
+        "@type": "OpeningHoursSpecification",
+        dayOfWeek: ["Saturday", "Sunday"],
+        opens: `${String(hours.openHour).padStart(2, "0")}:00`,
+        closes: `${String(hours.closeHourWeekend).padStart(2, "0")}:00`,
       },
     ],
     // Cheapest single visit to the top of the ladder.
-    priceRange: `RM${businessConfig.pricing.prepay}–RM${ladderPrices.thirtyVisit}`,
+    priceRange: `RM${businessConfig.pricing.firstVisit}–RM${ladderPrices.thirtyVisit}`,
     currenciesAccepted: "MYR",
     // Rednote is nullable by design — a withdrawn channel disappears from the
     // site, so it must disappear from here too rather than becoming "null".

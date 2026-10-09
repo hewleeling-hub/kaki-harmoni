@@ -15,8 +15,7 @@ import {
   whatsAppLink,
 } from "@/lib/whatsapp";
 import {
-  PREPAY_PRICE_MYR,
-  WALKIN_PRICE_MYR,
+  FIRST_VISIT_PRICE_MYR,
   LAUNCH_WINDOW,
   PRELAUNCH_MODE,
   BOOKING_START_LABEL,
@@ -65,24 +64,31 @@ export const businessConfig = {
    * the JSON-LD Google reads, and the booking slots themselves (lib/slots.ts
    * imports closeHour rather than keeping its own copy, which it used to).
    *
-   * `closeHour` is exclusive and slots run every 30 minutes, so 19 makes 18:30
-   * the last one a guest can take — which is what `lastSoak` says out loud.
-   * Change the number and the sentence together.
+   * Hours differ at the weekend, so the close hour is a pair rather than one
+   * number and lib/slots.ts picks the right one per date. Both are exclusive
+   * and slots run every 30 minutes — change a number and the `display` /
+   * `lastSoak` sentences with it, since nothing forces those to agree.
    */
   hours: {
     label: "Open daily",
-    display: "10:00am – 7:00pm",
-    lastSoak: "Last soak begins at 6:30pm.",
+    display: "Mon–Fri 10:00am – 6:00pm · Sat–Sun 10:00am – 4:00pm",
+    lastSoak: "Last soak begins at 5:30pm on weekdays, 3:30pm at weekends.",
     openHour: 10,
-    closeHour: 19,
+    /** Exclusive, and slots run every 30 minutes: 18 makes 17:30 the last one. */
+    closeHourWeekday: 18,
+    /** Exclusive: 16 makes 15:30 the last weekend slot. */
+    closeHourWeekend: 16,
     timezone: "Asia/Kuala_Lumpur",
   },
 
-  // Real first-visit launch pricing (MYR).
+  /**
+   * First-visit pricing (MYR). `firstVisit` is ONE price however you pay —
+   * online or at the door — which is why there is no prepay/walkin pair here
+   * any more. `normal` is what a soak costs once you are no longer new.
+   */
   pricing: {
-    prepay: PREPAY_PRICE_MYR, // 25
-    walkin: WALKIN_PRICE_MYR, // 30
-    normal: 40, // usual first-visit price before launch offer
+    firstVisit: FIRST_VISIT_PRICE_MYR, // 30
+    normal: 40, // standard single soak, and the first-visit price without the offer
   },
 
   prelaunch: PRELAUNCH_MODE,
@@ -112,7 +118,7 @@ export const visitSteps = [
     title: "Pay to confirm it",
     icon: "gift",
     short: "Your slot is confirmed once you pay.",
-    long: `Prepay RM${businessConfig.pricing.prepay} to confirm your slot — or choose to pay RM${businessConfig.pricing.walkin} at the door.`,
+    long: `RM${businessConfig.pricing.firstVisit} for your first visit — pay online now or at the door when you arrive, whichever suits you.`,
   },
   {
     number: 4,
@@ -241,7 +247,7 @@ export const faqs = [
   },
   {
     q: "How much is a visit?",
-    a: `Your first visit is RM${businessConfig.pricing.prepay} when you prepay online, or RM${businessConfig.pricing.walkin} at the door — launch prices for our opening period only, after which a first visit is the usual RM${businessConfig.pricing.normal}. A single soak is RM${businessConfig.pricing.normal} after that, or less with a package: from RM${ladderPerVisit.entry} a visit on the 5-Day Reset down to RM${ladderPerVisit.cheapest} on the 30-Day Routine.`,
+    a: `Your first visit is RM${businessConfig.pricing.firstVisit} — the same price whether you pay online or at the door. That's an opening-period price; after it a first visit is the usual RM${businessConfig.pricing.normal}. A single soak is RM${businessConfig.pricing.normal} after that, or less with a package: from RM${ladderPerVisit.entry} a visit on the 5-Day Reset down to RM${ladderPerVisit.cheapest} on the 30-Day Routine.`,
   },
   {
     q: "Do I pick a time when I book?",
@@ -382,9 +388,9 @@ export const proposition = "Your 15-minute daily reset." as const;
  */
 export const ctaLabels = {
   /** New visitor — the dominant acquisition CTA across the site. */
-  firstVisit: `Try Your First Soak — RM${businessConfig.pricing.prepay}`,
+  firstVisit: `Try Your First Soak — RM${businessConfig.pricing.firstVisit}`,
   /** Same promise, short enough for the nav bar. */
-  firstVisitShort: `First Soak — RM${businessConfig.pricing.prepay}`,
+  firstVisitShort: `First Soak — RM${businessConfig.pricing.firstVisit}`,
   /**
    * Visitor weighing up frequency. Deliberately not "packages" — the section it
    * leads to argues these aren't really discounts but the easiest way to build a
@@ -399,9 +405,10 @@ export const ctaLabels = {
 } as const;
 
 /**
- * LAUNCH OFFER — the RM25 prepay / RM30 at-the-door first visit is an introductory
- * price, NOT the standing rate. After the launch period a first visit is the usual
- * RM40, so anywhere the launch price is quoted must say it is time-limited.
+ * LAUNCH OFFER — the RM30 first visit is an introductory price, NOT the standing
+ * rate, and it is the same whether the guest pays online or at the door. After
+ * the launch period a first visit is the usual RM40, so anywhere the price is
+ * quoted must say it is time-limited.
  *
  * `endsLabel` is null because the business has not fixed an end date yet. Set it to
  * a human-readable date (e.g. "31 October 2026") and the precise wording switches on
@@ -444,7 +451,7 @@ export const launchOfferShort = launchOffer.endsLabel
  *
  * PRICING PROVENANCE — every price below is confirmed by the business. Do not
  * invent or adjust numbers here; the per-visit figures are DERIVED, not typed:
- *  - First Soak RM25 is the prepay first-visit launch price (RM30 at the door).
+ *  - First Soak RM30 is the first-visit price, the same online or at the door.
  *  - 5-Day Reset RM160 — the "Buy 4, get 1 free" package — is RM32 a visit.
  *  - 10-Day Reset RM300 is RM30 a visit.
  *  - 30-Day Routine RM840 is RM28 a visit.
@@ -485,8 +492,8 @@ export const routinePackages: readonly RoutinePackage[] = [
     stage: "TRY",
     name: "First Soak",
     visits: 1,
-    price: businessConfig.pricing.prepay,
-    priceNote: `or RM${businessConfig.pricing.walkin} at the door`,
+    price: businessConfig.pricing.firstVisit,
+    priceNote: "online or at the door — same price",
     positioning: "For people who are new to Kaki Harmoni.",
     cta: "TRY IT",
     href: reserveHref("first-soak"),

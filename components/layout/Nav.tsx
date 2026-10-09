@@ -43,7 +43,7 @@ export function DesktopNav() {
         </nav>
         <div className="ml-auto">
           <Button href="/#reserve" size="md" icon={<CalendarIcon size={20} />} className="whitespace-nowrap !px-4 xl:!px-5">
-            <span className="xl:hidden">RM{businessConfig.pricing.prepay} Soak</span>
+            <span className="xl:hidden">RM{businessConfig.pricing.firstVisit} Soak</span>
             <span className="hidden xl:inline">{ctaLabels.firstVisitShort}</span>
           </Button>
         </div>
@@ -96,7 +96,7 @@ export function MobileHeader() {
           className="ml-auto !min-h-11 !px-3.5 text-[15px]"
           icon={<CalendarIcon size={18} />}
         >
-          <span className="whitespace-nowrap">RM{businessConfig.pricing.prepay} Soak</span>
+          <span className="whitespace-nowrap">RM{businessConfig.pricing.firstVisit} Soak</span>
         </Button>
 
         <button
@@ -285,7 +285,7 @@ export function MobileBottomNav() {
               <span className="flex h-8 items-center justify-center">
                 <CalendarIcon size={22} />
               </span>
-              Reserve · RM{businessConfig.pricing.prepay}
+              Reserve · RM{businessConfig.pricing.firstVisit}
             </Link>
           </li>
         </ul>

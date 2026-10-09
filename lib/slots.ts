@@ -11,8 +11,21 @@ import { businessConfig } from "@/config/business";
  */
 export const BUSINESS_HOURS = {
   openHour: businessConfig.hours.openHour,
-  closeHour: businessConfig.hours.closeHour,
+  closeHourWeekday: businessConfig.hours.closeHourWeekday,
+  closeHourWeekend: businessConfig.hours.closeHourWeekend,
 };
+
+/**
+ * Closing time depends on the day: earlier at the weekend. Parsed as a plain
+ * calendar date (not `new Date(iso)`, which would read it as UTC and can shift
+ * the weekday for a +08:00 shop), so Saturday is Saturday in Kuala Lumpur.
+ */
+export function closeHourForDate(dateISO: string): number {
+  const [y, m, d] = dateISO.split("-").map(Number);
+  const day = new Date(y, (m ?? 1) - 1, d ?? 1).getDay(); // 0 Sun … 6 Sat
+  const isWeekend = day === 0 || day === 6;
+  return isWeekend ? BUSINESS_HOURS.closeHourWeekend : BUSINESS_HOURS.closeHourWeekday;
+}
 
 export const SLOT_INTERVAL_MINUTES = 30;
 
@@ -129,9 +142,10 @@ export function remainingFor(
  * still the mistakes to avoid.
  */
 
-export function generateSlotsForDay(): string[] {
+export function generateSlotsForDay(dateISO: string): string[] {
+  const closeHour = closeHourForDate(dateISO);
   const slots: string[] = [];
-  for (let h = BUSINESS_HOURS.openHour; h < BUSINESS_HOURS.closeHour; h++) {
+  for (let h = BUSINESS_HOURS.openHour; h < closeHour; h++) {
     for (let m = 0; m < 60; m += SLOT_INTERVAL_MINUTES) {
       slots.push(`${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`);
     }

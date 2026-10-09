@@ -29,7 +29,7 @@ export const revalidate = 600;
 export const metadata: Metadata = pageMetadata({
   title: "Prices & Packages — Kaki Harmoni",
   description:
-    "Try your first 15-minute soak for RM25, then choose how often you come: the 5-Day Reset works out at RM32 a visit, with longer routines available.",
+    "Try your first 15-minute soak for RM30, then choose how often you come: the 5-Day Reset works out at RM32 a visit, with longer routines available.",
   path: "/prices",
 });
 
@@ -118,34 +118,25 @@ export default function PricesPage() {
       {/* ── Start here ──────────────────────────────────────────────────── */}
       <section className="mt-8">
         <SectionHeading eyebrow="New here?" title="Your first visit" />
-        <div className="mt-5 grid gap-5 sm:grid-cols-2">
-          <Card className="flex flex-col text-center ring-2 ring-olive/50">
-            <p className="text-sm font-semibold uppercase tracking-wide text-olive">Prepay online · best value</p>
+        {/* One price, so one card. Two tiles here used to contrast RM25
+            prepaid against RM30 at the door; with the prices equal, a
+            side-by-side comparison would imply a difference that isn't there. */}
+        <div className="mt-5 flex justify-center">
+          <Card className="flex w-full max-w-md flex-col text-center ring-2 ring-olive/50">
+            <p className="text-sm font-semibold uppercase tracking-wide text-olive">First visit</p>
             <p className="mt-3 text-5xl font-bold text-olive" style={{ fontFamily: "var(--font-heading)" }}>
-              RM{pricing.prepay}
+              RM{pricing.firstVisit}
             </p>
             <p className="mt-1 text-[15px] text-muted line-through">Usually RM{pricing.normal}</p>
             <p className="mt-1 text-[14px] font-semibold text-olive">{launchOfferShort}</p>
             <p className="mt-3 text-[16px] leading-relaxed text-muted">
               A warm 15-minute leg soak and a coffee — an easy way to see whether it suits you.
             </p>
+            <p className="mt-2 text-[15px] text-brown">
+              Pay online or at the door — the price is the same either way.
+            </p>
             <Button href={reserveHref("first-soak")} full className="mt-5" icon={<CalendarIcon size={20} />}>
               {ctaLabels.firstVisit}
-            </Button>
-          </Card>
-
-          <Card className="flex flex-col text-center">
-            <p className="text-sm font-semibold uppercase tracking-wide text-brown">Pay at the door</p>
-            <p className="mt-3 text-5xl font-bold text-brown" style={{ fontFamily: "var(--font-heading)" }}>
-              RM{pricing.walkin}
-            </p>
-            <p className="mt-1 text-[15px] text-muted">First visit</p>
-            <p className="mt-1 text-[14px] font-semibold text-brown">{launchOfferShort}</p>
-            <p className="mt-3 text-[16px] leading-relaxed text-muted">
-              Reserve your spot now and settle when you arrive. Same warm soak and coffee.
-            </p>
-            <Button href={reserveHref("first-soak")} variant="secondary" full className="mt-5">
-              Reserve your spot
             </Button>
           </Card>
         </div>
@@ -241,9 +232,9 @@ export default function PricesPage() {
         </Card>
         <div className="mt-5">
           <PromotionCard
-            highlight={`RM${pricing.prepay}`}
+            highlight={`RM${pricing.firstVisit}`}
             title="No need to decide today"
-            description={`Come once, see how it feels, and think about a routine afterwards. Your first visit is RM${pricing.prepay} prepaid online, or RM${pricing.walkin} at the door, instead of the usual RM${pricing.normal}.`}
+            description={`Come once, see how it feels, and think about a routine afterwards. Your first visit is RM${pricing.firstVisit} — online or at the door — instead of the usual RM${pricing.normal}.`}
             terms={`${launchOfferNote} First visits from ${bookingStartLabel}. After the launch period a first visit is the usual RM${pricing.normal}.`}
           />
         </div>

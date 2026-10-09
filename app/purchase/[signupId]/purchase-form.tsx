@@ -4,8 +4,8 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { whatsAppLink, BUSINESS_WHATSAPP_NUMBER } from "@/lib/whatsapp";
-import { PRELAUNCH_MODE, DOOR_SURCHARGE_MYR, PREPAY_PRICE_MYR } from "@/lib/config";
-import { withOption, PACKAGES_ARE_DOOR_ONLY, FIRST_VISIT_PRODUCT_ID } from "@/config/catalogue";
+import { PRELAUNCH_MODE, FIRST_VISIT_PRICE_MYR } from "@/lib/config";
+import { withOption, PACKAGES_ARE_DOOR_ONLY } from "@/config/catalogue";
 
 type Product = {
   id: string;
@@ -77,14 +77,10 @@ export default function PurchaseForm({
 
   const subtotal = selected ? Number(selected.price_myr) : 0;
 
-  // The surcharge is the FIRST VISIT's prepay-vs-door gap and nothing else:
-  // lib/config defines it as WALKIN_PRICE_MYR - PREPAY_PRICE_MYR, RM30 at the
-  // door against RM25 prepaid. It is not a fee for paying in person, so a
-  // returning guest pays RM40 for a Single Soak either way — there is no RM45
-  // rate published anywhere.
-  const doorSurcharge = selected?.id === FIRST_VISIT_PRODUCT_ID ? DOOR_SURCHARGE_MYR : 0;
-  const surcharge = effectiveTiming === "door" ? doorSurcharge : 0;
-  const total = Math.round((subtotal + surcharge) * 100) / 100;
+  // No surcharge: paying at the door costs exactly what paying online costs.
+  // There used to be a first-visit gap (RM25 prepaid against RM30 at the door);
+  // the first visit is now RM30 either way, so the total is just the subtotal.
+  const total = Math.round(subtotal * 100) / 100;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -199,7 +195,7 @@ export default function PurchaseForm({
             Welcome back — you&apos;ve already had your first soak with us.
           </p>
           <p className="mt-1 text-xs text-black/60">
-            The RM{PREPAY_PRICE_MYR} first-visit price is a one-off for new guests, so it isn&apos;t
+            The RM{FIRST_VISIT_PRICE_MYR} first-visit price is a one-off for new guests, so it isn&apos;t
             shown below. Everything else is open to you as usual.
           </p>
         </div>
@@ -279,24 +275,10 @@ export default function PurchaseForm({
           </div>
         ) : (
           <div className="grid gap-2">
-            {timingOption(
-              "prepay",
-              "Prepay",
-              0,
-              doorSurcharge > 0
-                ? "Secures your slot at the launch rate — no extra charge."
-                : "Secures your slot before you arrive — no extra charge.",
-              // "Best value" only means something where prepaying is cheaper.
-              doorSurcharge > 0,
-            )}
-            {timingOption(
-              "door",
-              "Pay at the door",
-              doorSurcharge,
-              doorSurcharge > 0
-                ? "Prefer to pay when you arrive? No problem."
-                : "Same price — settle it with us when you arrive.",
-            )}
+            {/* Neither option is "best value" any more — they cost the same,
+                so the only difference is when you'd rather pay. */}
+            {timingOption("prepay", "Prepay", 0, "Secures your slot before you arrive.")}
+            {timingOption("door", "Pay at the door", 0, "Settle it with us when you arrive.")}
           </div>
         )}
         {effectiveTiming === "prepay" && (
@@ -307,27 +289,6 @@ export default function PurchaseForm({
         )}
       </div>
 
-      {/* ── Total ─────────────────────────────────────────────────────── *
-       * Only shown when the total isn't simply the price already on the card
-       * above — i.e. when the door surcharge is being added. Now that add-ons
-       * are gone, a prepay order would otherwise repeat the same figure as a
-       * line and again as a "Total", with the button below making three. */}
-      {selected && surcharge > 0 && (
-        <div className="rounded-lg bg-black/5 px-4 py-3 text-sm space-y-1">
-          <div className="flex justify-between gap-2 text-black/70">
-            <span className="min-w-0 truncate">{selected.name}</span>
-            <span className="tabular-nums">{money(Number(selected.price_myr))}</span>
-          </div>
-          <div className="flex justify-between gap-2 text-black/70">
-            <span>Pay-at-the-door</span>
-            <span className="tabular-nums">{money(surcharge)}</span>
-          </div>
-          <div className="flex justify-between gap-2 border-t border-black/10 pt-1.5 font-semibold" style={{ color: "var(--lagoon-dark)" }}>
-            <span>Total</span>
-            <span className="tabular-nums">{money(total)}</span>
-          </div>
-        </div>
-      )}
 
       <button
         type="submit"

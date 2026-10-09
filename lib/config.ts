@@ -13,11 +13,11 @@ export const BOOKING_START_DATE = "2026-09-11"; // ISO (Asia/Kuala_Lumpur)
 export const BOOKING_START_LABEL = "11 September 2026";
 export const BOOKING_WINDOW_DAYS = 30;
 
-// First-visit two-tier pricing (MYR): cheaper to prepay, small surcharge to
-// pay at the door. Prepaying is the better deal, which nudges people to pay now.
-export const PREPAY_PRICE_MYR = 25;
-export const WALKIN_PRICE_MYR = 30;
-export const DOOR_SURCHARGE_MYR = WALKIN_PRICE_MYR - PREPAY_PRICE_MYR;
+// First-visit price (MYR). ONE price: RM30 whether you prepay online or pay at
+// the door. The old two-tier RM25/RM30 split is gone, so there is deliberately
+// no surcharge constant here any more — paying in person costs the same, and
+// any code that adds a fee for it is a bug.
+export const FIRST_VISIT_PRICE_MYR = 30;
 
 // DuitNow QR image customers scan to pay online (any bank or e-wallet).
 // Save your QR poster to public/duitnow-qr.png.

@@ -198,7 +198,7 @@ export default function AboutPage() {
 
         <div className="mt-8 flex flex-wrap gap-3">
           <Button href="/#reserve" icon={<CalendarIcon size={20} />}>
-            Reserve your first visit — RM{pricing.prepay}
+            Reserve your first visit — RM{pricing.firstVisit}
           </Button>
           <Button href="/location" variant="secondary" icon={<MapPinIcon size={20} />}>
             Find Us
@@ -229,7 +229,7 @@ export default function AboutPage() {
           </p>
 
           <Button href="/#reserve" className="mt-6" icon={<CalendarIcon size={20} />}>
-            Reserve your first visit — RM{pricing.prepay}
+            Reserve your first visit — RM{pricing.firstVisit}
           </Button>
         </section>
       </div>

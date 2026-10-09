@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Could not load availability." }, { status: 500 });
   }
 
-  const slots = generateSlotsForDay().map((time) => ({
+  const slots = generateSlotsForDay(date).map((time) => ({
     time,
     remaining: remainingFor(occupancy, time, soaks),
   }));

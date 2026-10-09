@@ -141,8 +141,8 @@ export default async function Home({
             </Button>
           </div>
           <p className="mt-4 text-[15px] text-muted">
-            First visits from {bookingStartLabel}. RM{pricing.prepay} when you prepay, or RM
-            {pricing.walkin} at the door — instead of the usual RM{pricing.normal}.
+            First visits from {bookingStartLabel}. RM{pricing.firstVisit} instead of the usual
+            RM{pricing.normal}, online or at the door.
           </p>
         </div>
 
@@ -379,7 +379,7 @@ export default async function Home({
                   <Link href="/#reserve" className="font-semibold text-olive underline underline-offset-2 hover:text-olive-dark">
                     Start with a single first soak
                   </Link>{" "}
-                  instead — RM{pricing.prepay} when you prepay.
+                  instead — RM{pricing.firstVisit}.
                 </p>
               </>
             ) : (
@@ -395,12 +395,12 @@ export default async function Home({
                     of cake.
                   </p>
                 )}
-                <SectionHeading eyebrow="Start here" title={`Try your first soak — RM${pricing.prepay}`} />
+                <SectionHeading eyebrow="Start here" title={`Try your first soak — RM${pricing.firstVisit}`} />
                 <p className="mt-4 text-[18px] leading-relaxed text-muted">
                   A warm 15-minute leg soak and a freshly made coffee — an easy way to find out
                   whether fifteen minutes suits you. Your first visit is{" "}
-                  <strong className="text-olive-dark">RM{pricing.prepay} when you prepay</strong> online
-                  (or RM{pricing.walkin} at the door), instead of the usual RM{pricing.normal}. Reserve,
+                  <strong className="text-olive-dark">RM{pricing.firstVisit}</strong> — the same
+                  online or at the door — instead of the usual RM{pricing.normal}. Reserve,
                   pick your time, then pay to confirm — first visits from {bookingStartLabel}.
                 </p>
                 <p className="mt-2 text-[15px] text-muted">
@@ -449,9 +449,9 @@ export default async function Home({
 
         <div className="mx-auto mt-8 max-w-3xl">
           <PromotionCard
-            highlight={`RM${pricing.prepay}`}
+            highlight={`RM${pricing.firstVisit}`}
             title="Start with a single soak"
-            description={`There's no need to commit to anything today. Come once for RM${pricing.prepay} prepaid online, or RM${pricing.walkin} at the door — see how it feels, and decide about a routine afterwards.`}
+            description={`There's no need to commit to anything today. Come once for RM${pricing.firstVisit} — pay online or at the door, it's the same price — see how it feels, and decide about a routine afterwards.`}
             terms={`${launchOfferNote} First visits from ${bookingStartLabel}. After the launch period a first visit is the usual RM${pricing.normal}.`}
           />
         </div>

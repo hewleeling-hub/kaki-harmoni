@@ -28,7 +28,7 @@ const STAGES = [
     n: "02",
     title: "Confirm your booking",
     lead: "Choose how you'd like to pay.",
-    text: "Prepay to secure your slot, or settle up when you arrive. Both are proper bookings.",
+    text: "Pay online now or at the door when you arrive — same price, both are proper bookings.",
     photo: null,
     alt: "",
   },
@@ -60,7 +60,7 @@ const STAGES = [
 
 /** Only stage 01 changes with who you are. */
 const STAGE_ONE_NOTE: Record<Visitor, string> = {
-  first: "First visit? Enjoy our special launch rate when you prepay.",
+  first: "First visit? Enjoy our special opening rate.",
   returning: "Already been here? Simply book your next soak.",
 };
 
@@ -92,43 +92,19 @@ function StageMedia({ stage }: { stage: (typeof STAGES)[number] }) {
  * here would be a dead control.
  */
 function PaymentOptions() {
-  const { prepay, walkin } = businessConfig.pricing;
+  const { firstVisit } = businessConfig.pricing;
   return (
-    <div className="mt-1 grid w-full gap-2.5 text-left sm:max-w-md lg:max-w-none">
-      <div className="rounded-[16px] border-2 border-olive bg-ivory px-4 py-3">
-        <div className="flex items-baseline justify-between gap-2">
-          <span className="text-[15px] font-semibold text-olive-dark">Prepay</span>
-          <span
-            className="text-[20px] font-bold text-olive"
-            style={{ fontFamily: "var(--font-heading)" }}
-          >
-            RM{prepay}
-          </span>
-        </div>
-        {launchOffer.active && (
-          <span className="mt-1 inline-block rounded-full bg-gold/25 px-2 py-0.5 text-[10.5px] font-bold uppercase tracking-wider text-[#7a5410]">
-            Best value
-          </span>
-        )}
-        <p className="mt-1.5 text-[13.5px] leading-snug text-muted">
-          Secures your slot{launchOffer.active ? " at the launch rate" : ""}.
-        </p>
-      </div>
-
-      <div className="rounded-[16px] border border-line bg-ivory px-4 py-3">
-        <div className="flex items-baseline justify-between gap-2">
-          <span className="text-[15px] font-semibold text-olive-dark">Pay at the door</span>
-          <span
-            className="text-[20px] font-bold text-brown"
-            style={{ fontFamily: "var(--font-heading)" }}
-          >
-            RM{walkin}
-          </span>
-        </div>
-        <p className="mt-1.5 text-[13.5px] leading-snug text-muted">
-          Prefer to pay when you arrive? No problem.
-        </p>
-      </div>
+    <div className="mt-1 w-full rounded-[16px] border-2 border-olive bg-ivory px-4 py-3.5 sm:max-w-md lg:max-w-none">
+      <p className="text-[12px] font-bold uppercase tracking-[0.14em] text-olive">First visit</p>
+      <p
+        className="mt-0.5 text-[26px] font-bold leading-none text-olive"
+        style={{ fontFamily: "var(--font-heading)" }}
+      >
+        RM{firstVisit}
+      </p>
+      <p className="mt-2 text-[13.5px] leading-snug text-muted">
+        Pay online now, or at the door when you arrive — the price is the same either way.
+      </p>
     </div>
   );
 }
@@ -138,7 +114,7 @@ export function VisitJourney() {
   const panelId = useId();
   const isFirst = who === "first";
   const promo = launchOffer.active;
-  const { prepay, walkin } = businessConfig.pricing;
+  const { firstVisit } = businessConfig.pricing;
 
   const tab =
     "min-h-12 flex-1 rounded-full px-5 py-3 text-[15px] font-semibold transition duration-200 ease-out sm:flex-none sm:px-7";
@@ -223,11 +199,10 @@ export function VisitJourney() {
                       className="text-[34px] font-bold leading-none text-olive sm:text-[40px]"
                       style={{ fontFamily: "var(--font-heading)" }}
                     >
-                      RM{prepay}
+                      RM{firstVisit}
                     </p>
-                    <p className="text-[15px] text-brown">when you prepay</p>
                     <p className="mt-2 text-[15px] leading-relaxed text-muted">
-                      Prefer to pay when you arrive? Your first soak is RM{walkin} at the door.
+                      Pay online or at the door — the price is the same either way.
                     </p>
                   </div>
                 )}

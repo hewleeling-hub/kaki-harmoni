@@ -91,12 +91,11 @@ export default function YourVisitPage() {
             {promo && (
               <p className="text-[16px] leading-relaxed text-brown">
                 <strong className="text-olive-dark">
-                  First soak — RM{businessConfig.pricing.prepay}
-                </strong>{" "}
-                when you prepay.
+                  First soak — RM{businessConfig.pricing.firstVisit}
+                </strong>
                 <br />
                 <span className="text-[15px] text-muted">
-                  Or pay RM{businessConfig.pricing.walkin} at the door.
+                  Pay online or at the door — same price either way.
                 </span>
               </p>
             )}
