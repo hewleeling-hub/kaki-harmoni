@@ -66,6 +66,11 @@ Applying it is a production schema change with a real access-control effect (it 
 deletes and backfills every existing auth user as `owner`), so it was left alone. Apply it
 deliberately when you want the team feature switched on.
 
+`0021_first_visit_rm30.sql` **is** applied — the First Soak catalogue row is RM30, matching
+the single first-visit price on the site. Checkout prices from `products`, so that row and
+`businessConfig.pricing.firstVisit` have to move together or the site quotes one price and
+charges another.
+
 `0008_email_optional.sql` **is** applied — `signups.email` is nullable, phone is the
 required contact field.
 

@@ -1,4 +1,5 @@
 -- First visit moves to RM30, one price however you pay.
+-- APPLIED to the live database on 2026-10-10 (verified: products row reads 30.00).
 --
 -- The old two-tier offer was RM25 prepaid / RM30 at the door, with the gap
 -- added at checkout as a surcharge. That surcharge is gone from the code, so
