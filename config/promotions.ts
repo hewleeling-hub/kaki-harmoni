@@ -127,3 +127,100 @@ export function promotionForBookingDate(dateISO: string | null | undefined): Pro
 export function isPromotionProduct(productId: string | null | undefined): boolean {
   return !!productId && ALL.some((p) => p.productId === productId);
 }
+
+/* ======================================================================
+ * VOUCHER OFFERS
+ *
+ * A different shape from Promotion above, and deliberately a separate type.
+ *
+ * A Promotion OWNS a booking date: on its day it is the only thing bookable.
+ * A voucher is the opposite — it is bought in one window and redeemed in a
+ * much longer one, and it must never stop normal bookings. Expressing 11.11
+ * as a Promotion would have made 11 November unbookable for everything else,
+ * which is the reverse of what a voucher sale is for.
+ *
+ * Like Promotion, the windows are UTC instants rather than local dates: the
+ * site renders on UTC servers while the shop lives in Kuala Lumpur (+08:00).
+ * ====================================================================== */
+
+export interface VoucherOffer {
+  id: string;
+  /** Catalogue row, so the price charged comes from the database, not copy. */
+  productId: string;
+  badge: string;
+  title: string;
+  /** The poster is bilingual; the site shows the Chinese line alongside. */
+  titleZh?: string;
+  /** The price as printed on the poster. */
+  price: string;
+  /** What that price is per — "per session" on the poster. */
+  unit: string;
+  /** Exactly what one voucher buys. No more than the poster promises. */
+  buys: string;
+  /** The purchase cap, enforced at the counter (see the terms note below). */
+  maxPerPerson: number;
+  /** Sale window. */
+  sellFrom: Date;
+  sellUntil: Date;
+  /** Last day a voucher can be used, in words. */
+  redeemByLabel: string;
+  /** The last day to buy, in words. */
+  sellUntilLabel: string;
+}
+
+/**
+ * 11.11 Foot Spa Voucher — RM11 a session, bought by 11 November 2026 and used
+ * any time up to 31 December 2026. Maximum two per person.
+ *
+ * sellUntil is 2026-11-11T16:00:00Z, which is midnight at the end of the 11th
+ * in Kuala Lumpur — not 00:00Z on the 11th, which is 8am local and would close
+ * the sale while the shop was still taking money for it.
+ *
+ * NOTE ON THE TWO LIMITS: "maximum 2 per person" and "redeem by 31 December"
+ * are promises the WEBSITE makes but only the COUNTER keeps. There is no
+ * voucher table, no issued codes and no redemption tracking — staff write the
+ * voucher number on the paper intake form as they already do. That was a
+ * deliberate scope decision to get the offer live inside its sale window. If
+ * the offer is repeated, issuing real codes is the thing to build first.
+ */
+export const ELEVEN_ELEVEN: VoucherOffer = {
+  id: "eleven-eleven-2026",
+  productId: "c0000000-0000-0000-0000-000000000010",
+  badge: "11.11 offer",
+  title: "11.11 Foot Spa Voucher",
+  titleZh: "足浴优惠券",
+  price: "RM11",
+  unit: "per session",
+  // The poster says "foot spa voucher" and nothing else. It does NOT include a
+  // drink, unlike a standard visit, so the copy must not imply one.
+  buys: "One 15-minute foot soak.",
+  maxPerPerson: 2,
+  sellFrom: new Date("2026-10-28T00:00:00Z"),
+  sellUntil: new Date("2026-11-11T16:00:00Z"), // midnight ending 11 Nov, KL
+  sellUntilLabel: "11 November 2026",
+  redeemByLabel: "31 December 2026",
+};
+
+const VOUCHERS: VoucherOffer[] = [ELEVEN_ELEVEN];
+
+/** The voucher offer on sale right now, or null. Takes `now` so it is testable. */
+export function activeVoucherOffer(now: Date = new Date()): VoucherOffer | null {
+  return VOUCHERS.find((v) => now >= v.sellFrom && now < v.sellUntil) ?? null;
+}
+
+/**
+ * Whether today is the last day to buy, for copy that can honestly say so.
+ *
+ * Derived from sellUntil rather than a written-down date, so moving the sale
+ * window cannot leave the site shouting "last day" on the wrong one.
+ */
+export function isLastDayToBuy(offer: VoucherOffer, now: Date = new Date()): boolean {
+  const dayStart = new Date(offer.sellUntil.getTime() - 24 * 60 * 60 * 1000);
+  return now >= dayStart && now < offer.sellUntil;
+}
+
+/** Whole days left to buy, counting today. Never negative. */
+export function daysLeftToBuy(offer: VoucherOffer, now: Date = new Date()): number {
+  const ms = offer.sellUntil.getTime() - now.getTime();
+  return Math.max(0, Math.ceil(ms / (24 * 60 * 60 * 1000)));
+}

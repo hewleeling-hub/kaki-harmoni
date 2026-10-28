@@ -6,6 +6,7 @@ import { PublicShell } from "@/components/layout/PublicShell";
 import { Button, Card, SectionHeading } from "@/components/ui/primitives";
 import { PromotionCard } from "@/components/ui/cards";
 import { PromoBanner } from "@/components/ui/PromoBanner";
+import { VoucherBanner } from "@/components/ui/VoucherBanner";
 import { activePromotion } from "@/config/promotions";
 import { Lotti } from "@/components/ui/Lotti";
 import { ExperiencePreview } from "@/components/experiences/ExperiencePreview";
@@ -105,6 +106,16 @@ export default async function Home({
           at the top of its own accord once the day passes. */}
       <div className="pt-2">
         <PromoBanner />
+      </div>
+
+      {/* ── A voucher sale, when one is running ────────────────────────── */}
+      {/* Sits with the offer band for the same reason: it has a closing date,
+          and most phone traffic never scrolls past the hero. Renders nothing
+          outside its sale window. Separate from PromoBanner above because a
+          voucher sale and a one-day bookable offer can legitimately run at the
+          same time without being the same thing. */}
+      <div className="pt-2">
+        <VoucherBanner />
       </div>
 
       {/* ── Hero — the proposition, in a few seconds ───────────────────── */}
