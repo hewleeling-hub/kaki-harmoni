@@ -1,8 +1,8 @@
 -- 11.11 Foot Spa Voucher — RM11 a session.
 --
--- NOT YET APPLIED to production. Apply it before the offer is rung up at the
--- counter, otherwise there is no catalogue line to sell and the RM11 exists
--- only in page copy — a price the server never checks.
+-- APPLIED to production on 28 October 2026, on request. One INSERT, nothing
+-- else touched. Without it there is no catalogue line to sell and the RM11
+-- exists only in page copy — a price the server never checks.
 --
 -- A catalogue product like any other, so its price comes from the database on
 -- checkout the way every other line does. See config/promotions.ts for the

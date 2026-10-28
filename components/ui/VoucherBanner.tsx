@@ -1,4 +1,4 @@
-import { whatsappLink } from "@/config/business";
+import { VoucherClaimForm } from "@/components/ui/VoucherClaimForm";
 import {
   activeVoucherOffer,
   isLastDayToBuy,
@@ -104,21 +104,16 @@ function VoucherBand({
         <Term heading="Redeem by" value={offer.redeemByLabel} sub="兑换截止日期" />
       </div>
 
-      <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
-        <a
-          href={whatsappLink(
-            `Hi Kaki Harmoni! I'd like to buy the 11.11 Foot Spa Voucher at RM11 a session. How do I pay?`,
-          )}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex min-h-12 items-center justify-center rounded-[26px] bg-[#7a5410] px-6 text-[17px] font-semibold text-[#FBEFD6] shadow-[var(--shadow-warm)] transition hover:brightness-110"
-        >
-          Buy on WhatsApp
-        </a>
-        <p className="text-[15px] leading-relaxed text-brown">
-          Or buy one at the counter next time you&rsquo;re in.
-        </p>
+      {/* The number is taken here rather than only on WhatsApp, because the
+          two-per-person limit is counted on it. A message thread records
+          nothing the cap can check. */}
+      <div className="mt-5">
+        <VoucherClaimForm offer={offer} />
       </div>
+
+      <p className="mt-3 text-[15px] leading-relaxed text-brown">
+        Rather do it in person? Ask at the counter next time you&rsquo;re in.
+      </p>
     </section>
   );
 }

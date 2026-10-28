@@ -162,7 +162,14 @@ export interface VoucherOffer {
   /** Sale window. */
   sellFrom: Date;
   sellUntil: Date;
-  /** Last day a voucher can be used, in words. */
+  /**
+   * Last day a voucher can be used (yyyy-mm-dd, Kuala Lumpur).
+   *
+   * Stored onto each voucher row at purchase, so a voucher keeps the terms it
+   * was sold under even if a later offer changes them.
+   */
+  redeemByISO: string;
+  /** The same day in words, for the band. */
   redeemByLabel: string;
   /** The last day to buy, in words. */
   sellUntilLabel: string;
@@ -198,6 +205,7 @@ export const ELEVEN_ELEVEN: VoucherOffer = {
   sellFrom: new Date("2026-10-28T00:00:00Z"),
   sellUntil: new Date("2026-11-11T16:00:00Z"), // midnight ending 11 Nov, KL
   sellUntilLabel: "11 November 2026",
+  redeemByISO: "2026-12-31",
   redeemByLabel: "31 December 2026",
 };
 

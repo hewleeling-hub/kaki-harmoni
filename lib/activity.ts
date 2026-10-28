@@ -4,7 +4,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 export async function logActivity(
   supabase: SupabaseClient,
   params: {
-    entity_type: "signup" | "purchase";
+    entity_type: "signup" | "purchase" | "voucher";
     entity_id: string;
     action: string;
     actor: string;
