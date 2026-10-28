@@ -486,6 +486,15 @@ export interface RoutinePackage {
   featured?: boolean;
   /** Carries the launch-offer badge — the price is time-limited, not standing. */
   limitedTime?: boolean;
+  /**
+   * Suppresses the "coffee included" line for a rung where it is not true.
+   *
+   * A coffee comes with every standing soak, which is why the ladder says so
+   * on every rung. The 11.11 voucher is the exception: the poster promises a
+   * foot spa session and nothing else, so claiming a drink with it would be
+   * promising at RM11 what the offer does not cover.
+   */
+  noCoffee?: boolean;
 }
 
 export const routinePackages: readonly RoutinePackage[] = [
@@ -668,5 +677,37 @@ export function faqsNow(now: Date = new Date()): readonly { q: string; a: string
           a: `A single soak is RM${businessConfig.pricing.normal}, or less with a package: from RM${ladderPerVisit.entry} a visit on the 5-Day Reset down to RM${ladderPerVisit.cheapest} on the 30-Day Routine. While the 11.11 offer runs, a Foot Spa Voucher is RM11 a soak — buy by 11 November, redeem by 31 December.`,
         }
       : item,
+  );
+}
+
+
+/**
+ * The routine ladder as it should read RIGHT NOW.
+ *
+ * While the 11.11 voucher is on sale the TRY rung is the voucher, not the
+ * RM30 first visit: the ladder's whole job is to show the cheapest way in and
+ * then the ways to come back, and leaving RM30 on the bottom rung while an
+ * RM11 band runs above it puts the dearer option in the place reserved for
+ * the cheaper one.
+ *
+ * A function, not a constant, for the same reason as faqsNow(): a module-level
+ * date check is evaluated once at server start and would never flip.
+ */
+export function routinePackagesNow(now: Date = new Date()): readonly RoutinePackage[] {
+  if (!firstVisitPaused(now)) return routinePackages;
+  return routinePackages.map((rung) =>
+    rung.id === "first-soak"
+      ? {
+          ...rung,
+          name: "11.11 Voucher",
+          price: 11,
+          priceNote: "buy by 11 Nov · 2 per person · redeem by 31 Dec",
+          positioning: "The cheapest way to try us while the offer runs.",
+          cta: "GET A VOUCHER",
+          href: "/#voucher",
+          limitedTime: true,
+          noCoffee: true,
+        }
+      : rung,
   );
 }

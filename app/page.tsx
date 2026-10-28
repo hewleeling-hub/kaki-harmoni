@@ -414,13 +414,41 @@ export default async function Home({
                     of cake.
                   </p>
                 )}
-                <SectionHeading eyebrow="Start here" title={`Try your first soak — RM${pricing.firstVisit}`} />
+                {/* The heading carries a price, so it has to follow the same
+                    pause as everything else — "Try your first soak — RM30"
+                    sitting above an RM11 band was the site quoting two
+                    different "cheapest way in" prices on one screen. */}
+                <SectionHeading
+                  eyebrow="Start here"
+                  title={
+                    pauseFirstVisit
+                      ? "Try our 11.11 promotion voucher"
+                      : `Try your first soak — RM${pricing.firstVisit}`
+                  }
+                />
                 {pauseFirstVisit ? (
-                  <p className="mt-4 text-[18px] leading-relaxed text-muted">
-                    A warm 15-minute leg soak and a freshly made coffee — an easy way to find out
-                    whether fifteen minutes suits you. Reserve, pick your time, then pay to
-                    confirm. Holding an 11.11 voucher? Reserve here and bring it with you.
-                  </p>
+                  /* The heading above now offers the voucher, but the form
+                     below books a VISIT — it cannot sell a voucher. Saying so
+                     plainly, with the way to buy one alongside, keeps the two
+                     steps distinct: buy the voucher in the band, reserve the
+                     time here. */
+                  <>
+                    <p className="mt-4 text-[18px] leading-relaxed text-muted">
+                      A warm 15-minute leg soak and a freshly made coffee for{" "}
+                      <strong className="text-olive-dark">RM11</strong> with an 11.11 voucher —
+                      an easy way to find out whether fifteen minutes suits you.
+                    </p>
+                    <p className="mt-3 text-[17px] leading-relaxed text-brown">
+                      <a
+                        href="#voucher"
+                        className="font-semibold text-olive underline underline-offset-4 hover:text-olive-dark"
+                      >
+                        Get your voucher first
+                      </a>{" "}
+                      — then reserve your time below and bring it with you. Already have one, or
+                      just booking a soak? Reserve here as usual.
+                    </p>
+                  </>
                 ) : (
                   <>
                     <p className="mt-4 text-[18px] leading-relaxed text-muted">

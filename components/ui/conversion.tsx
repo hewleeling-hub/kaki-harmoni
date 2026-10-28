@@ -3,7 +3,7 @@ import { Card, Badge, SectionHeading, Button } from "@/components/ui/primitives"
 import { CheckIcon, ArrowRightIcon } from "@/components/ui/icons";
 import {
   businessConfig,
-  routinePackages,
+  routinePackagesNow,
   perVisitPrice,
   packageValidityLabel,
   coffeeIncludedNote,
@@ -75,7 +75,9 @@ function RoutineCard({ pkg }: { pkg: RoutinePackage }) {
               that they couldn't tell whether coffee came with a soak, and this
               is the surface where they were deciding what a price buys — the
               coffee was named in the prose everywhere except here. */}
-          <p className="mt-1 text-[13px] text-brown">{coffeeIncludedNote}</p>
+          {!pkg.noCoffee && (
+            <p className="mt-1 text-[13px] text-brown">{coffeeIncludedNote}</p>
+          )}
         </>
       ) : (
         /* No invented numbers: the tier is shown, the price is honestly pending. */
@@ -117,7 +119,7 @@ function RoutineCard({ pkg }: { pkg: RoutinePackage }) {
 export function RoutineLadder({ className = "" }: { className?: string }) {
   return (
     <div className={`grid gap-5 sm:grid-cols-2 lg:grid-cols-4 ${className}`}>
-      {routinePackages.map((pkg) => (
+      {routinePackagesNow().map((pkg) => (
         <RoutineCard key={pkg.id} pkg={pkg} />
       ))}
     </div>
