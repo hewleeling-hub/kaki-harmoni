@@ -100,8 +100,13 @@ export function VoucherClaimForm({ offer }: { offer: VoucherOffer }) {
           We&rsquo;ll confirm once it lands. Then soak any time before {done.redeem_by}.
           {done.remaining > 0 && ` You can still take ${done.remaining} more on this number.`}
         </p>
-        <p className="mt-2 text-[14px] text-muted">
-          Rather pay in person? Just mention your name at the counter.
+        {/* Reserving does not hold the price. An unpaid reservation found at
+            the counter in December is an argument about RM11 vs RM30, so the
+            deadline is said here rather than left to the terms above. */}
+        <p className="mt-2 text-[14px] leading-relaxed text-muted">
+          Rather pay in person? Mention your name at the counter — but it must be paid by{" "}
+          <strong className="text-brown">{offer.sellUntilLabel}</strong> for the {offer.price} price
+          to stand.
         </p>
       </div>
     );
@@ -172,8 +177,8 @@ export function VoucherClaimForm({ offer }: { offer: VoucherOffer }) {
         {busy ? "Just a moment…" : `Reserve for RM${11 * quantity}`}
       </button>
       <p className="mt-2 text-[14px] leading-relaxed text-muted">
-        Reserve here and pay by QR on the next step — or just ask at the counter next time
-        you&rsquo;re in.
+        Reserve here and pay by QR on the next step, or at the counter — either way, payment
+        must reach us by {offer.sellUntilLabel} for the {offer.price} price to stand.
       </p>
     </form>
   );

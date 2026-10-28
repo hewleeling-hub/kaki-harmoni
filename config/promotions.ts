@@ -232,3 +232,28 @@ export function daysLeftToBuy(offer: VoucherOffer, now: Date = new Date()): numb
   const ms = offer.sellUntil.getTime() - now.getTime();
   return Math.max(0, Math.ceil(ms / (24 * 60 * 60 * 1000)));
 }
+
+/**
+ * What the persistent nav CTA should say while a voucher offer is on sale.
+ *
+ * The standing CTA sells the RM30 first visit. During an offer that is the
+ * wrong thing for it to be pushing: RM30 competes with the very promotion the
+ * page is running, and a nav that argues with the band beneath it costs both.
+ * While a voucher is on sale the CTA carries the offer instead, and reverts to
+ * RM30 on its own when the window closes — no switch to remember.
+ *
+ * Returns null when nothing is on sale, which is the signal to use the
+ * standing CTA.
+ */
+export function voucherNavCta(
+  now: Date = new Date(),
+): { full: string; short: string; tab: string; href: string } | null {
+  const offer = activeVoucherOffer(now);
+  if (!offer) return null;
+  return {
+    full: `11.11 Voucher — ${offer.price}`,
+    short: `${offer.price} Voucher`,
+    tab: `11.11 · ${offer.price}`,
+    href: "/#voucher",
+  };
+}

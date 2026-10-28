@@ -9,6 +9,15 @@ import { Button } from "@/components/ui/primitives";
 import { CalendarIcon, MessageIcon, PhoneIcon, NAV_ICONS } from "@/components/ui/icons";
 import { Wordmark } from "./Wordmark";
 
+/**
+ * The offer CTA, when one is running — resolved in PublicShell (a server
+ * component) so the date check happens once, server-side, and cannot
+ * disagree between the server render and the browser.
+ *
+ * null means nothing is on sale: the nav sells the standing first visit.
+ */
+export type VoucherCta = { full: string; short: string; tab: string; href: string } | null;
+
 function useIsActive() {
   const pathname = usePathname();
   return (href: string) => {
@@ -18,7 +27,7 @@ function useIsActive() {
 }
 
 /** Desktop top navigation bar (hidden below lg). */
-export function DesktopNav() {
+export function DesktopNav({ voucher = null }: { voucher?: VoucherCta }) {
   const isActive = useIsActive();
   return (
     <header className="sticky top-0 z-30 hidden border-b border-line bg-cream/90 backdrop-blur lg:block">
@@ -42,9 +51,14 @@ export function DesktopNav() {
           })}
         </nav>
         <div className="ml-auto">
-          <Button href="/#reserve" size="md" icon={<CalendarIcon size={20} />} className="whitespace-nowrap !px-4 xl:!px-5">
-            <span className="xl:hidden">RM{businessConfig.pricing.firstVisit} Soak</span>
-            <span className="hidden xl:inline">{ctaLabels.firstVisitShort}</span>
+          <Button
+            href={voucher ? voucher.href : "/#reserve"}
+            size="md"
+            icon={<CalendarIcon size={20} />}
+            className="whitespace-nowrap !px-4 xl:!px-5"
+          >
+            <span className="xl:hidden">{voucher ? voucher.short : `RM${businessConfig.pricing.firstVisit} Soak`}</span>
+            <span className="hidden xl:inline">{voucher ? voucher.full : ctaLabels.firstVisitShort}</span>
           </Button>
         </div>
       </div>
@@ -60,7 +74,7 @@ export function DesktopNav() {
  * Contact had no route on the device most visitors use. The bottom bar is
  * deliberately four actions and can't carry nine pages, so the rest live here.
  */
-export function MobileHeader() {
+export function MobileHeader({ voucher = null }: { voucher?: VoucherCta }) {
   const [open, setOpen] = useState(false);
   const isActive = useIsActive();
   const pathname = usePathname();
@@ -91,12 +105,14 @@ export function MobileHeader() {
         <Wordmark showTagline={false} />
 
         <Button
-          href="/#reserve"
+          href={voucher ? voucher.href : "/#reserve"}
           size="md"
           className="ml-auto !min-h-11 !px-3.5 text-[15px]"
           icon={<CalendarIcon size={18} />}
         >
-          <span className="whitespace-nowrap">RM{businessConfig.pricing.firstVisit} Soak</span>
+          <span className="whitespace-nowrap">
+            {voucher ? voucher.short : `RM${businessConfig.pricing.firstVisit} Soak`}
+          </span>
         </Button>
 
         <button
@@ -218,7 +234,7 @@ function CloseIcon() {
 }
 
 /** Sticky bottom tab bar for mobile/tablet (hidden on lg). */
-export function MobileBottomNav() {
+export function MobileBottomNav({ voucher = null }: { voucher?: VoucherCta }) {
   const isActive = useIsActive();
 
   /* Every tab is the same shape, so the differences between them are only the
@@ -279,13 +295,13 @@ export function MobileBottomNav() {
               strip of screen is for — the rest is navigation that can wait. */}
           <li className="flex-[2]">
             <Link
-              href="/#reserve"
+              href={voucher ? voucher.href : "/#reserve"}
               className={`${tab} bg-olive px-2 text-ivory shadow-[var(--shadow-warm)]`}
             >
               <span className="flex h-8 items-center justify-center">
                 <CalendarIcon size={22} />
               </span>
-              Reserve · RM{businessConfig.pricing.firstVisit}
+              {voucher ? voucher.tab : `Reserve · RM${businessConfig.pricing.firstVisit}`}
             </Link>
           </li>
         </ul>

@@ -114,7 +114,7 @@ export default async function Home({
           outside its sale window. Separate from PromoBanner above because a
           voucher sale and a one-day bookable offer can legitimately run at the
           same time without being the same thing. */}
-      <div className="pt-2">
+      <div id="voucher" className="scroll-mt-24 pt-2">
         <VoucherBanner />
       </div>
 
