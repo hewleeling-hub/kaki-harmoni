@@ -30,7 +30,7 @@ export const revalidate = 600;
 export const metadata: Metadata = pageMetadata({
   title: "Prices & Packages — Kaki Harmoni",
   description:
-    "Try your first 15-minute soak for RM30, then choose how often you come: the 5-Day Reset works out at RM32 a visit, with longer routines available.",
+    "A 15-minute soak is RM40, or less with a package: the 5-Day Reset works out at RM32 a visit, down to RM28 on the 30-Day Routine.",
   path: "/prices",
 });
 
@@ -42,6 +42,8 @@ function PriceTile({
   save,
   perSession,
   featured,
+  offerPrice,
+  offerNote,
 }: {
   name: string;
   /** Catalogue entry this tile sells, so the button books this exact thing. */
@@ -51,6 +53,10 @@ function PriceTile({
   save?: number;
   perSession?: number;
   featured?: boolean;
+  /** Offer price for this tile, struck against the standing one. */
+  offerPrice?: number;
+  /** The conditions that make the offer price true. Never show one without it. */
+  offerNote?: string;
 }) {
   return (
     <Card className={`flex flex-col text-center ${featured ? "ring-2 ring-olive/50" : ""}`}>
@@ -60,9 +66,34 @@ function PriceTile({
         </span>
       ) : null}
       <h3 className="text-[18px] text-olive-dark">{name}</h3>
-      <p className="mt-2 text-4xl font-bold text-olive" style={{ fontFamily: "var(--font-heading)" }}>
-        RM{price}
-      </p>
+      {offerPrice !== undefined ? (
+        /* The standing price stays visible and struck through rather than being
+           swapped out: the saving is the point, and a lone RM11 says nothing
+           about what it is cheaper than. */
+        <p className="mt-2 flex items-baseline justify-center gap-2.5">
+          <span
+            className="text-[26px] font-bold text-muted line-through"
+            style={{ fontFamily: "var(--font-heading)" }}
+          >
+            RM{price}
+          </span>
+          <span
+            className="text-4xl font-bold text-[#7a5410]"
+            style={{ fontFamily: "var(--font-heading)" }}
+          >
+            RM{offerPrice}
+          </span>
+        </p>
+      ) : (
+        <p className="mt-2 text-4xl font-bold text-olive" style={{ fontFamily: "var(--font-heading)" }}>
+          RM{price}
+        </p>
+      )}
+      {offerNote ? (
+        /* The conditions ride with the price. RM11 shown bare would read as a
+           walk-in rate, which it is not — it is a voucher, capped and dated. */
+        <p className="mt-1.5 text-[14px] font-semibold leading-snug text-[#7a5410]">{offerNote}</p>
+      ) : null}
       {perSession ? (
         <p className="mt-1 text-[15px] font-semibold text-brown">RM{perSession} a session</p>
       ) : null}
@@ -74,7 +105,27 @@ function PriceTile({
           The fallback still gives an action they can take right now: "sign up
           at the shop" left an interested customer with nothing to click, so
           they book the slot online and settle the package in person. */}
-      {isOnSale(slug) ? (
+      {offerPrice !== undefined ? (
+        /* The headline price on this tile is the VOUCHER price, and a voucher
+           is not something checkout sells — booking this slug charges the
+           standing RM{price}. Leading with "Book" under a big RM11 would take
+           someone to a RM40 checkout, which is the sort of surprise that gets
+           argued about at the counter. The offer price gets the offer's
+           button; the standing price stays available underneath it. */
+        <>
+          <Button href="/#voucher" full className="mt-5">
+            Get the RM{offerPrice} voucher
+          </Button>
+          {isOnSale(slug) ? (
+            <a
+              href={reserveHref(slug)}
+              className="mt-3 text-[14px] font-semibold text-olive underline underline-offset-2 hover:text-olive-dark"
+            >
+              Or book a single soak at RM{price}
+            </a>
+          ) : null}
+        </>
+      ) : isOnSale(slug) ? (
         <Button href={reserveHref(slug)} variant="secondary" full className="mt-5">
           Book {name}
         </Button>
@@ -192,7 +243,20 @@ export default function PricesPage() {
         {/* Grid only splits once there is more than one rate to show. */}
         <div className={`mt-6 grid gap-5 ${sessionRates.length > 1 ? "sm:grid-cols-3" : "mx-auto max-w-md"}`}>
           {sessionRates.map((r) => (
-            <PriceTile key={r.name} name={r.name} slug={r.slug} price={r.price} detail={r.detail} featured={r.name === "Standard single"} />
+            <PriceTile
+              key={r.name}
+              name={r.name}
+              slug={r.slug}
+              price={r.price}
+              detail={r.detail}
+              featured={r.name === "Standard single"}
+              offerPrice={pauseFirstVisit ? 11 : undefined}
+              offerNote={
+                pauseFirstVisit
+                  ? "With an 11.11 voucher — buy by 11 Nov, 2 per person, redeem by 31 Dec"
+                  : undefined
+              }
+            />
           ))}
         </div>
       </section>
