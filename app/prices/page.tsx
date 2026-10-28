@@ -264,36 +264,42 @@ export default function PricesPage() {
       {/* ── Staying longer ──────────────────────────────────────────────── */}
       {/* Target of the homepage's "Want longer? Stay for two soaks." link, so the
           anchor and the heading have to answer that exact question. */}
+      {/* "Staying longer?" listed the Double Reset, which has been withdrawn
+          (see config/business.ts). The section renders only while there is
+          something in it, rather than leaving a heading above an empty grid —
+          and comes back on its own if a pass is added. */}
+      {OTHER_PASSES.length > 0 && (
       <section id="longer" className="mt-12 scroll-mt-24">
-        <SectionHeading
-          eyebrow="Also available"
-          title="Staying longer?"
-          subtitle="Fifteen minutes is the usual visit, not a limit — you're welcome to go back to back."
-        />
-        {/* Grid only splits once there is more than one pass to show. */}
-        <div className={`mt-6 grid gap-5 ${OTHER_PASSES.length > 1 ? "sm:grid-cols-2" : "mx-auto max-w-md"}`}>
-          {OTHER_PASSES.map((p) => (
-            <PriceTile
-              key={p.id}
-              name={p.name}
-              slug={p.slug}
-              price={p.price}
-              detail={p.detail}
-              save={p.save}
-              perSession={p.perSession}
-            />
-          ))}
-        </div>
-        <p className="mt-4 text-[14px] text-muted">
-          {/* Says the whole arrangement, because half of it is a surprise
-              otherwise: you book online but you don't pay online. A guest who
-              expects a payment screen and reaches "settle at the shop" will
-              wonder whether the booking actually went through. */}
-          {PACKAGES_ON_SALE
-            ? "Book any package right here — we'll hold your first slot, and our team sets the package up and takes payment when you arrive. Message us on WhatsApp if you'd like to talk it through first."
-            : "Book your first session online and pay at the shop — our team will set the package up for you there. Message us on WhatsApp if you'd like to talk it through first."}
-        </p>
-      </section>
+          <SectionHeading
+            eyebrow="Also available"
+            title="Staying longer?"
+            subtitle="Fifteen minutes is the usual visit, not a limit — you're welcome to go back to back."
+          />
+          {/* Grid only splits once there is more than one pass to show. */}
+          <div className={`mt-6 grid gap-5 ${OTHER_PASSES.length > 1 ? "sm:grid-cols-2" : "mx-auto max-w-md"}`}>
+            {OTHER_PASSES.map((p) => (
+              <PriceTile
+                key={p.id}
+                name={p.name}
+                slug={p.slug}
+                price={p.price}
+                detail={p.detail}
+                save={p.save}
+                perSession={p.perSession}
+              />
+            ))}
+          </div>
+          <p className="mt-4 text-[14px] text-muted">
+            {/* Says the whole arrangement, because half of it is a surprise
+                otherwise: you book online but you don't pay online. A guest who
+                expects a payment screen and reaches "settle at the shop" will
+                wonder whether the booking actually went through. */}
+            {PACKAGES_ON_SALE
+              ? "Book any package right here — we'll hold your first slot, and our team sets the package up and takes payment when you arrive. Message us on WhatsApp if you'd like to talk it through first."
+              : "Book your first session online and pay at the shop — our team will set the package up for you there. Message us on WhatsApp if you'd like to talk it through first."}
+          </p>
+        </section>
+      )}
 
       {/* ── What's included ─────────────────────────────────────────────── */}
       <section className="mt-12">

@@ -36,7 +36,6 @@ import {
   whatsappLink,
   proposition,
   ctaLabels,
-  doubleSoak,
   launchOfferNote,
   launchOfferBadge,
   offerForSlug,
@@ -250,15 +249,9 @@ export default async function Home({
                   question about duration, so the two belong to the same idea. */}
               <ClockIcon size={24} className="mt-1 shrink-0 text-olive" />
               <p className="text-[17px] leading-relaxed text-brown">
-                <strong className="text-olive-dark">Want longer? Stay for two soaks.</strong> Go back to
-                back, or one either side of a break — our{" "}
-                <Link
-                  href="/prices#longer"
-                  className="font-semibold text-olive underline underline-offset-4 hover:text-olive-dark"
-                >
-                  {doubleSoak.name}
-                </Link>{" "}
-                is two soaks with a bun and a coffee in the price, RM{doubleSoak.price}.
+                <strong className="text-olive-dark">Want longer? Stay for two soaks.</strong> Go back
+                to back, or one either side of a break — just ask our team when you arrive and
+                we&rsquo;ll set it up.
               </p>
             </div>
           </div>

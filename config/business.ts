@@ -229,7 +229,7 @@ export const faqs = [
   },
   {
     q: "How long is each session?",
-    a: `Each warm leg soak lasts about 15 minutes — a simple break that fits into your day. Fancy a longer unwind? You're very welcome to go back to back: many guests enjoy a second soak straight after, or one either side of a coffee break. Our ${doubleSoak.name} is built for exactly that — two soaks, with a bun and a coffee included in the price.`,
+    a: "Each warm leg soak lasts about 15 minutes — a simple break that fits into your day. Fancy a longer unwind? You're very welcome to go back to back: many guests enjoy a second soak straight after, or one either side of a break. Just ask our team and we'll set it up.",
   },
   {
     q: "How often should I come?",
@@ -275,10 +275,6 @@ export const faqs = [
        actual validity period. */
     q: "How long do I have to use my package?",
     a: `The number in the name is how many visits you get, not a countdown — a 10-Day Reset is ten soaks, not ten days. You have ${packageValidityLabel} from the day you buy it to use them all, so you can come daily or spread them out to suit your week.`,
-  },
-  {
-    q: `Can two of us share a ${doubleSoak.name}?`,
-    a: `The ${doubleSoak.name} is two soaks for one person — either back to back, or one on each side of a coffee — so it can't be split between two people. Coming as a pair? Just book a soak each. You're very welcome to sit together, and we'll bring your coffees at the same time.`,
   },
   {
     q: "Can I bring my children?",
@@ -349,9 +345,17 @@ export interface PackageOffer {
   perSession?: number;
 }
 
+/*
+ * WITHDRAWN: the Double Reset is not listed. It was never sold — no order_item
+ * has ever referenced it — so nothing is orphaned by taking it off the menu,
+ * and its product row is set inactive, which /api/purchases enforces.
+ *
+ * `doubleSoak` above, its catalogue slug and the two-machine capacity handling
+ * in lib/slots.ts are all left in place, because the business may offer it
+ * again. Putting it back is this one line and flipping the row active.
+ */
 export const packages: readonly PackageOffer[] = [
   { id: "five-for-four", slug: "five-day-reset", name: "Buy 4, get 1 free", price: ladderPrices.fiveVisit, detail: "5 soaks for the price of 4.", save: 40 },
-  doubleSoak,
 ];
 
 /* --------------------------- derived helpers --------------------------- */
