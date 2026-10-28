@@ -14,7 +14,7 @@ import {
   RepeatIcon,
 } from "@/components/ui/icons";
 import {
-  faqs,
+  faqsNow,
   goodToKnow,
   businessConfig,
   launchOffer,
@@ -157,7 +157,7 @@ export default function YourVisitPage() {
       <section className="mt-12">
         <h2 className="text-[26px] text-olive-dark">Frequently asked questions</h2>
         <div className="mt-5">
-          <FAQAccordion items={faqs} />
+          <FAQAccordion items={faqsNow()} />
         </div>
       </section>
 

@@ -5,6 +5,7 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { SectionHeading, Card, Button, Badge } from "@/components/ui/primitives";
 import { PromotionCard } from "@/components/ui/cards";
 import { PromoBanner } from "@/components/ui/PromoBanner";
+import { firstVisitPaused } from "@/config/promotions";
 import { RoutineLadder, PackagePicker, NextStep } from "@/components/ui/conversion";
 import { CalendarIcon, CheckIcon } from "@/components/ui/icons";
 import {
@@ -96,7 +97,12 @@ function PriceTile({
 const OTHER_PASSES = packages.filter((p) => p.id !== "five-for-four");
 
 export default function PricesPage() {
-  const { pricing, bookingStartLabel } = businessConfig;
+  const { pricing } = businessConfig;
+
+  /* The RM30 first visit is not promoted while the 11.11 voucher is on sale —
+     see firstVisitPaused(). The standing rates below stay exactly as they are;
+     only the introductory pitch pauses. */
+  const pauseFirstVisit = firstVisitPaused();
 
   return (
     <PublicShell>
@@ -116,6 +122,19 @@ export default function PricesPage() {
       </div>
 
       {/* ── Start here ──────────────────────────────────────────────────── */}
+      {pauseFirstVisit ? (
+        /* While the voucher runs, the cheapest way to try us IS the voucher.
+           Showing RM30 beside RM11 invites the obvious question and answers it
+           badly. The VoucherBanner above already carries the offer and its
+           terms, so this only needs to point at it. */
+        <section className="mt-8">
+          <SectionHeading
+            eyebrow="New here?"
+            title="Start with the 11.11 voucher"
+            subtitle="A 15-minute soak for RM11 — the cheapest way to try us while the offer runs. The standing rates below apply after it."
+          />
+        </section>
+      ) : (
       <section className="mt-8">
         <SectionHeading eyebrow="New here?" title="Your first visit" />
         {/* One price, so one card. Two tiles here used to contrast RM25
@@ -136,11 +155,12 @@ export default function PricesPage() {
               Pay online or at the door — the price is the same either way.
             </p>
             <Button href={reserveHref("first-soak")} full className="mt-5" icon={<CalendarIcon size={20} />}>
-              {ctaLabels.firstVisit}
+              {pauseFirstVisit ? ctaLabels.reserve : ctaLabels.firstVisit}
             </Button>
           </Card>
         </div>
       </section>
+      )}
 
       {/* ── The routine ladder ──────────────────────────────────────────── */}
       <section className="mt-12">
@@ -234,8 +254,12 @@ export default function PricesPage() {
           <PromotionCard
             highlight={`RM${pricing.firstVisit}`}
             title="No need to decide today"
-            description={`Come once, see how it feels, and think about a routine afterwards. Your first visit is RM${pricing.firstVisit} — online or at the door — instead of the usual RM${pricing.normal}.`}
-            terms={`${launchOfferNote} First visits from ${bookingStartLabel}. After the launch period a first visit is the usual RM${pricing.normal}.`}
+            description={
+              pauseFirstVisit
+                ? "Come once, see how it feels, and think about a routine afterwards. The 11.11 voucher is RM11 a soak while it runs."
+                : `Come once, see how it feels, and think about a routine afterwards. Your first visit is RM${pricing.firstVisit} — online or at the door — instead of the usual RM${pricing.normal}.`
+            }
+            terms={`${launchOfferNote} After the launch period a first visit is the usual RM${pricing.normal}.`}
           />
         </div>
       </section>
@@ -243,7 +267,7 @@ export default function PricesPage() {
       <NextStep
         title="Questions about anything?"
         body="Prices, packages, what to expect on the day — ask us whatever you like. Message us, or give us a call if you'd rather talk."
-        cta={ctaLabels.firstVisit}
+        cta={pauseFirstVisit ? ctaLabels.reserve : ctaLabels.firstVisit}
         href="/#reserve"
         secondary={{
           label: "Ask us on WhatsApp",

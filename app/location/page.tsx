@@ -33,7 +33,7 @@ const VISIT_INFO = [
 ];
 
 export default function FindUsPage() {
-  const { address, hours, callDisplay, bookingStartLabel } = businessConfig;
+  const { address, hours, callDisplay } = businessConfig;
 
   return (
     <PublicShell>
@@ -125,7 +125,7 @@ export default function FindUsPage() {
           </div>
           <p className="mt-3 text-[14px] text-muted">{hours.lastSoak}</p>
           <p className="mt-1 text-[14px] text-muted">
-            Booking is open — first visits from {bookingStartLabel}. Reserve now to lock the launch price.
+            Booking is open — reserve now to lock the launch price.
           </p>
         </Card>
       </div>

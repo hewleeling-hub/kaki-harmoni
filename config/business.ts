@@ -7,6 +7,7 @@
  * open after launch. Do not invent prices or availability.
  */
 
+import { firstVisitPaused } from "@/config/promotions";
 import {
   BUSINESS_WHATSAPP_NUMBER,
   BUSINESS_WHATSAPP_DISPLAY,
@@ -111,7 +112,7 @@ export const visitSteps = [
     title: "Pick your time",
     icon: "calendar",
     short: "Choose a slot that suits you.",
-    long: `Choose a time slot from the calendar — first visits are from ${businessConfig.bookingStartLabel}.`,
+    long: "Choose a time slot from the calendar that suits you.",
   },
   {
     number: 3,
@@ -221,7 +222,7 @@ export const packageValidityLabel = "6 months" as const;
 export const faqs = [
   {
     q: "When can I visit?",
-    a: `Booking is open now — first visits are from ${businessConfig.bookingStartLabel}. Share your details, pick a time slot, then pay to confirm it.`,
+    a: "Booking is open — share your details, pick a time slot, then pay to confirm it.",
   },
   {
     q: "How long is each session?",
@@ -251,7 +252,7 @@ export const faqs = [
   },
   {
     q: "Do I pick a time when I book?",
-    a: `Yes — you choose your slot from the calendar first, and it's confirmed once your payment goes through. The first available date is ${businessConfig.bookingStartLabel}.`,
+    a: "Yes — you choose your slot from the calendar first, and it's confirmed once your payment goes through.",
   },
   {
     q: "Can I just walk in?",
@@ -389,6 +390,8 @@ export const proposition = "Your 15-minute daily reset." as const;
 export const ctaLabels = {
   /** New visitor — the dominant acquisition CTA across the site. */
   firstVisit: `Try Your First Soak — RM${businessConfig.pricing.firstVisit}`,
+  /** Neutral ask, for when the first-visit price is paused by a running offer. */
+  reserve: "Reserve a soak",
   /** Same promise, short enough for the nav bar. */
   firstVisitShort: `First Soak — RM${businessConfig.pricing.firstVisit}`,
   /**
@@ -641,3 +644,29 @@ export const testimonials: readonly Testimonial[] = [];
 export const experienceVideo: { src: string | null; poster?: string; caption?: string } = {
   src: null,
 };
+
+
+/**
+ * The FAQ as it should read RIGHT NOW.
+ *
+ * `faqs` above is a module-level constant, evaluated once when the module is
+ * first imported. In production that happens at server start, so a date check
+ * written into it would freeze at whatever was true then and never flip when
+ * the offer closes. This is a function for that reason — call it per request.
+ *
+ * Only the price answer changes: while the 11.11 voucher is on sale the RM30
+ * first visit is not promoted (see firstVisitPaused), so the answer leads with
+ * the standing rates and the voucher instead of an introductory price the site
+ * is no longer offering anywhere else.
+ */
+export function faqsNow(now: Date = new Date()): readonly { q: string; a: string }[] {
+  if (!firstVisitPaused(now)) return faqs;
+  return faqs.map((item) =>
+    item.q === "How much is a visit?"
+      ? {
+          q: item.q,
+          a: `A single soak is RM${businessConfig.pricing.normal}, or less with a package: from RM${ladderPerVisit.entry} a visit on the 5-Day Reset down to RM${ladderPerVisit.cheapest} on the 30-Day Routine. While the 11.11 offer runs, a Foot Spa Voucher is RM11 a soak — buy by 11 November, redeem by 31 December.`,
+        }
+      : item,
+  );
+}

@@ -7,7 +7,7 @@ import { Button, Card, SectionHeading } from "@/components/ui/primitives";
 import { PromotionCard } from "@/components/ui/cards";
 import { PromoBanner } from "@/components/ui/PromoBanner";
 import { VoucherBanner } from "@/components/ui/VoucherBanner";
-import { activePromotion } from "@/config/promotions";
+import { activePromotion, firstVisitPaused } from "@/config/promotions";
 import { Lotti } from "@/components/ui/Lotti";
 import { ExperiencePreview } from "@/components/experiences/ExperiencePreview";
 import {
@@ -74,7 +74,7 @@ export default async function Home({
 }: {
   searchParams: Promise<{ option?: string }>;
 }) {
-  const { pricing, bookingStartLabel } = businessConfig;
+  const { pricing } = businessConfig;
 
   /* The chosen tier, lifted out of the form and into the section around it.
      A ladder CTA sends someone here with ?option=thirty-day-routine, and the
@@ -95,6 +95,11 @@ export default async function Home({
      that copy sits a long way down from the offer band, and on its day RM25 is
      not available at all. */
   const promo = activePromotion();
+
+  /* While the 11.11 voucher is on sale the RM30 first visit stops being
+     promoted: two "cheapest way to try us" prices on one page make the dearer
+     one look like an error. The product still works — this is copy only. */
+  const pauseFirstVisit = firstVisitPaused();
 
   return (
     <PublicShell>
@@ -144,17 +149,20 @@ export default async function Home({
               {/* The time limit rides inside the CTA itself — as a badge beside the
                   button it read as a separate offer sitting next to it. */}
               <span className="flex flex-col items-start leading-tight">
-                <span>{ctaLabels.firstVisit}</span>
-                <span className="mt-1 text-[12px] font-semibold uppercase tracking-wide opacity-80">
-                  {launchOfferBadge}
-                </span>
+                <span>{pauseFirstVisit ? ctaLabels.reserve : ctaLabels.firstVisit}</span>
+                {!pauseFirstVisit && (
+                  <span className="mt-1 text-[12px] font-semibold uppercase tracking-wide opacity-80">
+                    {launchOfferBadge}
+                  </span>
+                )}
               </span>
             </Button>
           </div>
-          <p className="mt-4 text-[15px] text-muted">
-            First visits from {bookingStartLabel}. RM{pricing.firstVisit} instead of the usual
-            RM{pricing.normal}, online or at the door.
-          </p>
+          {!pauseFirstVisit && (
+            <p className="mt-4 text-[15px] text-muted">
+              RM{pricing.firstVisit} instead of the usual RM{pricing.normal}, online or at the door.
+            </p>
+          )}
         </div>
 
         <div className="order-2 flex justify-center">
@@ -366,7 +374,7 @@ export default async function Home({
                   ) : (
                     <>
                       A warm 15-minute leg soak and a coffee. Reserve below, pick your time, then
-                      settle up — first visits from {bookingStartLabel}.
+                      settle up.
                     </>
                   )}
                 </p>
@@ -407,16 +415,26 @@ export default async function Home({
                   </p>
                 )}
                 <SectionHeading eyebrow="Start here" title={`Try your first soak — RM${pricing.firstVisit}`} />
-                <p className="mt-4 text-[18px] leading-relaxed text-muted">
-                  A warm 15-minute leg soak and a freshly made coffee — an easy way to find out
-                  whether fifteen minutes suits you. Your first visit is{" "}
-                  <strong className="text-olive-dark">RM{pricing.firstVisit}</strong> — the same
-                  online or at the door — instead of the usual RM{pricing.normal}. Reserve,
-                  pick your time, then pay to confirm — first visits from {bookingStartLabel}.
-                </p>
-                <p className="mt-2 text-[15px] text-muted">
-                  {launchOfferNote} After it ends, a first visit is the usual RM{pricing.normal}.
-                </p>
+                {pauseFirstVisit ? (
+                  <p className="mt-4 text-[18px] leading-relaxed text-muted">
+                    A warm 15-minute leg soak and a freshly made coffee — an easy way to find out
+                    whether fifteen minutes suits you. Reserve, pick your time, then pay to
+                    confirm. Holding an 11.11 voucher? Reserve here and bring it with you.
+                  </p>
+                ) : (
+                  <>
+                    <p className="mt-4 text-[18px] leading-relaxed text-muted">
+                      A warm 15-minute leg soak and a freshly made coffee — an easy way to find out
+                      whether fifteen minutes suits you. Your first visit is{" "}
+                      <strong className="text-olive-dark">RM{pricing.firstVisit}</strong> — the same
+                      online or at the door — instead of the usual RM{pricing.normal}. Reserve,
+                      pick your time, then pay to confirm.
+                    </p>
+                    <p className="mt-2 text-[15px] text-muted">
+                      {launchOfferNote} After it ends, a first visit is the usual RM{pricing.normal}.
+                    </p>
+                  </>
+                )}
                 <ul className="mt-5 space-y-2 text-[16px] text-brown">
                   {["No account needed", "Pick your visit time from the calendar", "Pay online or at the door"].map((t) => (
                     <li key={t} className="flex items-center gap-2">
@@ -459,12 +477,21 @@ export default async function Home({
         </div>
 
         <div className="mx-auto mt-8 max-w-3xl">
-          <PromotionCard
-            highlight={`RM${pricing.firstVisit}`}
-            title="Start with a single soak"
-            description={`There's no need to commit to anything today. Come once for RM${pricing.firstVisit} — pay online or at the door, it's the same price — see how it feels, and decide about a routine afterwards.`}
-            terms={`${launchOfferNote} First visits from ${bookingStartLabel}. After the launch period a first visit is the usual RM${pricing.normal}.`}
-          />
+          {pauseFirstVisit ? (
+            <PromotionCard
+              highlight="RM11"
+              title="Or just try a soak first"
+              description="There's no need to commit to a routine today. The 11.11 voucher is a 15-minute soak for RM11 — see how it feels, and decide afterwards."
+              terms="Buy by 11 November 2026, two per person, redeem by 31 December 2026."
+            />
+          ) : (
+            <PromotionCard
+              highlight={`RM${pricing.firstVisit}`}
+              title="Start with a single soak"
+              description={`There's no need to commit to anything today. Come once for RM${pricing.firstVisit} — pay online or at the door, it's the same price — see how it feels, and decide about a routine afterwards.`}
+              terms={`${launchOfferNote} After the launch period a first visit is the usual RM${pricing.normal}.`}
+            />
+          )}
         </div>
       </section>
 
@@ -528,7 +555,7 @@ export default async function Home({
               </p>
               <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
                 <Button href="#reserve" size="lg" icon={<CalendarIcon size={22} />}>
-                  {ctaLabels.firstVisit}
+                  {pauseFirstVisit ? ctaLabels.reserve : ctaLabels.firstVisit}
                 </Button>
                 <Button
                   href={whatsappLink("Hi Kaki Harmoni! I'd like to ask about a visit.")}

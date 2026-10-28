@@ -3,6 +3,7 @@ import Image from "next/image";
 import { PublicShell } from "@/components/layout/PublicShell";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { ctaLabels } from "@/config/business";
+import { firstVisitPaused } from "@/config/promotions";
 import { Card, Button } from "@/components/ui/primitives";
 import {
   WavesIcon,
@@ -146,7 +147,7 @@ export default function OurSpaPage() {
         </p>
         <div className="mt-1 flex flex-col gap-3 sm:flex-row">
           <Button href="/#reserve" size="lg" icon={<CalendarIcon size={22} />}>
-            {ctaLabels.firstVisit}
+            {firstVisitPaused() ? ctaLabels.reserve : ctaLabels.firstVisit}
           </Button>
           <Button href="/experiences" variant="secondary" size="lg" iconRight={<ArrowRightIcon size={20} />}>
             See the Experiences

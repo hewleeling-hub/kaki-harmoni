@@ -256,3 +256,21 @@ export function voucherNavCta(
     href: "/#voucher",
   };
 }
+
+/**
+ * Whether the standing first-visit offer should be PAUSED in customer-facing
+ * copy, because a voucher sale is running.
+ *
+ * The RM30 introductory price and an RM11 voucher are both "the cheap way to
+ * try us", and shown together the cheaper one makes the dearer one look like
+ * a mistake. For the length of the sale the site stops promoting RM30 and
+ * leads with the offer instead.
+ *
+ * This pauses the PROMOTION of it, not the product: the catalogue row, the
+ * booking flow and the once-per-person rule in /api/purchases are untouched,
+ * so a first visit still prices correctly for anyone who books one. It comes
+ * back on its own when the window closes.
+ */
+export function firstVisitPaused(now: Date = new Date()): boolean {
+  return activeVoucherOffer(now) !== null;
+}

@@ -5,7 +5,8 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { FAQAccordion } from "@/components/ui/FAQAccordion";
 import { Button } from "@/components/ui/primitives";
 import { MessageIcon, CalendarIcon } from "@/components/ui/icons";
-import { faqs, whatsappLink, ctaLabels } from "@/config/business";
+import { faqsNow, whatsappLink, ctaLabels } from "@/config/business";
+import { firstVisitPaused } from "@/config/promotions";
 
 export const metadata: Metadata = pageMetadata({
   title: "FAQ — Kaki Harmoni",
@@ -23,7 +24,7 @@ export default function FaqPage() {
       />
 
       <section className="mt-8">
-        <FAQAccordion items={faqs} />
+        <FAQAccordion items={faqsNow()} />
       </section>
 
       <section className="mt-10 flex flex-col items-center gap-3 rounded-[24px] border border-line bg-beige/50 p-8 text-center">
@@ -38,7 +39,7 @@ export default function FaqPage() {
             WhatsApp Us
           </Button>
           <Button href="/#reserve" variant="secondary" size="lg" icon={<CalendarIcon size={22} />}>
-            {ctaLabels.firstVisit}
+            {firstVisitPaused() ? ctaLabels.reserve : ctaLabels.firstVisit}
           </Button>
         </div>
       </section>
