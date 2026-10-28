@@ -16,7 +16,7 @@ import { Wordmark } from "./Wordmark";
  *
  * null means nothing is on sale: the nav sells the standing first visit.
  */
-export type VoucherCta = { full: string; short: string; tab: string; href: string } | null;
+export type VoucherCta = { full: string; short: string; href: string } | null;
 
 function useIsActive() {
   const pathname = usePathname();
@@ -292,16 +292,25 @@ export function MobileBottomNav({ voucher = null }: { voucher?: VoucherCta }) {
 
           {/* The point of the whole bar. Filled rather than another outline
               tab, and given twice the width, because a booking is what this
-              strip of screen is for — the rest is navigation that can wait. */}
+              strip of screen is for — the rest is navigation that can wait.
+
+              This tab keeps leading to a BOOKING even while an offer runs, and
+              it is the only thing in the persistent chrome that does: the
+              desktop pill, the header button and the drawer all carry the
+              offer, so pointing this here too left a visitor on any page but
+              the homepage with no way to book at all. During the offer it
+              drops the price rather than the destination — RM30 competing
+              with RM11 in the same strip of screen is what we were getting
+              away from. */}
           <li className="flex-[2]">
             <Link
-              href={voucher ? voucher.href : "/#reserve"}
+              href="/#reserve"
               className={`${tab} bg-olive px-2 text-ivory shadow-[var(--shadow-warm)]`}
             >
               <span className="flex h-8 items-center justify-center">
                 <CalendarIcon size={22} />
               </span>
-              {voucher ? voucher.tab : `Reserve · RM${businessConfig.pricing.firstVisit}`}
+              {voucher ? "Reserve a soak" : `Reserve · RM${businessConfig.pricing.firstVisit}`}
             </Link>
           </li>
         </ul>

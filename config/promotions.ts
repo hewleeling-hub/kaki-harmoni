@@ -247,13 +247,12 @@ export function daysLeftToBuy(offer: VoucherOffer, now: Date = new Date()): numb
  */
 export function voucherNavCta(
   now: Date = new Date(),
-): { full: string; short: string; tab: string; href: string } | null {
+): { full: string; short: string; href: string } | null {
   const offer = activeVoucherOffer(now);
   if (!offer) return null;
   return {
     full: `11.11 Voucher — ${offer.price}`,
     short: `${offer.price} Voucher`,
-    tab: `11.11 · ${offer.price}`,
     href: "/#voucher",
   };
 }
