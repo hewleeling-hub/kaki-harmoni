@@ -73,8 +73,19 @@ export const businessConfig = {
   hours: {
     label: "Open daily",
     display: "Mon–Fri 10:00am – 6:00pm · Sat–Sun 10:00am – 4:00pm",
-    lastSoak: "Last soak begins at 5:30pm on weekdays, 3:30pm at weekends.",
+    lastSoak:
+      "First soak begins at 10:30am. Last soak begins at 5:30pm on weekdays, 3:30pm at weekends.",
     openHour: 10,
+    /**
+     * Minutes past openHour before the FIRST soak can start.
+     *
+     * The shop opens at 10:00; the first bookable soak is 10:30, which is the
+     * setting-up half hour. Separate from openHour on purpose — the door time
+     * is what the JSON-LD and the "open daily" copy should say, and a guest
+     * arriving at 10:05 is not arriving early. Collapsing the two would move
+     * the advertised opening time to suit the booking grid.
+     */
+    firstSlotMinute: 30,
     /** Exclusive, and slots run every 30 minutes: 18 makes 17:30 the last one. */
     closeHourWeekday: 18,
     /** Exclusive: 16 makes 15:30 the last weekend slot. */

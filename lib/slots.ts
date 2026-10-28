@@ -11,6 +11,7 @@ import { businessConfig } from "@/config/business";
  */
 export const BUSINESS_HOURS = {
   openHour: businessConfig.hours.openHour,
+  firstSlotMinute: businessConfig.hours.firstSlotMinute,
   closeHourWeekday: businessConfig.hours.closeHourWeekday,
   closeHourWeekend: businessConfig.hours.closeHourWeekend,
 };
@@ -145,8 +146,16 @@ export function remainingFor(
 export function generateSlotsForDay(dateISO: string): string[] {
   const closeHour = closeHourForDate(dateISO);
   const slots: string[] = [];
+  /* The first soak is later than the door: the shop opens on the hour and the
+     first bookable slot is firstSlotMinute past it. Expressed as a minutes
+     floor rather than by starting the loop half an hour in, so that a later
+     change to the interval or the opening minute cannot silently reinstate a
+     slot before the shop is ready. */
+  const firstSlotMinutes = BUSINESS_HOURS.openHour * 60 + BUSINESS_HOURS.firstSlotMinute;
+
   for (let h = BUSINESS_HOURS.openHour; h < closeHour; h++) {
     for (let m = 0; m < 60; m += SLOT_INTERVAL_MINUTES) {
+      if (h * 60 + m < firstSlotMinutes) continue;
       slots.push(`${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`);
     }
   }
