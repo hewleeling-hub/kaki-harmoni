@@ -14,7 +14,7 @@ import {
 import { promotionForBookingDate, isPromotionProduct } from "@/config/promotions";
 
 // Legacy default used when no items are sent or the catalogue isn't available yet.
-const DEFAULT_ITEM_NAME = "First Visit — Foot Soak + Coffee";
+const DEFAULT_ITEM_NAME = "First Visit — Foot Soak";
 const DEFAULT_ITEM_PRICE_MYR = 25.0;
 
 type ResolvedLine = {

@@ -6,7 +6,6 @@ import {
   routinePackagesNow,
   perVisitPrice,
   packageValidityLabel,
-  coffeeIncludedNote,
   packagePicker,
   whyNotAtHome,
   testimonials,
@@ -70,13 +69,6 @@ function RoutineCard({ pkg }: { pkg: RoutinePackage }) {
             <p className="mt-1 text-[13px] font-medium uppercase tracking-wide text-muted">
               Valid {packageValidityLabel}
             </p>
-          )}
-          {/* On EVERY rung, including the single first soak. A guest fed back
-              that they couldn't tell whether coffee came with a soak, and this
-              is the surface where they were deciding what a price buys — the
-              coffee was named in the prose everywhere except here. */}
-          {!pkg.noCoffee && (
-            <p className="mt-1 text-[13px] text-brown">{coffeeIncludedNote}</p>
           )}
         </>
       ) : (

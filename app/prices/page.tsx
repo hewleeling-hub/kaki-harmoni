@@ -200,7 +200,7 @@ export default function PricesPage() {
             <p className="mt-1 text-[15px] text-muted line-through">Usually RM{pricing.normal}</p>
             <p className="mt-1 text-[14px] font-semibold text-olive">{launchOfferShort}</p>
             <p className="mt-3 text-[16px] leading-relaxed text-muted">
-              A warm 15-minute leg soak and a coffee — an easy way to see whether it suits you.
+              A warm 15-minute leg soak — an easy way to see whether it suits you.
             </p>
             <p className="mt-2 text-[15px] text-brown">
               Pay online or at the door — the price is the same either way.
@@ -302,8 +302,6 @@ export default function PricesPage() {
           <ul className="grid gap-3 sm:grid-cols-2">
             {[
               "A warm 15-minute leg soak",
-              // Coffee only — tea isn't stocked. See the drinks note in the FAQ.
-              "A freshly made coffee",
               "A comfortable place to rest",
               "Time to relax and reconnect",
             ].map((item) => (

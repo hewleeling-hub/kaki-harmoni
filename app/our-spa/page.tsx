@@ -125,7 +125,7 @@ export default function OurSpaPage() {
               "Thousands of soft bubbles, not still water",
               "Warmth that stays gentle and even",
               "Fresh, clean water each time",
-              "A calm place to switch off — with a coffee before or after",
+              "A calm place to switch off, with a café beside you",
             ].map((item) => (
               <li key={item} className="flex items-start gap-2.5 text-[15.5px] text-olive-dark">
                 <CheckIcon size={18} className="mt-0.5 shrink-0 text-success" />

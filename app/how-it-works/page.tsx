@@ -64,7 +64,7 @@ export default function YourVisitPage() {
           {/* The mascot used to sit beside this line. Without her the flex row
               has nothing to align, so it is back to a plain paragraph. */}
           <p className="mt-6 text-[16px] leading-relaxed text-brown">
-            Fifteen minutes, a warm soak and a good coffee.
+            Fifteen minutes and a warm soak.
             <br className="hidden sm:block" /> That&rsquo;s the whole thing.
           </p>
         </div>

@@ -41,7 +41,6 @@ import {
   launchOfferBadge,
   offerForSlug,
   packageValidityLabel,
-  coffeeIncludedNote,
 } from "@/config/business";
 import { isCatalogueSlug, isOnSale } from "@/config/catalogue";
 
@@ -135,8 +134,8 @@ export default async function Home({
             <span className="text-olive">daily reset.</span>
           </h1>
           <p className="mt-5 max-w-md text-[18px] leading-relaxed text-muted">
-            A warm leg soak, a good coffee and a comfortable place to sit — all in
-            fifteen minutes. Easy enough to fit into your day, every day.
+            A warm leg soak and a comfortable place to sit, with a café beside you —
+            all in fifteen minutes. Easy enough to fit into your day, every day.
           </p>
           {/* One CTA only. "Build Your Routine" asked a first-time visitor to
               choose a multi-visit package before they knew what a soak here is
@@ -252,14 +251,14 @@ export default async function Home({
               <ClockIcon size={24} className="mt-1 shrink-0 text-olive" />
               <p className="text-[17px] leading-relaxed text-brown">
                 <strong className="text-olive-dark">Want longer? Stay for two soaks.</strong> Go back to
-                back, or one either side of a coffee — our{" "}
+                back, or one either side of a break — our{" "}
                 <Link
                   href="/prices#longer"
                   className="font-semibold text-olive underline underline-offset-4 hover:text-olive-dark"
                 >
                   {doubleSoak.name}
                 </Link>{" "}
-                is two soaks with a bun &amp; coffee on us, RM{doubleSoak.price}.
+                is two soaks with a bun and a coffee in the price, RM{doubleSoak.price}.
               </p>
             </div>
           </div>
@@ -315,7 +314,7 @@ export default async function Home({
           center
           eyebrow="More than warm water"
           title="Why Kaki Harmoni instead of doing it at home?"
-          subtitle="It's the whole fifteen minutes — the water, the warmth, the coffee and the company."
+          subtitle="It's the whole fifteen minutes — the water, the warmth, the comfort and the company."
         />
         <WhyNotAtHome className="mx-auto mt-8 max-w-4xl" />
       </section>
@@ -373,7 +372,7 @@ export default async function Home({
                     </>
                   ) : (
                     <>
-                      A warm 15-minute leg soak and a coffee. Reserve below, pick your time, then
+                      A warm 15-minute leg soak. Reserve below, pick your time, then
                       settle up.
                     </>
                   )}
@@ -382,7 +381,6 @@ export default async function Home({
                   {[
                     "No account needed",
                     "Pick your visit time from the calendar",
-                    coffeeIncludedNote,
                     chosen.visits > 1
                       ? `Set up and paid for at the shop — valid ${packageValidityLabel}`
                       : "Pay online or at the door",
@@ -434,7 +432,7 @@ export default async function Home({
                      time here. */
                   <>
                     <p className="mt-4 text-[18px] leading-relaxed text-muted">
-                      A warm 15-minute leg soak and a freshly made coffee for{" "}
+                      A warm 15-minute leg soak for{" "}
                       <strong className="text-olive-dark">RM11</strong> with an 11.11 voucher —
                       an easy way to find out whether fifteen minutes suits you.
                     </p>

@@ -125,8 +125,8 @@ export const visitSteps = [
     number: 4,
     title: "Relax and reconnect",
     icon: "heart",
-    short: "Enjoy a warm 15-minute soak and a coffee.",
-    long: "Come in for a warm 15-minute leg soak, a good coffee and a friendly chat.",
+    short: "Enjoy a warm 15-minute soak and a friendly chat.",
+    long: "Come in for a warm 15-minute leg soak, a comfortable seat and a friendly chat. Coffee and other drinks are available to buy from the café.",
   },
 ] as const;
 
@@ -160,10 +160,13 @@ export const referralOptions = [
  * basin at home, and it was being left out of the pitch at the moment of the
  * decision.
  *
- * One string, so the day a package stops including it there is one place to
- * change and no stale promise left behind on a card somewhere.
+ * KEPT AS AN EMPTY CONCEPT ON PURPOSE — see git history. Coffee is NOT
+ * included with a soak at any price; it is sold separately at the café. The
+ * note that used to say otherwise appeared on every rung of the ladder, which
+ * made it the single most-repeated untrue line on the site once that changed.
+ * Removed rather than reworded: a price that includes nothing extra needs no
+ * line explaining what it includes.
  */
-export const coffeeIncludedNote = "Freshly made coffee included" as const;
 
 /** “Good to know before you visit” — no medical claims. */
 export const goodToKnow = [
@@ -193,7 +196,7 @@ export const doubleSoak = {
   price: 68,
   /** Derived: RM68 for two soaks. Kept out of `detail`, which is reused as prose. */
   perSession: 34,
-  detail: "Two soaks, with a bun & coffee on us.",
+  detail: "Two soaks, with a bun and a coffee included in the price.",
   /** RM68 against two standard singles at RM40. */
   save: 12,
 } as const;
@@ -226,7 +229,7 @@ export const faqs = [
   },
   {
     q: "How long is each session?",
-    a: `Each warm leg soak lasts about 15 minutes — a simple break that fits into your day. Fancy a longer unwind? You're very welcome to go back to back: many guests enjoy a second soak straight after, or one either side of a coffee break. Our ${doubleSoak.name} is built for exactly that — two soaks, with a bun & coffee on us.`,
+    a: `Each warm leg soak lasts about 15 minutes — a simple break that fits into your day. Fancy a longer unwind? You're very welcome to go back to back: many guests enjoy a second soak straight after, or one either side of a coffee break. Our ${doubleSoak.name} is built for exactly that — two soaks, with a bun and a coffee included in the price.`,
   },
   {
     q: "How often should I come?",
@@ -302,7 +305,7 @@ export const faqs = [
   },
   {
     q: "Is coffee included?",
-    a: "Yes — a freshly made coffee is part of your visit, to enjoy before or after your soak (not during, so everything stays clean and hygienic).",
+    a: "No — the price covers your soak. Our café is right there, so you're very welcome to buy a coffee or another drink to enjoy before or after (not during, so everything stays clean and hygienic).",
   },
   {
     /* DRINKS: coffee is the one drink guaranteed with a visit, and the only one
@@ -313,7 +316,7 @@ export const faqs = [
        would have found out at the counter. Name a specific drink here only if
        it is always in stock. */
     q: "I don't drink coffee — is there something else?",
-    a: "Yes — coffee is what comes with your visit, but we keep other drinks too. What's on changes from day to day, so just ask our team when you arrive and they'll tell you what we have. You're very welcome either way: the soak is the point, and nobody has to drink anything.",
+    a: "Yes — we keep other drinks besides coffee. What's on changes from day to day, so just ask our team when you arrive and they'll tell you what we have. Nobody has to buy anything: the soak is the point.",
   },
 ] as const;
 
@@ -328,7 +331,7 @@ export const sessionRates = [
     name: "Standard single",
     slug: "single-soak",
     price: 40,
-    detail: "Anytime · per soak, coffee included",
+    detail: "Anytime · per soak",
   },
 ] as const;
 
@@ -486,15 +489,6 @@ export interface RoutinePackage {
   featured?: boolean;
   /** Carries the launch-offer badge — the price is time-limited, not standing. */
   limitedTime?: boolean;
-  /**
-   * Suppresses the "coffee included" line for a rung where it is not true.
-   *
-   * A coffee comes with every standing soak, which is why the ladder says so
-   * on every rung. The 11.11 voucher is the exception: the poster promises a
-   * foot spa session and nothing else, so claiming a drink with it would be
-   * promising at RM11 what the offer does not cover.
-   */
-  noCoffee?: boolean;
 }
 
 export const routinePackages: readonly RoutinePackage[] = [
@@ -596,7 +590,7 @@ export const whyNotAtHome = [
   { title: "Gentle bubbles and warmth", text: "A hydrosonic soak held at a comfortable temperature the whole 15 minutes." },
   { title: "Oils and mineral salts", text: "Chosen blends of essential oils and salts — not something you'd keep at home." },
   { title: "Four experiences to pick from", text: "Choose the mood that suits your day, and change it whenever you like." },
-  { title: "A proper coffee", text: "Freshly made, waiting for you before or after your soak." },
+  { title: "A proper coffee on hand", text: "A café right beside you — buy one before or after your soak, with nothing to wash up." },
   { title: "Company, if you want it", text: "Comfy chairs and someone to chat to — or a quiet corner if you'd rather not." },
   { title: "Nothing to clean up", text: "No buckets, no towels, no mopping the floor afterwards." },
   { title: "Fifteen minutes that are yours", text: "Away from the kitchen, the laundry and the to-do list." },
@@ -706,7 +700,6 @@ export function routinePackagesNow(now: Date = new Date()): readonly RoutinePack
           cta: "GET A VOUCHER",
           href: "/#voucher",
           limitedTime: true,
-          noCoffee: true,
         }
       : rung,
   );

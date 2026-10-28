@@ -29,7 +29,7 @@ export function draftFollowup(input: DraftFollowupInput): string {
 
   // Already converted but hasn't picked a slot yet.
   if (input.status === "converted" && !input.has_booking) {
-    return `Hi ${who}! Thanks for grabbing the RM${first} first-visit foot soak + coffee at Kaki Harmoni. You haven't picked a time yet — want me to save you a slot this week? Just let me know what suits you.`;
+    return `Hi ${who}! Thanks for grabbing the RM${first} first-visit foot soak at Kaki Harmoni. You haven't picked a time yet — want me to save you a slot this week? Just let me know what suits you.`;
   }
 
   // Converted, booked, but payment still pending.
@@ -39,11 +39,11 @@ export function draftFollowup(input: DraftFollowupInput): string {
 
   // Hot lead who signed up but hasn't purchased.
   if ((input.lead_score ?? 0) >= 70) {
-    return `Hi ${who}! It's Kaki Harmoni. We saved your spot for the RM${first} first-visit foot soak + coffee (usually RM${usual}). It's a lovely 15 minutes to reset — want me to hold a time for you this week?`;
+    return `Hi ${who}! It's Kaki Harmoni. We saved your spot for the RM${first} first-visit foot soak (usually RM${usual}). It's a lovely 15 minutes to reset — want me to hold a time for you this week?`;
   }
 
   // Default nudge for a signed-up-but-not-converted lead.
-  return `Hi ${who}! This is Kaki Harmoni — just checking in on your RM${first} first-visit foot soak + coffee. No rush at all, but we'd love to have you. Want us to save you a slot this week?`;
+  return `Hi ${who}! This is Kaki Harmoni — just checking in on your RM${first} first-visit foot soak. No rush at all, but we'd love to have you. Want us to save you a slot this week?`;
 }
 
 // Win-back draft for a lapsed customer (Sprint 8). Warm, in Lotti's voice.
