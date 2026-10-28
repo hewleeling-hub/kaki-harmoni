@@ -180,28 +180,6 @@ export const goodToKnow = [
 
 /** FAQ content — editable here, rendered by the accordion. */
 /**
- * Two soaks back to back. A 15-minute soak is the unit that makes a daily habit
- * easy — it is NOT a cap, and guests who want a longer sit simply stay for a
- * second. Named to sit beside the 5-Day and 10-Day Resets, and worded so it
- * covers one person going twice as well as two people going once.
- *
- * Declared up here, above `faqs`, because the FAQ copy interpolates the name:
- * it had already drifted to a stale "Double + bun & coffee" once.
- */
-export const doubleSoak = {
-  id: "double-bun-coffee",
-  /** Sellable catalogue entry this card buys. */
-  slug: "double-reset",
-  name: "Double Reset",
-  price: 68,
-  /** Derived: RM68 for two soaks. Kept out of `detail`, which is reused as prose. */
-  perSession: 34,
-  detail: "Two soaks, with a bun and a coffee included in the price.",
-  /** RM68 against two standard singles at RM40. */
-  save: 12,
-} as const;
-
-/**
  * Ladder prices, hoisted above `faqs` because the FAQ quotes the per-visit range
  * and `routinePackages` (declared further down) sets the cards. One source, so
  * the two can't drift — the FAQ has already carried stale copy once.
@@ -346,13 +324,9 @@ export interface PackageOffer {
 }
 
 /*
- * WITHDRAWN: the Double Reset is not listed. It was never sold — no order_item
- * has ever referenced it — so nothing is orphaned by taking it off the menu,
- * and its product row is set inactive, which /api/purchases enforces.
- *
- * `doubleSoak` above, its catalogue slug and the two-machine capacity handling
- * in lib/slots.ts are all left in place, because the business may offer it
- * again. Putting it back is this one line and flipping the row active.
+ * The Double Reset was removed entirely — definition, catalogue slug and
+ * product row — after it was confirmed never to have sold. `packages` is the
+ * list of passes beside the routine ladder; it currently holds one.
  */
 export const packages: readonly PackageOffer[] = [
   { id: "five-for-four", slug: "five-day-reset", name: "Buy 4, get 1 free", price: ladderPrices.fiveVisit, detail: "5 soaks for the price of 4.", save: 40 },
@@ -557,9 +531,6 @@ export function offerForSlug(
   const rung = routinePackages.find((p) => p.slug === slug);
   if (rung && rung.price !== null) {
     return { name: rung.name, price: rung.price, visits: rung.visits };
-  }
-  if (slug === "double-reset") {
-    return { name: doubleSoak.name, price: doubleSoak.price, visits: 2 };
   }
   if (slug === "single-soak") {
     return { name: sessionRates[0].name, price: sessionRates[0].price, visits: 1 };

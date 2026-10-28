@@ -17,7 +17,6 @@
 export const CATALOGUE_PRODUCT_IDS = {
   "first-soak": "c0000000-0000-0000-0000-000000000001",
   "single-soak": "c0000000-0000-0000-0000-000000000002",
-  "double-reset": "c0000000-0000-0000-0000-000000000006",
   "five-day-reset": "c0000000-0000-0000-0000-000000000005",
   "ten-day-reset": "c0000000-0000-0000-0000-000000000007",
   "thirty-day-routine": "c0000000-0000-0000-0000-000000000008",
@@ -28,19 +27,23 @@ export type CatalogueSlug = keyof typeof CATALOGUE_PRODUCT_IDS;
 /**
  * How many soaks one unit of this product uses IN A SINGLE VISIT.
  *
- * Double Reset is "two soaks back to back", which is one appointment, not two
- * bookings — and it cannot be one machine used twice, because a machine has to
- * stand for 30 minutes between runs. So it occupies a second machine starting
- * as the first soak ends, and a Double Reset takes two of the four.
+ * EMPTY TODAY, and kept rather than deleted. Its only entry was the Double
+ * Reset, which has been withdrawn; everything now on sale uses one machine, so
+ * soaksForProductId() falls through to 1 for all of them and the capacity
+ * check behaves exactly as it did.
  *
- * The multi-visit packages are NOT here. A 5-Day Reset is five separate
+ * The mechanism is what is worth keeping. "Two soaks back to back" is one
+ * appointment, not two bookings, and it cannot be one machine used twice —
+ * a machine has to stand for 30 minutes between runs — so it occupies a
+ * second machine starting as the first soak ends. Any future product that
+ * does that belongs here, or it will be sold into a slot that cannot hold it.
+ *
+ * The multi-visit packages do NOT belong here. A 5-Day Reset is five separate
  * appointments on five separate days; booking it holds one slot for the first
  * of them, so it uses one machine like any other single visit. Putting 5 here
  * would block the whole shop for one customer.
  */
-const SOAKS_PER_UNIT: Partial<Record<CatalogueSlug, number>> = {
-  "double-reset": 2,
-};
+const SOAKS_PER_UNIT: Partial<Record<CatalogueSlug, number>> = {};
 
 // Typed as plain strings on the key side: product ids arrive from the database
 // and from request bodies, not as the literal union this object infers.
@@ -111,7 +114,6 @@ export const PACKAGES_ARE_DOOR_ONLY = true;
 
 /** The slugs gated by PACKAGES_ON_SALE. Singles are always sellable. */
 const PACKAGE_SLUGS: CatalogueSlug[] = [
-  "double-reset",
   "five-day-reset",
   "ten-day-reset",
   "thirty-day-routine",
