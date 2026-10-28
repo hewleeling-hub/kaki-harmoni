@@ -111,9 +111,6 @@ function VoucherBand({
         <VoucherClaimForm offer={offer} />
       </div>
 
-      <p className="mt-3 text-[15px] leading-relaxed text-brown">
-        Rather do it in person? Ask at the counter next time you&rsquo;re in.
-      </p>
     </section>
   );
 }

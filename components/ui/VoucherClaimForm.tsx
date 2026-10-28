@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { whatsappLink } from "@/config/business";
+import { PAYMENT_QR } from "@/lib/config";
 import type { VoucherOffer } from "@/config/promotions";
 
 /**
@@ -20,6 +21,8 @@ type Result = {
   held: number;
   remaining: number;
   redeem_by: string;
+  reference: string;
+  amount_myr: number;
 };
 
 export function VoucherClaimForm({ offer }: { offer: VoucherOffer }) {
@@ -54,31 +57,52 @@ export function VoucherClaimForm({ offer }: { offer: VoucherOffer }) {
   }
 
   if (done) {
+    const amount = `RM${done.amount_myr}`;
     return (
       <div className="rounded-[18px] border border-olive/30 bg-ivory/80 p-5">
         <p className="text-[18px] font-semibold text-olive-dark">
-          {done.claimed === 1 ? "One voucher is yours" : `${done.claimed} vouchers are yours`} — RM
-          {11 * done.claimed} in total.
+          {done.claimed === 1 ? "One voucher reserved" : `${done.claimed} vouchers reserved`} — {amount} to pay.
         </p>
-        <p className="mt-2 text-[16px] leading-relaxed text-brown">
-          We&rsquo;ve put {done.claimed === 1 ? "it" : "them"} against your number. Settle up on
-          WhatsApp or at the counter, and soak any time before {done.redeem_by}.
+        <p className="mt-1 text-[15px] text-muted">
+          Reference <span className="font-semibold text-brown">{done.reference}</span> — quote it if
+          you message us.
         </p>
-        {done.remaining > 0 && (
-          <p className="mt-2 text-[15px] text-muted">
-            You can still take {done.remaining} more on this number.
+
+        {/* Paying is the step that actually completes this, so the QR is shown
+            here rather than linked to: a customer who has to go and find it
+            is a customer who pays later, or not at all. Same DuitNow code the
+            booking flow uses. */}
+        <div className="mt-4 rounded-[14px] bg-cream/60 p-4 text-center">
+          <p className="text-[16px] font-semibold text-olive-dark">Scan to pay {amount} · DuitNow</p>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={PAYMENT_QR}
+            alt={`DuitNow QR code to pay ${amount} to Kaki Harmoni`}
+            className="mx-auto mt-3 w-52 rounded-[12px] bg-white"
+          />
+          <p className="mt-3 text-[15px] leading-relaxed text-brown">
+            Open any bank or e-wallet app, scan, and pay {amount}.
           </p>
-        )}
+        </div>
+
         <a
           href={whatsappLink(
-            `Hi Kaki Harmoni! I've reserved ${done.claimed} 11.11 Foot Spa Voucher${done.claimed === 1 ? "" : "s"} (${name}, ${phone}). How would you like me to pay?`,
+            `Hi Kaki Harmoni! I've paid ${amount} for ${done.claimed} 11.11 Foot Spa Voucher${done.claimed === 1 ? "" : "s"}. Reference ${done.reference} (${name}, ${phone}).`,
           )}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-4 inline-flex min-h-12 items-center justify-center rounded-[26px] bg-[#7a5410] px-6 text-[17px] font-semibold text-[#FBEFD6] transition hover:brightness-110"
+          className="mt-4 inline-flex min-h-12 w-full items-center justify-center rounded-[26px] bg-[#25D366] px-6 text-[17px] font-semibold text-white transition hover:brightness-95"
         >
-          Pay on WhatsApp
+          I&rsquo;ve paid — tell us
         </a>
+
+        <p className="mt-3 text-[15px] leading-relaxed text-brown">
+          We&rsquo;ll confirm once it lands. Then soak any time before {done.redeem_by}.
+          {done.remaining > 0 && ` You can still take ${done.remaining} more on this number.`}
+        </p>
+        <p className="mt-2 text-[14px] text-muted">
+          Rather pay in person? Just mention your name at the counter.
+        </p>
       </div>
     );
   }
@@ -148,7 +172,8 @@ export function VoucherClaimForm({ offer }: { offer: VoucherOffer }) {
         {busy ? "Just a moment…" : `Reserve for RM${11 * quantity}`}
       </button>
       <p className="mt-2 text-[14px] leading-relaxed text-muted">
-        No payment now — settle on WhatsApp or at the counter.
+        Reserve here and pay by QR on the next step — or just ask at the counter next time
+        you&rsquo;re in.
       </p>
     </form>
   );

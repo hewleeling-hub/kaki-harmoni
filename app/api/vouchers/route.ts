@@ -171,6 +171,11 @@ export async function POST(request: NextRequest) {
       max: after.max,
       expires_on: offer.redeemByISO,
       redeem_by: offer.redeemByLabel,
+      /* Something short the customer can quote and staff can match a DuitNow
+         transfer against — the same first-eight-of-the-uuid shape the booking
+         reference already uses, so the counter reads one kind of reference. */
+      reference: String(vouchers[0].id).slice(0, 8).toUpperCase(),
+      amount_myr: Number(product.price_myr) * vouchers.length,
     },
     { status: 201 },
   );
