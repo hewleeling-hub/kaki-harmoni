@@ -11,7 +11,7 @@ import {
   PACKAGES_ARE_DOOR_ONLY,
   soaksForProductId,
 } from "@/config/catalogue";
-import { promotionForBookingDate, isPromotionProduct } from "@/config/promotions";
+import { promotionForBookingDate, isPromotionProduct, isVoucherProduct } from "@/config/promotions";
 
 // Legacy default used when no items are sent or the catalogue isn't available yet.
 const DEFAULT_ITEM_NAME = "First Visit — Foot Soak";
@@ -202,6 +202,16 @@ export async function POST(request: NextRequest) {
         error: `On ${bookingPromo.dateISO === "2026-09-16" ? "Malaysia Day" : "that day"} we're serving the ${bookingPromo.title} only — ${bookingPromo.price}, soak, any drink and a slice of cake. Please reload and pick it, or choose another date.`,
         promotion_only: true,
       },
+      { status: 409 },
+    );
+  }
+
+  // Same rule server-side: a voucher is not a bookable line. The checkout
+  // hides it; this is what stops a hand-built request buying a capped price
+  // without going through the cap.
+  if (isVoucherProduct(mainLine?.product_id)) {
+    return NextResponse.json(
+      { error: "That voucher is bought from the 11.11 offer, not booked here. Please pick a soak." },
       { status: 409 },
     );
   }

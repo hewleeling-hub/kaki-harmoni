@@ -274,3 +274,22 @@ export function voucherNavCta(
 export function firstVisitPaused(now: Date = new Date()): boolean {
   return activeVoucherOffer(now) !== null;
 }
+
+
+/**
+ * Is this product a voucher, sold ONLY through the voucher flow?
+ *
+ * A voucher is bought against a phone number with a per-person cap
+ * (lib/vouchers.ts). The slot-booking checkout knows nothing about that cap,
+ * so if the voucher row appeared in its product picker anyone could book an
+ * RM11 soak straight from it, as many times as they liked — the cap would
+ * still be enforced on /api/vouchers and simply bypassed everywhere else.
+ *
+ * It stayed off the picker by accident until now: the picker lists active
+ * products and the packages above it were active too. Turning the packages
+ * off for the 11.11 promotion is what would have exposed it, which is a poor
+ * reason for a price to become reachable.
+ */
+export function isVoucherProduct(productId: string | null | undefined): boolean {
+  return !!productId && VOUCHERS.some((v) => v.productId === productId);
+}

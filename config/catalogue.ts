@@ -81,12 +81,22 @@ export function productIdForSlug(value: string | null | undefined): string | nul
  * the counter, see PACKAGES_ARE_DOOR_ONLY below for why that is the shape and
  * not a limitation to route around.
  *
- * This travels with the four package rows in `products`, which were reactivated
- * on 7 Sep 2026. Both must agree: true here with the rows inactive sends
- * customers to a checkout that can't sell what they clicked, and false with the
- * rows active leaves every ladder CTA pointing at a bare /#reserve.
+ * This travels with the package rows in `products`. Both must agree: true here
+ * with the rows inactive sends customers to a checkout that can't sell what
+ * they clicked, and false with the rows active leaves every ladder CTA
+ * pointing at a bare /#reserve.
+ *
+ * OFF since 28 Oct 2026, for the 11.11 promotion: the three package rows are
+ * set inactive, which is what actually removes them from the checkout picker
+ * (that list is built from `active = true`, not from this flag — the flag
+ * governs CTAs and copy). The ladder still SHOWS the packages, because they
+ * are still sold at the counter; their buttons now fall back to a plain
+ * reserve link rather than a checkout that would not list them.
+ *
+ * To put them back: true here AND reactivate the rows. One without the other
+ * is the mismatch this comment warns about.
  */
-export const PACKAGES_ON_SALE = true;
+export const PACKAGES_ON_SALE = false;
 
 /**
  * Packages are settled AT THE SHOP, never prepaid online. Booking one online

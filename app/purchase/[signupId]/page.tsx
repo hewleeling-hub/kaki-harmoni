@@ -6,7 +6,7 @@ import { PRELAUNCH_MODE, LAUNCH_WINDOW } from "@/lib/config";
 import { formatSlotTime } from "@/lib/slots";
 import { productIdForSlug, FIRST_VISIT_PRODUCT_ID } from "@/config/catalogue";
 import { hasBookedBefore } from "@/lib/customer";
-import { promotionForBookingDate, isPromotionProduct } from "@/config/promotions";
+import { promotionForBookingDate, isPromotionProduct, isVoucherProduct } from "@/config/promotions";
 
 export default async function PurchasePage({
   params,
@@ -56,6 +56,10 @@ export default async function PurchasePage({
   const products = (allProducts ?? []).filter((p) => {
     if (promo) return p.id === promo.productId;
     if (isPromotionProduct(p.id)) return false;
+    // Vouchers are sold through the voucher flow, which enforces the
+    // per-person cap. Booking one here would be a soak at voucher price with
+    // no cap at all.
+    if (isVoucherProduct(p.id)) return false;
     return !(isReturning && p.id === FIRST_VISIT_PRODUCT_ID);
   });
 
