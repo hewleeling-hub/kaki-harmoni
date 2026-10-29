@@ -1,8 +1,9 @@
-import { VoucherClaimForm } from "@/components/ui/VoucherClaimForm";
+import Link from "next/link";
 import {
   activeVoucherOffer,
   isLastDayToBuy,
   daysLeftToBuy,
+  voucherBuyHref,
   type VoucherOffer,
 } from "@/config/promotions";
 
@@ -104,17 +105,28 @@ function VoucherBand({
         <Term heading="Redeem by" value={offer.redeemByLabel} sub="兑换截止日期" />
       </div>
 
-      {/* The number is taken here rather than only on WhatsApp, because the
-          two-per-person limit is counted on it. A message thread records
-          nothing the cap can check. */}
-      {/* The CTAs target the FORM, not the band. The band is the first thing
-          on the page, so a link to it scrolled roughly four pixels and the
-          button read as broken — nothing visibly happened because there was
-          nowhere to go. Landing on the form moves the page and puts the thing
-          they have to fill in front of them. scroll-mt keeps the offer
-          headline above it for anyone arriving from another page. */}
+      {/* INTO THE ORDINARY FLOW, not a form of its own.
+          This band used to carry its own claim form: name, number, how many,
+          pay by QR — and then, having taken the money, hand the customer to
+          the normal booking flow to type the same name and number again and
+          pick a time. Two funnels for one purchase, and it read as going
+          round in circles.
+          So the band now does what every other price on the site does: it
+          sends them to the booking form with the voucher already chosen. Same
+          three steps as any booking — details, time, pay — with "pay now,
+          pick your time later" offered at the time step, because a voucher is
+          a credit with a redeem-by date rather than an appointment. */}
       <div id="voucher-form" className="mt-5 scroll-mt-28">
-        <VoucherClaimForm offer={offer} />
+        <Link
+          href={voucherBuyHref(offer)}
+          className="inline-flex min-h-13 w-full items-center justify-center rounded-[26px] bg-[#7a5410] px-7 text-[17px] font-semibold text-[#FBEFD6] transition hover:brightness-110 sm:w-auto sm:text-[18px]"
+        >
+          Get your {offer.price} voucher →
+        </Link>
+        <p className="mt-2.5 text-[15px] leading-relaxed text-brown">
+          Takes a minute: your details, a time that suits you, then pay. Up to{" "}
+          {offer.maxPerPerson} vouchers in one go — or pay now and pick your time later.
+        </p>
       </div>
 
     </section>

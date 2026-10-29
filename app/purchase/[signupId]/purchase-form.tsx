@@ -33,6 +33,8 @@ export default function PurchaseForm({
   option = null,
   isReturning = false,
   voucherAlreadyPaid = false,
+  voucherMaxQuantity = 1,
+  bookLater = false,
 }: {
   signupId: string;
   signupName: string;
@@ -53,6 +55,13 @@ export default function PurchaseForm({
    * way, from the voucher row it finds, not from anything this form sends.
    */
   voucherAlreadyPaid?: boolean;
+  /**
+   * How many vouchers this phone may still buy — the server's number, from the
+   * same cap it enforces on submit. 1 for everything that is not the voucher.
+   */
+  voucherMaxQuantity?: number;
+  /** No slot was chosen: they are paying now and arranging the time with us. */
+  bookLater?: boolean;
 }) {
   const router = useRouter();
 
@@ -69,6 +78,9 @@ export default function PurchaseForm({
   const [selectedId, setSelectedId] = useState<string | null>(
     preselectedProductId ?? mainItems[0]?.id ?? null,
   );
+  /* Only the voucher is ever more than one — see maxQuantityFor() in
+     /api/purchases for why a visit cannot be. */
+  const [quantity, setQuantity] = useState(1);
   const [payTiming, setPayTiming] = useState<PayTiming>("prepay");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -87,7 +99,20 @@ export default function PurchaseForm({
      decides this too, from the voucher row; the form must agree with it or
      the customer is shown a price they will not be charged. */
   const usingPaidVoucher = voucherAlreadyPaid && isVoucherProduct(selected?.id);
-  const subtotal = usingPaidVoucher ? 0 : selected ? Number(selected.price_myr) : 0;
+
+  /* The voucher is the one thing sold in twos: the poster allows two per
+     person and they are credits, not appointments. Shown only when the server
+     says this number has two left — asking for a second one it would refuse is
+     a dead control. */
+  const buyingVoucher = !usingPaidVoucher && isVoucherProduct(selected?.id);
+  const quantityChoices = buyingVoucher ? Math.max(1, Math.min(voucherMaxQuantity, 2)) : 1;
+  const effectiveQuantity = quantityChoices > 1 ? quantity : 1;
+
+  const subtotal = usingPaidVoucher
+    ? 0
+    : selected
+      ? Number(selected.price_myr) * effectiveQuantity
+      : 0;
 
   // No surcharge: paying at the door costs exactly what paying online costs.
   // There used to be a first-visit gap (RM25 prepaid against RM30 at the door);
@@ -103,7 +128,9 @@ export default function PurchaseForm({
       return;
     }
 
-    const items = selected ? [{ product_id: selected.id, quantity: 1 }] : [];
+    const items = selected
+      ? [{ product_id: selected.id, quantity: effectiveQuantity }]
+      : [];
 
     setSubmitting(true);
     try {
@@ -273,6 +300,47 @@ export default function PurchaseForm({
             You&apos;re booking the first visit today; the rest are yours to arrange whenever
             suits — just message us or ask at the counter.
           </p>
+        )}
+
+        {/* ── How many vouchers ──────────────────────────────────────────
+            Two is the poster's limit and the server's, so this picker tops
+            out where the cap does. A second voucher does NOT need a second
+            slot: it is a soak owed, redeemable any time before it expires,
+            which is said plainly below so nobody expects two appointments. */}
+        {quantityChoices > 1 && (
+          <div className="mt-3 rounded-xl border-2 border-black/10 bg-white px-4 py-3">
+            <p className="text-sm font-medium">How many vouchers?</p>
+            <div className="mt-2 flex gap-2">
+              {Array.from({ length: quantityChoices }, (_, i) => i + 1).map((n) => {
+                const active = effectiveQuantity === n;
+                return (
+                  <button
+                    key={n}
+                    type="button"
+                    onClick={() => setQuantity(n)}
+                    aria-pressed={active}
+                    className="min-h-11 flex-1 rounded-lg border-2 px-3 text-sm font-semibold transition"
+                    style={{
+                      borderColor: active ? "var(--lagoon)" : "rgba(0,0,0,0.12)",
+                      background: active ? "rgba(46,125,123,0.07)" : "white",
+                    }}
+                  >
+                    {n === 1 ? "1 voucher" : `${n} vouchers`}
+                    <span className="mt-0.5 block text-xs font-normal text-black/55">
+                      {money(Number(selected?.price_myr ?? 0) * n)}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+            {effectiveQuantity > 1 && (
+              <p className="mt-2 text-xs text-black/55">
+                {bookLater
+                  ? "Both are yours to use any time before they expire — we'll arrange the dates with you."
+                  : "One of them books the time you picked; the other is yours to use any time before it expires."}
+              </p>
+            )}
+          </div>
         )}
       </fieldset>
 

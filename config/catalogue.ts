@@ -20,6 +20,13 @@ export const CATALOGUE_PRODUCT_IDS = {
   "five-day-reset": "c0000000-0000-0000-0000-000000000005",
   "ten-day-reset": "c0000000-0000-0000-0000-000000000007",
   "thirty-day-routine": "c0000000-0000-0000-0000-000000000008",
+  // The 11.11 voucher. It is here so it can travel through the ORDINARY
+  // booking flow as `?option=eleven-eleven`, like every other thing we sell:
+  // key in details, pick a slot, pay. It used to be sold only by its own form
+  // in the band, which meant a customer entered their name and number there,
+  // paid, and was then sent to the normal flow to enter the same details again
+  // and pick a time. One funnel, not two.
+  "eleven-eleven": "c0000000-0000-0000-0000-000000000010",
 } as const;
 
 export type CatalogueSlug = keyof typeof CATALOGUE_PRODUCT_IDS;

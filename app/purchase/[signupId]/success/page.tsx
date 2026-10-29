@@ -74,7 +74,13 @@ export default async function PurchaseSuccessPage({ params }: { params: Promise<
             Your launch price is locked in.
           </p>
         ) : (
-          <p className="text-black/70">Thanks — we&apos;ll see you at Kaki Harmoni soon.</p>
+          /* Paid, no date — the "pick my time later" path. This has to say what
+             happens next, or a customer who has just handed over money is left
+             on a screen that thanks them and tells them nothing. */
+          <p className="text-black/70">
+            Thanks! We&apos;ll message you on WhatsApp to arrange a time that suits you. Nothing
+            else to do for now.
+          </p>
         )}
 
         {/* Payment, stated plainly. A prepay that staff have not yet verified is

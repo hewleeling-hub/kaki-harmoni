@@ -7,7 +7,7 @@
  * open after launch. Do not invent prices or availability.
  */
 
-import { firstVisitPaused } from "@/config/promotions";
+import { firstVisitPaused, activeVoucherOffer } from "@/config/promotions";
 import {
   BUSINESS_WHATSAPP_NUMBER,
   BUSINESS_WHATSAPP_DISPLAY,
@@ -545,6 +545,13 @@ export function offerForSlug(
   }
   if (slug === "single-soak") {
     return { name: sessionRates[0].name, price: sessionRates[0].price, visits: 1 };
+  }
+  /* The voucher is sold through this flow like anything else, so the signup
+     form has to be able to name it back to the customer. Priced from the offer
+     rather than the package ladder, which it is not part of. */
+  const voucher = activeVoucherOffer();
+  if (voucher && slug === voucher.slug) {
+    return { name: voucher.title, price: Number(voucher.price.replace(/[^0-9.]/g, "")), visits: 1 };
   }
   return null;
 }

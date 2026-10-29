@@ -3,6 +3,10 @@ import { notFound, redirect } from "next/navigation";
 import Logo from "@/app/logo";
 import BookingForm from "./booking-form";
 import { PRELAUNCH_MODE } from "@/lib/config";
+import Link from "next/link";
+import { activeVoucherOffer, isVoucherProduct } from "@/config/promotions";
+import { productIdForSlug } from "@/config/catalogue";
+import { unusedVoucherFor } from "@/lib/vouchers";
 
 export default async function BookPage({
   params,
@@ -27,6 +31,18 @@ export default async function BookPage({
   if (!signup) {
     notFound();
   }
+
+  /* "I'll pick my time later" is offered for the voucher only.
+     A voucher is a prepaid credit with a redeem-by date printed on it, so
+     paying before choosing a date is how it is meant to work — and insisting
+     on a December afternoon before taking RM11 loses sales to a decision the
+     customer does not have to make yet.
+     A visit is different: a dateless RM40 booking has no terms saying when it
+     must be used, so it would just become a message for someone to chase. */
+  const voucherOffer = activeVoucherOffer();
+  const askedForVoucher = isVoucherProduct(productIdForSlug(option));
+  const ownsAVoucher = !!(await unusedVoucherFor(supabase, signup.phone as string | null));
+  const canBookLater = !!voucherOffer && (askedForVoucher || ownsAVoucher);
 
   // An existing booking used to send people straight to the success page,
   // which made a second visit impossible to book — the routine ladder is built
@@ -54,6 +70,21 @@ export default async function BookPage({
           </div>
         )}
         <BookingForm signupId={signupId} option={option ?? null} />
+
+        {canBookLater && (
+          <div className="border-t border-black/10 pt-4 text-center">
+            <Link
+              href={`/purchase/${signupId}?later=1${option ? `&option=${encodeURIComponent(option)}` : ""}`}
+              className="text-sm font-medium underline underline-offset-2"
+              style={{ color: "var(--lagoon-dark)" }}
+            >
+              I&apos;d rather pay now and pick my time later
+            </Link>
+            <p className="mt-1 text-xs text-black/50">
+              We&apos;ll message you to arrange a time that suits you.
+            </p>
+          </div>
+        )}
       </div>
     </main>
   );

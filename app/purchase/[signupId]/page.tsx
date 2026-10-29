@@ -14,10 +14,10 @@ export default async function PurchasePage({
   searchParams,
 }: {
   params: Promise<{ signupId: string }>;
-  searchParams: Promise<{ date?: string; time?: string; option?: string }>;
+  searchParams: Promise<{ date?: string; time?: string; option?: string; later?: string }>;
 }) {
   const { signupId } = await params;
-  const { date: slotDate, time: slotTime, option } = await searchParams;
+  const { date: slotDate, time: slotTime, option, later } = await searchParams;
   const supabase = createAdminClient();
 
   const { data: signup } = await supabase.from("signups").select("*").eq("id", signupId).maybeSingle();
@@ -26,10 +26,18 @@ export default async function PurchasePage({
     notFound();
   }
 
-  // Payment now confirms a slot the customer has already chosen. Arriving here
-  // without one means they skipped a step (or shared the link) — send them to
-  // pick a time rather than taking money for a visit with no date on it.
-  if (!PRELAUNCH_MODE && !(slotDate && slotTime)) {
+  /* `later=1` is the customer saying "take my money now, I'll sort the date
+     out with you" — the one deliberate way to reach this page without a slot.
+     It exists for the voucher, which IS a prepaid credit with a redeem-by
+     date rather than an appointment: making somebody choose a December
+     afternoon before they are allowed to pay RM11 loses the sale over a
+     decision they do not have to make yet. */
+  const bookLater = later === "1";
+
+  // Otherwise payment confirms a slot the customer has already chosen.
+  // Arriving here without one means they skipped a step (or shared the link) —
+  // send them to pick a time rather than taking money for a visit with no date.
+  if (!PRELAUNCH_MODE && !bookLater && !(slotDate && slotTime)) {
     redirect(`/purchase/${signupId}/book`);
   }
 
@@ -109,9 +117,11 @@ export default async function PurchasePage({
           <p className="text-black/60 text-sm">
             {PRELAUNCH_MODE
               ? `Hi ${signup.name.split(" ")[0]}, lock in the launch price — we open in ${LAUNCH_WINDOW} and we'll message you to schedule your visit.`
-              : isReturning
-                ? `Welcome back, ${signup.name.split(" ")[0]}. Your slot is held until you complete this step.`
-                : `Hi ${signup.name.split(" ")[0]}, your slot is held until you complete this step.`}
+              : bookLater
+                ? `Hi ${signup.name.split(" ")[0]}, pay now and we'll message you to arrange a time that suits you.`
+                : isReturning
+                  ? `Welcome back, ${signup.name.split(" ")[0]}. Your slot is held until you complete this step.`
+                  : `Hi ${signup.name.split(" ")[0]}, your slot is held until you complete this step.`}
           </p>
         </div>
 
@@ -142,8 +152,10 @@ export default async function PurchasePage({
           signupPhone={signup.phone ?? ""}
           products={products}
           voucherAlreadyPaid={!!heldVoucher}
-          slotDate={slotDate ?? null}
-          slotTime={slotTime ?? null}
+          voucherMaxQuantity={voucherOnSale && !heldVoucher ? (voucherAllow?.remaining ?? 0) : 1}
+          bookLater={bookLater}
+          slotDate={bookLater ? null : (slotDate ?? null)}
+          slotTime={bookLater ? null : (slotTime ?? null)}
           preselectedProductId={preselected}
           option={option ?? null}
           isReturning={isReturning}

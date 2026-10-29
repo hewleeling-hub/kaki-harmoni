@@ -31,12 +31,29 @@ type ResolvedLine = {
 /** Services and packages are the thing being bought; add-ons ride along. */
 const isMainCategory = (category: string) => category === "service" || category === "package";
 
+/**
+ * How many of one main item a single order may contain.
+ *
+ * One for everything that is a VISIT: one booking holds one place in the slot,
+ * and the FAQ tells a pair to book a soak each.
+ *
+ * The voucher is not a visit — it is a prepaid credit with a redeem-by date,
+ * and the poster sells up to two of them per person. Buying two means paying
+ * RM22 now and owing two soaks, one of which may be booked into today's slot
+ * and the other taken any time before it expires. Capped at the offer's own
+ * limit, so this can never exceed what the cap would allow anyway.
+ */
+function maxQuantityFor(productId: string | null): number {
+  if (!isVoucherProduct(productId)) return 1;
+  return (activeVoucherOffer() ?? ELEVEN_ELEVEN).maxPerPerson;
+}
+
 // Resolve requested items against the catalogue, pricing every line from the DB
 // (never trusting client-sent prices). Falls back to the legacy single item.
 //
-// The shape is enforced here, not just in the form: exactly one main item at
-// quantity 1 (one booking holds one place in the slot, and the FAQ tells a pair
-// to book a soak each), plus any number of add-ons at 1–20.
+// The shape is enforced here, not just in the form: exactly one main item,
+// at quantity 1 unless it is a voucher (see maxQuantityFor), plus any number
+// of add-ons at 1–20.
 async function resolveLines(
   supabase: ReturnType<typeof createAdminClient>,
   items: { product_id?: string; quantity?: number }[] | undefined,
@@ -67,9 +84,11 @@ async function resolveLines(
         if (main && mainTaken) continue;
         if (main) mainTaken = true;
 
-        const quantity = main
-          ? 1
-          : Math.min(Math.max(Math.floor(req.quantity as number), 1), 20);
+        const ceiling = main ? maxQuantityFor(p.id) : 20;
+        const quantity = Math.min(
+          Math.max(Math.floor(req.quantity as number), 1),
+          ceiling,
+        );
         const unit = Number(p.price_myr);
         lines.push({
           product_id: p.id,
@@ -164,9 +183,14 @@ export async function POST(request: NextRequest) {
   // real gate — someone else may have taken the last machine meanwhile.
   if (slot_date && slot_time) {
     const occupancy = await occupancyForDate(supabase, slot_date);
-    // resolveLines guarantees exactly one main item at quantity 1, so the
-    // booking's shape is that line's: one soak, or two for a Double Reset.
-    // Add-ons occupy no machine.
+    // resolveLines guarantees exactly one main item, so the booking's shape is
+    // that line's. Add-ons occupy no machine.
+    //
+    // QUANTITY IS DELIBERATELY NOT A MULTIPLIER here. Two vouchers are two
+    // prepaid soaks, not two soaks at once: one may be booked into this slot
+    // and the other is a credit to spend on another day. Multiplying would
+    // make a customer buying their two allowed vouchers need two free
+    // machines at the same time, and be refused a slot that has room for them.
     const soaks = lines
       .filter((l) => l.category === "service" || l.category === "package")
       .reduce((most, l) => Math.max(most, soaksForProductId(l.product_id)), 1);
@@ -214,6 +238,9 @@ export async function POST(request: NextRequest) {
      checkout only hides the option; a stale tab or a hand-built request would
      otherwise buy a capped price without going through the cap. */
   const bookingVoucher = isVoucherProduct(mainLine?.product_id);
+  /* How many vouchers this order buys. resolveLines has already clamped it to
+     the offer's own per-person limit, so this is 1 or 2. */
+  const voucherQuantity = bookingVoucher ? (mainLine?.quantity ?? 1) : 0;
 
   /* Two different things wear the same product row.
      ALREADY OWNS ONE: bought in the band, paid for, no slot yet. Booking
@@ -231,7 +258,10 @@ export async function POST(request: NextRequest) {
     const refusal = refuseVoucherClaim({
       offer,
       allowance,
-      wanted: 1,
+      /* What they are actually buying, not one. Asking for two when one is
+         left has to be refused as "you can take 1 more" rather than quietly
+         selling two and breaking the cap the poster promises. */
+      wanted: voucherQuantity,
       onSale: !!activeVoucherOffer(),
     });
     if (refusal) {
@@ -244,7 +274,11 @@ export async function POST(request: NextRequest) {
      sent: the discount is decided by a voucher row this server found, not by
      a price a request claimed. */
   if (heldVoucher && mainLine) {
+    /* Redeeming, not buying. One voucher is one soak, so the quantity collapses
+       to 1 however many the request asked for — otherwise a stale tab could
+       claim "2" and get two soaks for the price of the one voucher it holds. */
     mainLine.product_name = `${mainLine.product_name} (already paid)`;
+    mainLine.quantity = 1;
     mainLine.unit_price_myr = 0;
     mainLine.line_total_myr = 0;
   }
@@ -319,32 +353,52 @@ export async function POST(request: NextRequest) {
   /* Attach the voucher they already owned, rather than writing another. This
      is what stops one person counting as two against their own limit, and
      what makes the voucher single-use for booking. */
+  const bookedASlot = !!(slot_date && slot_time);
+
   if (heldVoucher) {
-    const { error: attachError } = await supabase
-      .from("vouchers")
-      .update({ purchase_id: purchase.id })
-      .eq("id", heldVoucher.id)
-      .is("purchase_id", null); // lost race = somebody already booked it
-    if (attachError) {
-      console.error("voucher attach failed — it may be bookable twice:", attachError.message);
+    /* Only when a slot was actually chosen. Someone who already owns a voucher
+       and comes through the "I'll pick my time later" path has nothing to
+       attach it to — spending it against a dateless purchase would consume the
+       soak they paid for and leave them nothing to book with. */
+    if (bookedASlot) {
+      const { error: attachError } = await supabase
+        .from("vouchers")
+        .update({ purchase_id: purchase.id })
+        .eq("id", heldVoucher.id)
+        .is("purchase_id", null); // lost race = somebody already booked it
+      if (attachError) {
+        console.error("voucher attach failed — it may be bookable twice:", attachError.message);
+      }
     }
   } else if (bookingVoucher) {
     const offer = activeVoucherOffer() ?? ELEVEN_ELEVEN;
-    const { error: voucherError } = await supabase.from("vouchers").insert({
+    const phoneKey = phoneKeyFor(signup.phone as string | null);
+
+    /* ONE ROW PER VOUCHER. The cap counts rows, so two vouchers sold as a
+       single RM22 line have to become two rows or the second one is invisible
+       to the limit and to the customer, who could then buy two more.
+
+       Only the FIRST is attached to this purchase, and only if a slot was
+       chosen: that is the soak being booked right now and it is already spent.
+       The rest stay unattached, which is what makes them redeemable later —
+       unusedVoucherFor() finds them on the next booking and that soak costs
+       nothing more. */
+    const rows = Array.from({ length: voucherQuantity }, (_, i) => ({
       signup_id,
-      phone_normalised: phoneKeyFor(signup.phone as string | null),
+      phone_normalised: phoneKey,
       offer_id: offer.id,
       product_id: mainLine?.product_id ?? offer.productId,
       price_myr: mainLine?.unit_price_myr ?? 11,
       status: "reserved",
       expires_on: offer.redeemByISO,
-      /* Attached to THIS booking as it is created. A voucher bought here is
-         bought with its slot, so it is already spent — leaving purchase_id
-         null would make it look unused, and the next booking on that number
-         would read it as "already paid" and hand out a free soak. */
-      purchase_id: purchase.id,
-      notes: `Bought and booked at checkout for ${slot_date ?? "an unspecified date"}.`,
-    });
+      purchase_id: i === 0 && bookedASlot ? purchase.id : null,
+      notes:
+        i === 0 && bookedASlot
+          ? `Bought and booked at checkout for ${slot_date}.`
+          : "Bought at checkout, awaiting a slot.",
+    }));
+
+    const { error: voucherError } = await supabase.from("vouchers").insert(rows);
     if (voucherError) {
       console.error("voucher row insert failed — cap will undercount:", voucherError.message);
     }

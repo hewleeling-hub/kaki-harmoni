@@ -147,6 +147,11 @@ export interface VoucherOffer {
   id: string;
   /** Catalogue row, so the price charged comes from the database, not copy. */
   productId: string;
+  /**
+   * The `?option=` slug that carries this offer through the ordinary booking
+   * flow, so buying a voucher is the same three steps as buying anything else.
+   */
+  slug: string;
   badge: string;
   title: string;
   /** The poster is bilingual; the site shows the Chinese line alongside. */
@@ -193,6 +198,7 @@ export interface VoucherOffer {
 export const ELEVEN_ELEVEN: VoucherOffer = {
   id: "eleven-eleven-2026",
   productId: "c0000000-0000-0000-0000-000000000010",
+  slug: "eleven-eleven",
   badge: "11.11 offer",
   title: "11.11 Foot Spa Voucher",
   titleZh: "足浴优惠券",
@@ -253,8 +259,21 @@ export function voucherNavCta(
   return {
     full: `11.11 Voucher — ${offer.price}`,
     short: `${offer.price} Voucher`,
-    href: "/#voucher-form",
+    href: voucherBuyHref(offer),
   };
+}
+
+/**
+ * Where a "buy the voucher" button goes.
+ *
+ * Into the ORDINARY booking flow with the voucher preselected — the same place
+ * every other price on the site sends people. The band used to sell it inline
+ * through a form of its own, which took a name and a number, took payment, and
+ * then handed the customer to this flow to type the same details again and
+ * pick a time. Two funnels for one purchase; this is the one.
+ */
+export function voucherBuyHref(offer: VoucherOffer): string {
+  return `/?option=${offer.slug}#reserve`;
 }
 
 /**
