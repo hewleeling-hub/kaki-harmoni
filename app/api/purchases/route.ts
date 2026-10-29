@@ -12,7 +12,7 @@ import {
   soaksForProductId,
 } from "@/config/catalogue";
 import { promotionForBookingDate, isPromotionProduct, isVoucherProduct, activeVoucherOffer, ELEVEN_ELEVEN } from "@/config/promotions";
-import { voucherAllowance, refuseVoucherClaim } from "@/lib/vouchers";
+import { voucherAllowance, refuseVoucherClaim, unusedVoucherFor } from "@/lib/vouchers";
 import { phoneKeyFor } from "@/lib/customer";
 
 // Legacy default used when no items are sent or the catalogue isn't available yet.
@@ -214,7 +214,18 @@ export async function POST(request: NextRequest) {
      checkout only hides the option; a stale tab or a hand-built request would
      otherwise buy a capped price without going through the cap. */
   const bookingVoucher = isVoucherProduct(mainLine?.product_id);
-  if (bookingVoucher) {
+
+  /* Two different things wear the same product row.
+     ALREADY OWNS ONE: bought in the band, paid for, no slot yet. Booking
+     attaches to that voucher and costs nothing more — no cap check, because
+     using what you already bought cannot exceed what you were allowed to buy.
+     BUYING ONE NOW: no unused voucher, so this is a sale, and the cap applies
+     exactly as it does in the band. */
+  const heldVoucher = bookingVoucher
+    ? await unusedVoucherFor(supabase, signup.phone as string | null)
+    : null;
+
+  if (bookingVoucher && !heldVoucher) {
     const offer = activeVoucherOffer() ?? ELEVEN_ELEVEN;
     const allowance = await voucherAllowance(supabase, signup.phone as string | null, offer);
     const refusal = refuseVoucherClaim({
@@ -226,6 +237,16 @@ export async function POST(request: NextRequest) {
     if (refusal) {
       return NextResponse.json({ error: refusal.message, reason: refusal.reason }, { status: 409 });
     }
+  }
+
+  /* Priced to nothing because it is already paid for. Done here, after the
+     catalogue priced the line, rather than by trusting anything the browser
+     sent: the discount is decided by a voucher row this server found, not by
+     a price a request claimed. */
+  if (heldVoucher && mainLine) {
+    mainLine.product_name = `${mainLine.product_name} (already paid)`;
+    mainLine.unit_price_myr = 0;
+    mainLine.line_total_myr = 0;
   }
 
   if (!bookingPromo && isPromotionProduct(mainLine?.product_id)) {
@@ -295,7 +316,19 @@ export async function POST(request: NextRequest) {
      door into the same price. Same shape the band writes, so one count covers
      both. Failure is logged rather than fatal: the booking and the money are
      already real, and losing the row costs a cap check, not a purchase. */
-  if (bookingVoucher) {
+  /* Attach the voucher they already owned, rather than writing another. This
+     is what stops one person counting as two against their own limit, and
+     what makes the voucher single-use for booking. */
+  if (heldVoucher) {
+    const { error: attachError } = await supabase
+      .from("vouchers")
+      .update({ purchase_id: purchase.id })
+      .eq("id", heldVoucher.id)
+      .is("purchase_id", null); // lost race = somebody already booked it
+    if (attachError) {
+      console.error("voucher attach failed — it may be bookable twice:", attachError.message);
+    }
+  } else if (bookingVoucher) {
     const offer = activeVoucherOffer() ?? ELEVEN_ELEVEN;
     const { error: voucherError } = await supabase.from("vouchers").insert({
       signup_id,
@@ -305,7 +338,12 @@ export async function POST(request: NextRequest) {
       price_myr: mainLine?.unit_price_myr ?? 11,
       status: "reserved",
       expires_on: offer.redeemByISO,
-      notes: `Booked at checkout for ${slot_date ?? "an unspecified date"}.`,
+      /* Attached to THIS booking as it is created. A voucher bought here is
+         bought with its slot, so it is already spent — leaving purchase_id
+         null would make it look unused, and the next booking on that number
+         would read it as "already paid" and hand out a free soak. */
+      purchase_id: purchase.id,
+      notes: `Bought and booked at checkout for ${slot_date ?? "an unspecified date"}.`,
     });
     if (voucherError) {
       console.error("voucher row insert failed — cap will undercount:", voucherError.message);

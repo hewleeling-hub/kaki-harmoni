@@ -124,3 +124,49 @@ export function refuseVoucherClaim({
   }
   return null;
 }
+
+/**
+ * A voucher this phone has already paid for and not yet booked a slot against,
+ * or null.
+ *
+ * The band sells vouchers without a date — "buy by 11 November, redeem by 31
+ * December" means the slot is chosen later. When they come back to book,
+ * checkout asks this: finding one means they already own a soak, so the
+ * booking attaches to it instead of selling another. Without that the same
+ * person either pays RM11 twice or writes a second voucher row and counts as
+ * two against their own two-per-person limit.
+ *
+ * Oldest first, so a customer holding two uses the one bought first — which is
+ * also the one that expires first if the terms ever differ between offers.
+ *
+ * Cancelled vouchers are excluded, and so are expired ones: a voucher past its
+ * redeem-by date is not a soak somebody still owns.
+ */
+export async function unusedVoucherFor(
+  supabase: ReturnType<typeof createAdminClient>,
+  phone: string | null | undefined,
+  offer: VoucherOffer = ELEVEN_ELEVEN,
+  today: string = new Date().toISOString().slice(0, 10),
+): Promise<{ id: string; price_myr: number } | null> {
+  const phoneKey = phoneKeyFor(phone);
+  if (!phoneKey) return null;
+
+  const { data, error } = await supabase
+    .from("vouchers")
+    .select("id, price_myr")
+    .eq("phone_normalised", phoneKey)
+    .eq("offer_id", offer.id)
+    .is("purchase_id", null)
+    .neq("status", "cancelled")
+    .gte("expires_on", today)
+    .order("created_at", { ascending: true })
+    .limit(1)
+    .maybeSingle();
+
+  /* A failed lookup must not invent a voucher. Returning null is the safe
+     direction here — the opposite of the cap, where refusing is safe: this
+     one decides whether to charge, so the failure mode is "they pay again
+     and we sort it out", never "a free soak for anyone whose query errored". */
+  if (error || !data) return null;
+  return { id: data.id as string, price_myr: Number(data.price_myr) };
+}

@@ -117,6 +117,17 @@ export function VoucherClaimForm({ offer }: { offer: VoucherOffer }) {
           I&rsquo;ve paid — send screenshot
         </a>
 
+        {/* The step that was missing. Paying used to be the end of the screen,
+            which left somebody holding a voucher and no idea that a time still
+            had to be picked. Checkout recognises the voucher by their number
+            and books it at no further charge. */}
+        <a
+          href="/#reserve"
+          className="mt-3 inline-flex min-h-12 w-full items-center justify-center rounded-[26px] border border-olive bg-ivory px-6 text-[17px] font-semibold text-olive-dark transition hover:bg-beige/50"
+        >
+          Now pick your time →
+        </a>
+
         <p className="mt-3 text-[15px] leading-relaxed text-brown">
           We&rsquo;ll confirm once it lands. Then soak any time before {done.redeem_by}.
           {done.remaining > 0 && ` You can still take ${done.remaining} more on this number.`}

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { whatsAppLink, BUSINESS_WHATSAPP_NUMBER } from "@/lib/whatsapp";
 import { PRELAUNCH_MODE, FIRST_VISIT_PRICE_MYR } from "@/lib/config";
 import { withOption, PACKAGES_ARE_DOOR_ONLY } from "@/config/catalogue";
+import { isVoucherProduct } from "@/config/promotions";
 
 type Product = {
   id: string;
@@ -31,6 +32,7 @@ export default function PurchaseForm({
   preselectedProductId = null,
   option = null,
   isReturning = false,
+  voucherAlreadyPaid = false,
 }: {
   signupId: string;
   signupName: string;
@@ -45,6 +47,12 @@ export default function PurchaseForm({
   option?: string | null;
   /** This phone has booked before, so the first-visit price isn't on offer. */
   isReturning?: boolean;
+  /**
+   * They already bought an 11.11 voucher in the band and are here to pick a
+   * date. The voucher line is shown at RM0 — the server prices it the same
+   * way, from the voucher row it finds, not from anything this form sends.
+   */
+  voucherAlreadyPaid?: boolean;
 }) {
   const router = useRouter();
 
@@ -75,7 +83,11 @@ export default function PurchaseForm({
   const doorOnly = PACKAGES_ARE_DOOR_ONLY && isPackage;
   const effectiveTiming: PayTiming = doorOnly ? "door" : payTiming;
 
-  const subtotal = selected ? Number(selected.price_myr) : 0;
+  /* A voucher already paid for in the band costs nothing to book. The server
+     decides this too, from the voucher row; the form must agree with it or
+     the customer is shown a price they will not be charged. */
+  const usingPaidVoucher = voucherAlreadyPaid && isVoucherProduct(selected?.id);
+  const subtotal = usingPaidVoucher ? 0 : selected ? Number(selected.price_myr) : 0;
 
   // No surcharge: paying at the door costs exactly what paying online costs.
   // There used to be a first-visit gap (RM25 prepaid against RM30 at the door);
@@ -231,7 +243,11 @@ export default function PurchaseForm({
                         className="font-display text-lg font-bold whitespace-nowrap"
                         style={{ color: "var(--lagoon-dark)" }}
                       >
-                        {money(Number(p.price_myr))}
+                        {voucherAlreadyPaid && isVoucherProduct(p.id) ? (
+                          <span className="text-[13px] uppercase tracking-wide">Already paid</span>
+                        ) : (
+                          money(Number(p.price_myr))
+                        )}
                       </span>
                     </span>
                     {p.description && (

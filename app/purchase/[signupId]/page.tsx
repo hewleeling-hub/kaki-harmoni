@@ -7,7 +7,7 @@ import { formatSlotTime } from "@/lib/slots";
 import { productIdForSlug, FIRST_VISIT_PRODUCT_ID } from "@/config/catalogue";
 import { hasBookedBefore } from "@/lib/customer";
 import { promotionForBookingDate, isPromotionProduct, isVoucherProduct, activeVoucherOffer } from "@/config/promotions";
-import { voucherAllowance } from "@/lib/vouchers";
+import { voucherAllowance, unusedVoucherFor } from "@/lib/vouchers";
 
 export default async function PurchasePage({
   params,
@@ -66,7 +66,16 @@ export default async function PurchasePage({
   const voucherAllow = voucherOnSale
     ? await voucherAllowance(supabase, signup.phone as string | null)
     : null;
-  const voucherBookable = !!voucherOnSale && !!voucherAllow?.countable && voucherAllow.remaining > 0;
+
+  /* Already bought one in the band and come back for a date? Then the option
+     has to be here EVEN IF the cap is used up — their two are spent on
+     vouchers they own, and this is them collecting one. Offered after the
+     sale closes too: the sale ends on 11 November, the right to use what you
+     bought runs to 31 December. */
+  const heldVoucher = await unusedVoucherFor(supabase, signup.phone as string | null);
+
+  const voucherBookable =
+    !!heldVoucher || (!!voucherOnSale && !!voucherAllow?.countable && voucherAllow.remaining > 0);
 
   const products = (allProducts ?? []).filter((p) => {
     if (promo) return p.id === promo.productId;
@@ -132,6 +141,7 @@ export default async function PurchasePage({
           signupName={signup.name}
           signupPhone={signup.phone ?? ""}
           products={products}
+          voucherAlreadyPaid={!!heldVoucher}
           slotDate={slotDate ?? null}
           slotTime={slotTime ?? null}
           preselectedProductId={preselected}
