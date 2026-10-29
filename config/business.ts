@@ -654,7 +654,7 @@ export function faqsNow(now: Date = new Date()): readonly { q: string; a: string
     item.q === "How much is a visit?"
       ? {
           q: item.q,
-          a: `A single soak is RM${businessConfig.pricing.normal}, or less with a package: from RM${ladderPerVisit.entry} a visit on the 5-Day Reset down to RM${ladderPerVisit.cheapest} on the 30-Day Routine. While the 11.11 offer runs, a Foot Spa Voucher is RM11 a soak — buy by 11 November, redeem by 31 December.`,
+          a: `While the 11.11 offer runs, a Foot Spa Voucher is RM11 a soak — buy by 11 November, two per person, redeem by 31 December. After that a single soak is RM${businessConfig.pricing.normal}. Packages work out cheaper again if you come often — ask our team in the shop and they'll set one up for you.`,
         }
       : item,
   );

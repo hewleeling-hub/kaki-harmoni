@@ -5,6 +5,7 @@ import { PublicShell } from "@/components/layout/PublicShell";
 import { Button, Card } from "@/components/ui/primitives";
 import { CalendarIcon, MapPinIcon } from "@/components/ui/icons";
 import { businessConfig } from "@/config/business";
+import { firstVisitPaused } from "@/config/promotions";
 
 export const metadata: Metadata = pageMetadata({
   title: "About — Kaki Harmoni",
@@ -42,6 +43,22 @@ const FEATURES = [
 
 export default function AboutPage() {
   const { pricing } = businessConfig;
+
+  /* These two CTAs still quoted RM30 while every other first-visit price on
+     the site was paused for the 11.11 offer. Rather than just hiding the
+     number, they strike it against the RM11 the checkout can now actually
+     charge — the voucher became bookable there, so the lower price is a real
+     thing this button leads to, not a claim it cannot honour. */
+  const pauseFirstVisit = firstVisitPaused();
+  const firstVisitCta = pauseFirstVisit ? (
+    <>
+      Reserve your first visit —{" "}
+      <span className="font-semibold line-through opacity-70">RM{pricing.firstVisit}</span>{" "}
+      <span className="font-bold">RM11</span>
+    </>
+  ) : (
+    <>Reserve your first visit — RM{pricing.firstVisit}</>
+  );
   return (
     <PublicShell>
       <div className="mx-auto max-w-3xl py-8 md:py-12">
@@ -198,7 +215,7 @@ export default function AboutPage() {
 
         <div className="mt-8 flex flex-wrap gap-3">
           <Button href="/#reserve" icon={<CalendarIcon size={20} />}>
-            Reserve your first visit — RM{pricing.firstVisit}
+            {firstVisitCta}
           </Button>
           <Button href="/location" variant="secondary" icon={<MapPinIcon size={20} />}>
             Find Us
@@ -229,7 +246,7 @@ export default function AboutPage() {
           </p>
 
           <Button href="/#reserve" className="mt-6" icon={<CalendarIcon size={20} />}>
-            Reserve your first visit — RM{pricing.firstVisit}
+            {firstVisitCta}
           </Button>
         </section>
       </div>

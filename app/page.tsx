@@ -388,7 +388,15 @@ export default async function Home({
                   <Link href="/#reserve" className="font-semibold text-olive underline underline-offset-2 hover:text-olive-dark">
                     Start with a single first soak
                   </Link>{" "}
-                  instead — RM{pricing.firstVisit}.
+                  instead —{" "}
+                  {pauseFirstVisit ? (
+                    <>
+                      <span className="line-through opacity-70">RM{pricing.firstVisit}</span>{" "}
+                      <strong className="text-olive-dark">RM11</strong> with an 11.11 voucher.
+                    </>
+                  ) : (
+                    <>RM{pricing.firstVisit}.</>
+                  )}
                 </p>
               </>
             ) : (

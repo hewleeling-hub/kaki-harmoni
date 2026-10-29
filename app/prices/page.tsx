@@ -320,14 +320,18 @@ export default function PricesPage() {
         </Card>
         <div className="mt-5">
           <PromotionCard
-            highlight={`RM${pricing.firstVisit}`}
+            highlight={pauseFirstVisit ? "RM11" : `RM${pricing.firstVisit}`}
             title="No need to decide today"
             description={
               pauseFirstVisit
                 ? "Come once, see how it feels, and think about a routine afterwards. The 11.11 voucher is RM11 a soak while it runs."
                 : `Come once, see how it feels, and think about a routine afterwards. Your first visit is RM${pricing.firstVisit} — online or at the door — instead of the usual RM${pricing.normal}.`
             }
-            terms={`${launchOfferNote} After the launch period a first visit is the usual RM${pricing.normal}.`}
+            terms={
+              pauseFirstVisit
+                ? `Buy by 11 November 2026, two per person, redeem by 31 December 2026. A single soak is RM${pricing.normal} otherwise. Ask our team in the shop about packages.`
+                : `${launchOfferNote} After the launch period a first visit is the usual RM${pricing.normal}.`
+            }
           />
         </div>
       </section>

@@ -4,6 +4,7 @@ import { Card, Button } from "@/components/ui/primitives";
 import { FAQAccordion } from "@/components/ui/FAQAccordion";
 import { Lotti } from "@/components/ui/Lotti";
 import { VisitJourney } from "@/components/visit/VisitJourney";
+import { soakOfferPrice } from "@/config/promotions";
 import {
   CheckIcon,
   CalendarIcon,
@@ -91,11 +92,23 @@ export default function YourVisitPage() {
             {promo && (
               <p className="text-[16px] leading-relaxed text-brown">
                 <strong className="text-olive-dark">
-                  First soak — RM{businessConfig.pricing.firstVisit}
+                  {soakOfferPrice() ? (
+                    <>
+                      First soak —{" "}
+                      <span className="line-through opacity-70">
+                        RM{businessConfig.pricing.firstVisit}
+                      </span>{" "}
+                      {soakOfferPrice()}
+                    </>
+                  ) : (
+                    <>First soak — RM{businessConfig.pricing.firstVisit}</>
+                  )}
                 </strong>
                 <br />
                 <span className="text-[15px] text-muted">
-                  Pay online or at the door — same price either way.
+                  {soakOfferPrice()
+                    ? "With an 11.11 voucher — buy by 11 Nov, 2 per person."
+                    : "Pay online or at the door — same price either way."}
                 </span>
               </p>
             )}

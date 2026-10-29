@@ -4,6 +4,7 @@ import { useId, useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/primitives";
 import { CalendarIcon, CheckIcon } from "@/components/ui/icons";
+import { soakOfferPrice } from "@/config/promotions";
 import { businessConfig, launchOffer, SHOW_RETURNING_VISITOR } from "@/config/business";
 
 type Visitor = "first" | "returning";
@@ -93,6 +94,7 @@ function StageMedia({ stage }: { stage: (typeof STAGES)[number] }) {
  */
 function PaymentOptions() {
   const { firstVisit } = businessConfig.pricing;
+  const offer = soakOfferPrice();
   return (
     <div className="mt-1 w-full rounded-[16px] border-2 border-olive bg-ivory px-4 py-3.5 sm:max-w-md lg:max-w-none">
       <p className="text-[12px] font-bold uppercase tracking-[0.14em] text-olive">First visit</p>
@@ -100,16 +102,26 @@ function PaymentOptions() {
         className="mt-0.5 text-[26px] font-bold leading-none text-olive"
         style={{ fontFamily: "var(--font-heading)" }}
       >
-        RM{firstVisit}
+        {offer ? (
+          <>
+            <span className="text-[19px] text-muted line-through">RM{firstVisit}</span>{" "}
+            <span className="text-[#7a5410]">{offer}</span>
+          </>
+        ) : (
+          <>RM{firstVisit}</>
+        )}
       </p>
       <p className="mt-2 text-[13.5px] leading-snug text-muted">
-        Pay online now, or at the door when you arrive — the price is the same either way.
+        {offer
+          ? "With an 11.11 voucher — buy by 11 Nov, 2 per person, redeem by 31 Dec."
+          : "Pay online now, or at the door when you arrive — the price is the same either way."}
       </p>
     </div>
   );
 }
 
 export function VisitJourney() {
+  const offerPrice = soakOfferPrice();
   const [who, setWho] = useState<Visitor>("first");
   const panelId = useId();
   const isFirst = who === "first";
@@ -199,10 +211,21 @@ export function VisitJourney() {
                       className="text-[34px] font-bold leading-none text-olive sm:text-[40px]"
                       style={{ fontFamily: "var(--font-heading)" }}
                     >
-                      RM{firstVisit}
+                      {offerPrice ? (
+                        <>
+                          <span className="text-[24px] text-muted line-through sm:text-[28px]">
+                            RM{firstVisit}
+                          </span>{" "}
+                          <span className="text-[#7a5410]">{offerPrice}</span>
+                        </>
+                      ) : (
+                        <>RM{firstVisit}</>
+                      )}
                     </p>
                     <p className="mt-2 text-[15px] leading-relaxed text-muted">
-                      Pay online or at the door — the price is the same either way.
+                      {offerPrice
+                        ? "With an 11.11 voucher — buy by 11 Nov, 2 per person, redeem by 31 Dec."
+                        : "Pay online or at the door — the price is the same either way."}
                     </p>
                   </div>
                 )}

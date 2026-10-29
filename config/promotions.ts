@@ -293,3 +293,16 @@ export function firstVisitPaused(now: Date = new Date()): boolean {
 export function isVoucherProduct(productId: string | null | undefined): boolean {
   return !!productId && VOUCHERS.some((v) => v.productId === productId);
 }
+
+/**
+ * The offer price for a single soak right now, as it should be shown, or null.
+ *
+ * One source for every price surface on the site. The 11.11 price was added
+ * to the band, the prices page and the ladder one at a time, and each pass
+ * missed somewhere — the About CTAs, How It Works, the experience modal — so
+ * the site quoted RM30 or RM40 in places while running an RM11 offer. Anything
+ * that prints a soak price should ask this rather than decide for itself.
+ */
+export function soakOfferPrice(now: Date = new Date()): string | null {
+  return activeVoucherOffer(now)?.price ?? null;
+}

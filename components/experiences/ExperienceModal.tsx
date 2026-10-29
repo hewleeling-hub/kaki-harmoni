@@ -14,6 +14,7 @@ import {
   SparklesIcon,
   WavesIcon,
 } from "@/components/ui/icons";
+import { soakOfferPrice } from "@/config/promotions";
 import { businessConfig } from "@/config/business";
 import type { Experience } from "@/config/experiences";
 
@@ -66,6 +67,7 @@ export function ExperienceModal({
   const pale = `rgba(${exp.glowRgb},0.16)`;
   const titleId = `exp-title-${exp.id}`;
   const price = `RM${businessConfig.pricing.normal}`;
+  const offerPrice = soakOfferPrice();
 
   const includes = [
     { icon: DropletIcon, text: `${exp.name} essential oils` },
@@ -202,10 +204,20 @@ export function ExperienceModal({
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <p className="text-[18px] font-semibold text-olive-dark">
-                    {price} <span className="text-muted">• {exp.duration}</span>
+                    {offerPrice ? (
+                      <>
+                        <span className="text-muted line-through">{price}</span>{" "}
+                        <span className="text-[#7a5410]">{offerPrice}</span>
+                      </>
+                    ) : (
+                      price
+                    )}{" "}
+                    <span className="text-muted">• {exp.duration}</span>
                   </p>
                   <p className="mt-0.5 text-[12.5px] text-muted">
-                    First visit RM{businessConfig.pricing.firstVisit} · save with a package
+                    {offerPrice
+                      ? "With an 11.11 voucher — buy by 11 Nov, 2 per person"
+                      : `First visit RM${businessConfig.pricing.firstVisit} · save with a package`}
                   </p>
                 </div>
                 <Link
