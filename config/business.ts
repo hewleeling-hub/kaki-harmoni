@@ -218,7 +218,7 @@ export const faqs = [
   },
   {
     q: "How long is each session?",
-    a: "Each warm leg soak lasts about 15 minutes — a simple break that fits into your day. Fancy a longer unwind? You're very welcome to go back to back: many guests enjoy a second soak straight after, or one either side of a break. Just ask our team and we'll set it up.",
+    a: "Each warm leg soak lasts about 15 minutes — a simple break that fits into your day. Fancy a longer unwind? You're very welcome to go back to back — tell our team when you arrive.",
   },
   {
     q: "How often should I come?",
