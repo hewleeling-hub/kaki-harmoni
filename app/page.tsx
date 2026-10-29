@@ -438,7 +438,7 @@ export default async function Home({
                     </p>
                     <p className="mt-3 text-[17px] leading-relaxed text-brown">
                       <a
-                        href="#voucher"
+                        href="#voucher-form"
                         className="font-semibold text-olive underline underline-offset-4 hover:text-olive-dark"
                       >
                         Get your voucher first

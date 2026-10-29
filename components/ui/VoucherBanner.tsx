@@ -107,7 +107,13 @@ function VoucherBand({
       {/* The number is taken here rather than only on WhatsApp, because the
           two-per-person limit is counted on it. A message thread records
           nothing the cap can check. */}
-      <div className="mt-5">
+      {/* The CTAs target the FORM, not the band. The band is the first thing
+          on the page, so a link to it scrolled roughly four pixels and the
+          button read as broken — nothing visibly happened because there was
+          nowhere to go. Landing on the form moves the page and puts the thing
+          they have to fill in front of them. scroll-mt keeps the offer
+          headline above it for anyone arriving from another page. */}
+      <div id="voucher-form" className="mt-5 scroll-mt-28">
         <VoucherClaimForm offer={offer} />
       </div>
 

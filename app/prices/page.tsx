@@ -113,7 +113,7 @@ function PriceTile({
            argued about at the counter. The offer price gets the offer's
            button; the standing price stays available underneath it. */
         <>
-          <Button href="/#voucher" full className="mt-5">
+          <Button href="/#voucher-form" full className="mt-5">
             Get the RM{offerPrice} voucher
           </Button>
           {/* No "or book it at the standing price" alternative while the offer

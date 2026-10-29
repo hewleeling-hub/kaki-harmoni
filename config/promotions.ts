@@ -253,7 +253,7 @@ export function voucherNavCta(
   return {
     full: `11.11 Voucher — ${offer.price}`,
     short: `${offer.price} Voucher`,
-    href: "/#voucher",
+    href: "/#voucher-form",
   };
 }
 

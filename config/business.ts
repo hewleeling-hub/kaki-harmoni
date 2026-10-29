@@ -684,7 +684,7 @@ export function routinePackagesNow(now: Date = new Date()): readonly RoutinePack
           priceNote: "buy by 11 Nov · 2 per person · redeem by 31 Dec",
           positioning: "The cheapest way to try us while the offer runs.",
           cta: "GET A VOUCHER",
-          href: "/#voucher",
+          href: "/#voucher-form",
           limitedTime: true,
         }
       : rung,
