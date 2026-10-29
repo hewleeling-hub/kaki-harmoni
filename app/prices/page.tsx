@@ -116,14 +116,10 @@ function PriceTile({
           <Button href="/#voucher" full className="mt-5">
             Get the RM{offerPrice} voucher
           </Button>
-          {isOnSale(slug) ? (
-            <a
-              href={reserveHref(slug)}
-              className="mt-3 text-[14px] font-semibold text-olive underline underline-offset-2 hover:text-olive-dark"
-            >
-              Or book a single soak at RM{price}
-            </a>
-          ) : null}
+          {/* No "or book it at the standing price" alternative while the offer
+              runs. Offering RM40 underneath RM11 asks a question that answers
+              itself, and the standing price is still on the checkout for
+              anyone who wants it. The struck price above carries the saving. */}
         </>
       ) : isOnSale(slug) ? (
         <Button href={reserveHref(slug)} variant="secondary" full className="mt-5">
