@@ -11,7 +11,9 @@ import {
   PACKAGES_ARE_DOOR_ONLY,
   soaksForProductId,
 } from "@/config/catalogue";
-import { promotionForBookingDate, isPromotionProduct, isVoucherProduct } from "@/config/promotions";
+import { promotionForBookingDate, isPromotionProduct, isVoucherProduct, activeVoucherOffer, ELEVEN_ELEVEN } from "@/config/promotions";
+import { voucherAllowance, refuseVoucherClaim } from "@/lib/vouchers";
+import { phoneKeyFor } from "@/lib/customer";
 
 // Legacy default used when no items are sent or the catalogue isn't available yet.
 const DEFAULT_ITEM_NAME = "First Visit — Foot Soak";
@@ -206,14 +208,24 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // Same rule server-side: a voucher is not a bookable line. The checkout
-  // hides it; this is what stops a hand-built request buying a capped price
-  // without going through the cap.
-  if (isVoucherProduct(mainLine?.product_id)) {
-    return NextResponse.json(
-      { error: "That voucher is bought from the 11.11 offer, not booked here. Please pick a soak." },
-      { status: 409 },
-    );
+  /* The 11.11 voucher is bookable here, under the SAME per-person cap the band
+     enforces — counted on the phone number, so two bought in the band and two
+     booked here is still two, not four. Checked server-side because the
+     checkout only hides the option; a stale tab or a hand-built request would
+     otherwise buy a capped price without going through the cap. */
+  const bookingVoucher = isVoucherProduct(mainLine?.product_id);
+  if (bookingVoucher) {
+    const offer = activeVoucherOffer() ?? ELEVEN_ELEVEN;
+    const allowance = await voucherAllowance(supabase, signup.phone as string | null, offer);
+    const refusal = refuseVoucherClaim({
+      offer,
+      allowance,
+      wanted: 1,
+      onSale: !!activeVoucherOffer(),
+    });
+    if (refusal) {
+      return NextResponse.json({ error: refusal.message, reason: refusal.reason }, { status: 409 });
+    }
   }
 
   if (!bookingPromo && isPromotionProduct(mainLine?.product_id)) {
@@ -276,6 +288,28 @@ export async function POST(request: NextRequest) {
 
   if (purchaseError || !purchase) {
     return NextResponse.json({ error: "Something went wrong. Please try again." }, { status: 500 });
+  }
+
+  /* A voucher booked here has to leave a voucher ROW, or the cap would only
+     ever count what the band sold and this route would be an unlimited side
+     door into the same price. Same shape the band writes, so one count covers
+     both. Failure is logged rather than fatal: the booking and the money are
+     already real, and losing the row costs a cap check, not a purchase. */
+  if (bookingVoucher) {
+    const offer = activeVoucherOffer() ?? ELEVEN_ELEVEN;
+    const { error: voucherError } = await supabase.from("vouchers").insert({
+      signup_id,
+      phone_normalised: phoneKeyFor(signup.phone as string | null),
+      offer_id: offer.id,
+      product_id: mainLine?.product_id ?? offer.productId,
+      price_myr: mainLine?.unit_price_myr ?? 11,
+      status: "reserved",
+      expires_on: offer.redeemByISO,
+      notes: `Booked at checkout for ${slot_date ?? "an unspecified date"}.`,
+    });
+    if (voucherError) {
+      console.error("voucher row insert failed — cap will undercount:", voucherError.message);
+    }
   }
 
   // Persist line items. If the table doesn't exist yet (migration not applied),

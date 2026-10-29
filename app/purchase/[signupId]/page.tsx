@@ -6,7 +6,8 @@ import { PRELAUNCH_MODE, LAUNCH_WINDOW } from "@/lib/config";
 import { formatSlotTime } from "@/lib/slots";
 import { productIdForSlug, FIRST_VISIT_PRODUCT_ID } from "@/config/catalogue";
 import { hasBookedBefore } from "@/lib/customer";
-import { promotionForBookingDate, isPromotionProduct, isVoucherProduct } from "@/config/promotions";
+import { promotionForBookingDate, isPromotionProduct, isVoucherProduct, activeVoucherOffer } from "@/config/promotions";
+import { voucherAllowance } from "@/lib/vouchers";
 
 export default async function PurchasePage({
   params,
@@ -53,13 +54,24 @@ export default async function PurchasePage({
   // The API applies the same rule; this is the half the customer sees.
   const promo = promotionForBookingDate(slotDate);
 
+  /* The 11.11 voucher IS bookable here, but only while it is on sale and only
+     while this phone has allowance left. The cap is counted on the number, the
+     same one the band uses, so the two routes share a limit rather than having
+     one each — buying two in the band and two here would otherwise be four.
+
+     Checked here so the option is simply absent once they have had their two;
+     /api/purchases checks it again, because hiding a radio button is
+     presentation, not a rule. */
+  const voucherOnSale = activeVoucherOffer();
+  const voucherAllow = voucherOnSale
+    ? await voucherAllowance(supabase, signup.phone as string | null)
+    : null;
+  const voucherBookable = !!voucherOnSale && !!voucherAllow?.countable && voucherAllow.remaining > 0;
+
   const products = (allProducts ?? []).filter((p) => {
     if (promo) return p.id === promo.productId;
     if (isPromotionProduct(p.id)) return false;
-    // Vouchers are sold through the voucher flow, which enforces the
-    // per-person cap. Booking one here would be a soak at voucher price with
-    // no cap at all.
-    if (isVoucherProduct(p.id)) return false;
+    if (isVoucherProduct(p.id)) return voucherBookable;
     return !(isReturning && p.id === FIRST_VISIT_PRODUCT_ID);
   });
 
