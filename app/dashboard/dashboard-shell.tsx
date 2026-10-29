@@ -26,6 +26,9 @@ export default function DashboardShell({
     // the signed sheet. It sits inside the dashboard, so it is behind the same
     // login as everything else here and there is no public route to it.
     { href: "/dashboard/intake", label: "Intake", icon: IntakeIcon },
+    // Every role, for the same reason as Intake: the person who gets the
+    // WhatsApp payment screenshot is the one who marks the voucher paid.
+    { href: "/dashboard/vouchers", label: "Vouchers", icon: VoucherIcon },
     ...(role === "owner" || role === "manager"
       ? [
           { href: "/dashboard/retention", label: "Retention", icon: RetentionIcon },
@@ -162,6 +165,15 @@ function IntakeIcon() {
       <path d="M9.5 8.5h5" />
       <path d="M9.5 12h5" />
       <path d="M9.5 15.5h3" />
+    </svg>
+  );
+}
+
+function VoucherIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 9a2 2 0 0 0 0 6v3a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1v-3a2 2 0 0 1 0-6V6a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1z" />
+      <path d="M13 5v14" strokeDasharray="2 3" />
     </svg>
   );
 }
