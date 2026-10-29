@@ -83,17 +83,38 @@ export function VoucherClaimForm({ offer }: { offer: VoucherOffer }) {
           <p className="mt-3 text-[15px] leading-relaxed text-brown">
             Open any bank or e-wallet app, scan, and pay {amount}.
           </p>
+          {/* A DuitNow transfer arrives with whatever the sender's bank chose
+              to put on it, which is often a bank reference and nothing else.
+              Two steps make it matchable: the name in the reference field, and
+              the screenshot. Numbered, because both have to happen and a
+              sentence running them together gets half-read. */}
+          <ol className="mt-3 space-y-1.5 text-left text-[15px] leading-relaxed text-brown">
+            <li className="flex gap-2">
+              <span className="font-semibold text-[#7a5410]">1.</span>
+              <span>
+                Put <strong className="text-olive-dark">your full name</strong> in the reference or
+                recipient reference box, so we can match the payment to you.
+              </span>
+            </li>
+            <li className="flex gap-2">
+              <span className="font-semibold text-[#7a5410]">2.</span>
+              <span>
+                <strong className="text-olive-dark">Send us a screenshot</strong> of the payment on
+                WhatsApp — tap the button below and attach it.
+              </span>
+            </li>
+          </ol>
         </div>
 
         <a
           href={whatsappLink(
-            `Hi Kaki Harmoni! I've paid ${amount} for ${done.claimed} 11.11 Foot Spa Voucher${done.claimed === 1 ? "" : "s"}. Reference ${done.reference} (${name}, ${phone}).`,
+            `Hi Kaki Harmoni! I've paid ${amount} for ${done.claimed} 11.11 Foot Spa Voucher${done.claimed === 1 ? "" : "s"}. Full name: ${name}. Reference ${done.reference} (${phone}). Screenshot of my payment is attached.`,
           )}
           target="_blank"
           rel="noopener noreferrer"
           className="mt-4 inline-flex min-h-12 w-full items-center justify-center rounded-[26px] bg-[#25D366] px-6 text-[17px] font-semibold text-white transition hover:brightness-95"
         >
-          I&rsquo;ve paid — tell us
+          I&rsquo;ve paid — send screenshot
         </a>
 
         <p className="mt-3 text-[15px] leading-relaxed text-brown">
