@@ -88,9 +88,23 @@ export default async function PurchasePage({
   const products = (allProducts ?? []).filter((p) => {
     if (promo) return p.id === promo.productId;
     if (isPromotionProduct(p.id)) return false;
+    /* Paying with no date is only coherent for the voucher, which carries a
+       redeem-by date of its own. A dateless visit has no terms saying when it
+       must be used, so it would just become a message for someone to chase —
+       and `later=1` is a URL anyone can type, so the rule lives here and not
+       only in the link that offers it. */
+    if (bookLater) return isVoucherProduct(p.id) && voucherBookable;
     if (isVoucherProduct(p.id)) return voucherBookable;
     return !(isReturning && p.id === FIRST_VISIT_PRODUCT_ID);
   });
+
+  /* Nothing left to sell on the dateless path — their two vouchers are spent,
+     or the sale has closed. Without this the picker would fall through to its
+     empty-catalogue fallback and quietly offer the legacy RM25 first visit
+     with no date on it. Send them to the calendar, which says what IS open. */
+  if (bookLater && products.length === 0) {
+    redirect(`/purchase/${signupId}/book`);
+  }
 
   // The tier they clicked on /prices, resolved to a real catalogue row. An
   // unrecognised or withdrawn option falls through to null and the form simply

@@ -292,7 +292,7 @@ export default function PurchaseForm({
           </div>
         ) : (
           <div className="w-full rounded-lg border border-black/10 bg-black/5 px-3 py-2.5">
-            <p className="text-black/80 text-sm font-medium">First Visit — Foot Soak + Coffee</p>
+            <p className="text-black/80 text-sm font-medium">First Visit — Foot Soak</p>
           </div>
         )}
         {isPackage && (

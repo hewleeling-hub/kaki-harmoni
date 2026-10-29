@@ -41,8 +41,12 @@ export default async function BookPage({
      must be used, so it would just become a message for someone to chase. */
   const voucherOffer = activeVoucherOffer();
   const askedForVoucher = isVoucherProduct(productIdForSlug(option));
+  /* NOT offered to somebody who already owns a voucher. They have already paid;
+     picking a time is the only thing left to do, and "pay now and pick your
+     time later" would take them to a checkout with nothing to charge and
+     nothing to book — a link that looks like it does something and doesn't. */
   const ownsAVoucher = !!(await unusedVoucherFor(supabase, signup.phone as string | null));
-  const canBookLater = !!voucherOffer && (askedForVoucher || ownsAVoucher);
+  const canBookLater = !!voucherOffer && askedForVoucher && !ownsAVoucher;
 
   // An existing booking used to send people straight to the success page,
   // which made a second visit impossible to book — the routine ladder is built
