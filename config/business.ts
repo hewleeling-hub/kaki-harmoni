@@ -91,6 +91,13 @@ export const businessConfig = {
     /** Exclusive: 16 makes 15:30 the last weekend slot. */
     closeHourWeekend: 16,
     timezone: "Asia/Kuala_Lumpur",
+    /**
+     * Whole days the shop is shut, as ISO dates (Kuala Lumpur). The calendar
+     * offers no slots on these and /api/purchases and /api/bookings refuse them,
+     * so a typed or shared link cannot book one either. Add a date here and
+     * nothing else needs to change; remove it once it has passed.
+     */
+    closedDates: ["2026-11-01"] as readonly string[],
   },
 
   /**

@@ -143,7 +143,16 @@ export function remainingFor(
  * still the mistakes to avoid.
  */
 
+/** Is the shop shut for the whole of this date? See hours.closedDates. */
+export function isClosedDate(dateISO: string): boolean {
+  return businessConfig.hours.closedDates.includes(dateISO);
+}
+
+/** What to tell somebody who asks for a closed date. One sentence, one place. */
+export const CLOSED_DATE_MESSAGE = "We're closed on that day — please pick another date.";
+
 export function generateSlotsForDay(dateISO: string): string[] {
+  if (isClosedDate(dateISO)) return [];
   const closeHour = closeHourForDate(dateISO);
   const slots: string[] = [];
   /* The first soak is later than the door: the shop opens on the hour and the
@@ -169,6 +178,17 @@ export function formatSlotTime(time: string): string {
   const displayHour = h % 12 === 0 ? 12 : h % 12;
   return `${displayHour}:${mStr} ${period}`;
 }
+
+/** The first open date on or after `dateISO`, so the calendar never opens on a closed day. */
+export function nextOpenDate(dateISO: string): string {
+  const d = new Date(`${dateISO}T00:00:00`);
+  // Bounded: a mistyped run of closed dates must not spin forever.
+  for (let i = 0; i < 366 && isClosedDate(fmtLocal(d)); i++) d.setDate(d.getDate() + 1);
+  return fmtLocal(d);
+}
+
+const fmtLocal = (d: Date) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
 // Earliest bookable date is the later of today or BOOKING_START_DATE; the
 // calendar then runs BOOKING_WINDOW_DAYS ahead of that.

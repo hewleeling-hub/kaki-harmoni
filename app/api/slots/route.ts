@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { generateSlotsForDay, remainingFor } from "@/lib/slots";
+import { generateSlotsForDay, remainingFor, isClosedDate } from "@/lib/slots";
 import { occupancyForDate } from "@/lib/capacity";
 import { soaksForSlug } from "@/config/catalogue";
 
@@ -16,6 +16,11 @@ export async function GET(request: NextRequest) {
   // travels here as ?option= — the same slug the booking flow already carries
   // — and anything unrecognised falls back to one soak.
   const soaks = soaksForSlug(request.nextUrl.searchParams.get("option"));
+
+  // No point reading bookings for a day with nothing to book.
+  if (isClosedDate(date)) {
+    return NextResponse.json({ slots: [], closed: true });
+  }
 
   const supabase = createAdminClient();
 

@@ -3,7 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { logActivity, logAudit } from "@/lib/activity";
 import { scoreLead } from "@/lib/scoring";
 import { sendSalesAlert, purchaseConfirmedEmail } from "@/lib/email";
-import { remainingFor } from "@/lib/slots";
+import { remainingFor, isClosedDate, CLOSED_DATE_MESSAGE } from "@/lib/slots";
 import { occupancyForDate } from "@/lib/capacity";
 import { hasBookedBefore } from "@/lib/customer";
 import {
@@ -73,6 +73,11 @@ export async function POST(request: NextRequest) {
   // Nothing reserves the slot between picking it and paying, so this is the
   // real gate — someone else may have taken the last machine meanwhile.
   if (slot_date && slot_time) {
+    /* A closed day offers no slots, but the date travels in the URL and this is
+       the only place a hand-made or stale one is stopped. */
+    if (isClosedDate(slot_date)) {
+      return NextResponse.json({ error: CLOSED_DATE_MESSAGE, closed: true }, { status: 409 });
+    }
     const occupancy = await occupancyForDate(supabase, slot_date);
     // resolveLines guarantees exactly one main item, so the booking's shape is
     // that line's. Add-ons occupy no machine.

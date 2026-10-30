@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { bookableDateRange, formatSlotTime } from "@/lib/slots";
+import { bookableDateRange, formatSlotTime, isClosedDate, nextOpenDate, CLOSED_DATE_MESSAGE } from "@/lib/slots";
 import { withOption } from "@/config/catalogue";
 
 interface Slot {
@@ -20,7 +20,7 @@ export default function BookingForm({
 }) {
   const router = useRouter();
   const { min, max } = bookableDateRange();
-  const [date, setDate] = useState(min);
+  const [date, setDate] = useState(() => nextOpenDate(min));
   const [slots, setSlots] = useState<Slot[] | null>(null);
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
@@ -104,6 +104,9 @@ export default function BookingForm({
               <div key={i} className="h-9 rounded-lg bg-black/5 animate-pulse" />
             ))}
           </div>
+        ) : isClosedDate(date) ? (
+          /* The native date input cannot grey out a single day, so say it. */
+          <p className="rounded-lg bg-black/5 px-4 py-3 text-sm text-black/70">{CLOSED_DATE_MESSAGE}</p>
         ) : (
           <div className="grid grid-cols-3 gap-2 max-h-56 overflow-y-auto pr-1">
             {slots?.map((s) => {
