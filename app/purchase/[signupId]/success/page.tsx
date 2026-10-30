@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { formatSlotTime } from "@/lib/slots";
 import { PRELAUNCH_MODE, PAYMENT_QR, LAUNCH_WINDOW } from "@/lib/config";
 import { whatsAppLink, BUSINESS_WHATSAPP_NUMBER } from "@/lib/whatsapp";
+import { ELEVEN_ELEVEN, isVoucherProduct } from "@/config/promotions";
 
 const money = (n: number) => `RM${Number(n).toFixed(2)}`;
 
@@ -26,6 +27,14 @@ export default async function PurchaseSuccessPage({ params }: { params: Promise<
     .select("name")
     .eq("id", signupId)
     .maybeSingle();
+
+  /* Does this order contain the 11.11 voucher? Read from the order lines, which
+     carry the product id, rather than guessed from the name. The redeem-by date
+     comes from the offer in config/promotions.ts like every other surface. */
+  const { data: items } = purchase
+    ? await supabase.from("order_items").select("product_id").eq("purchase_id", purchase.id)
+    : { data: null };
+  const hasVoucher = (items ?? []).some((i) => isVoucherProduct(i.product_id));
 
   const hasBooking = !!purchase?.booking_date && !!purchase?.booking_time;
   const isPending = purchase?.status === "pending_payment";
@@ -111,6 +120,11 @@ export default async function PurchaseSuccessPage({ params }: { params: Promise<
                     : "paid"}
               </span>
             </p>
+            {hasVoucher && (
+              <p className="text-sm text-black/70">
+                <span className="text-black/45">Redeem by:</span> {ELEVEN_ELEVEN.redeemByLabel}
+              </p>
+            )}
             <p className="text-sm text-black/70">
               <span className="text-black/45">Where:</span> Desa Cindaimas Condominium Clubhouse,
               Jalan Sekutu, Taman Gembira, 58200 Kuala Lumpur
@@ -136,6 +150,11 @@ export default async function PurchaseSuccessPage({ params }: { params: Promise<
               Open any bank or e-wallet app, scan, and pay {money(amount)}. Your spot is
               locked once we receive it — fully refundable until your slot is confirmed.
             </p>
+            {hasVoucher && (
+              <p className="text-xs font-medium text-black/70">
+                Your 11.11 voucher can only be redeemed until {ELEVEN_ELEVEN.redeemByLabel}.
+              </p>
+            )}
             <a
               href={paidWa}
               target="_blank"
