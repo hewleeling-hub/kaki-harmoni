@@ -4,9 +4,8 @@ import Logo from "@/app/logo";
 import BookingForm from "./booking-form";
 import { PRELAUNCH_MODE } from "@/lib/config";
 import Link from "next/link";
-import { activeVoucherOffer, isVoucherProduct } from "@/config/promotions";
-import { productIdForSlug } from "@/config/catalogue";
-import { unusedVoucherFor } from "@/lib/vouchers";
+import { activeVoucherOffer } from "@/config/promotions";
+import { unusedVoucherFor, voucherAllowance } from "@/lib/vouchers";
 
 export default async function BookPage({
   params,
@@ -40,13 +39,23 @@ export default async function BookPage({
      A visit is different: a dateless RM40 booking has no terms saying when it
      must be used, so it would just become a message for someone to chase. */
   const voucherOffer = activeVoucherOffer();
-  const askedForVoucher = isVoucherProduct(productIdForSlug(option));
   /* NOT offered to somebody who already owns a voucher. They have already paid;
      picking a time is the only thing left to do, and "pay now and pick your
      time later" would take them to a checkout with nothing to charge and
      nothing to book — a link that looks like it does something and doesn't. */
   const ownsAVoucher = !!(await unusedVoucherFor(supabase, signup.phone as string | null));
-  const canBookLater = !!voucherOffer && askedForVoucher && !ownsAVoucher;
+  /* Nor to somebody who has used their two. /purchase/[id]?later=1 would find
+     nothing to sell and send them straight back here — a link that loops. The
+     cap fails closed, so an uncountable number gets no link either. */
+  const allowance = voucherOffer
+    ? await voucherAllowance(supabase, signup.phone as string | null, voucherOffer)
+    : null;
+  /* Offered to everyone while the promo is on, not only to someone who arrived
+     with ?option=eleven-eleven: people reach this page from the ordinary
+     reserve form too, and a customer who wants to pay for the 11.11 voucher
+     first should not have to have found the right link to be allowed to. */
+  const canBookLater =
+    !!voucherOffer && !ownsAVoucher && !!allowance?.countable && allowance.remaining > 0;
 
   // An existing booking used to send people straight to the success page,
   // which made a second visit impossible to book — the routine ladder is built
@@ -82,10 +91,11 @@ export default async function BookPage({
               className="text-sm font-medium underline underline-offset-2"
               style={{ color: "var(--lagoon-dark)" }}
             >
-              I&apos;d rather pay now and pick my time later
+              Want the 11.11 voucher? Pay now and pick your time later
             </Link>
             <p className="mt-1 text-xs text-black/50">
-              We&apos;ll message you to arrange a time that suits you.
+              {voucherOffer?.price} a soak, redeem by {voucherOffer?.redeemByLabel}. We&apos;ll
+              message you to arrange a time that suits you.
             </p>
           </div>
         )}
