@@ -7,7 +7,7 @@
  * open after launch. Do not invent prices or availability.
  */
 
-import { firstVisitPaused, activeVoucherOffer } from "@/config/promotions";
+import { firstVisitPaused, activeVoucherOffer, ELEVEN_ELEVEN } from "@/config/promotions";
 import {
   BUSINESS_WHATSAPP_NUMBER,
   BUSINESS_WHATSAPP_DISPLAY,
@@ -656,15 +656,34 @@ export const experienceVideo: { src: string | null; poster?: string; caption?: s
  * is no longer offering anywhere else.
  */
 export function faqsNow(now: Date = new Date()): readonly { q: string; a: string }[] {
-  if (!firstVisitPaused(now)) return faqs;
-  return faqs.map((item) =>
-    item.q === "How much is a visit?"
-      ? {
-          q: item.q,
-          a: `While the 11.11 offer runs, a Foot Spa Voucher is RM11 a soak — buy by 11 November, two per person, redeem by 31 December. After that a single soak is RM${businessConfig.pricing.normal}. Packages work out cheaper again if you come often — ask our team in the shop and they'll set one up for you.`,
-        }
-      : item,
-  );
+  const base = firstVisitPaused(now)
+    ? faqs.map((item) =>
+        item.q === "How much is a visit?"
+          ? {
+              q: item.q,
+              a: `While the 11.11 offer runs, a Foot Spa Voucher is RM11 a soak — buy by 11 November, two per person, redeem by 31 December. After that a single soak is RM${businessConfig.pricing.normal}. Packages work out cheaper again if you come often — ask our team in the shop and they'll set one up for you.`,
+            }
+          : item,
+      )
+    : faqs;
+
+  /* The voucher's own entry outlives the sale: it is bought by 11 November but
+     can be used until 31 December, and the question "when does it run out?" is
+     asked most in the weeks AFTER the band has gone. So the window here is
+     sellFrom to the end of the redeem-by day (KL), not the sale window that
+     firstVisitPaused() uses. */
+  const offer = ELEVEN_ELEVEN;
+  const redeemEnd = new Date(new Date(`${offer.redeemByISO}T00:00:00+08:00`).getTime() + 24 * 60 * 60 * 1000);
+  if (now < offer.sellFrom || now >= redeemEnd) return base;
+
+  const entry = {
+    q: "How does the 11.11 voucher work?",
+    a: `The 11.11 Foot Spa Voucher is RM11 a soak. Buy by ${offer.sellUntilLabel}, up to ${offer.maxPerPerson} per person. It must be redeemed by ${offer.redeemByLabel} — after that it can no longer be used. Pick your time when you book, or pay now and choose your time later, as long as you use it by ${offer.redeemByLabel}.`,
+  };
+  /* Straight under "How long do I have to use my package?": that is where
+     someone looking for a deadline is already reading. */
+  const at = base.findIndex((item) => item.q === "How long do I have to use my package?");
+  return at === -1 ? [...base, entry] : [...base.slice(0, at + 1), entry, ...base.slice(at + 1)];
 }
 
 
