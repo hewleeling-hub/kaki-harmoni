@@ -79,6 +79,8 @@ export default function IntakeClient({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+  // What the save did about the customer record — see the note in /api/intake.
+  const [savedNote, setSavedNote] = useState<string | null>(null);
 
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string>("");
@@ -328,6 +330,20 @@ export default function IntakeClient({
 
       if (payload?.form) setJustSaved((prev) => [payload.form as IntakeForm, ...prev]);
 
+      const c = payload?.customer as
+        | { name: string | null; customer_no: number | null; created: boolean }
+        | null
+        | undefined;
+      setSavedNote(
+        c
+          ? c.created
+            ? `New customer ${customerRef(c.customer_no)} (${c.name}) added to the customer list.`
+            : `Filed against existing customer ${customerRef(c.customer_no)} (${c.name}) — matched on the phone number.`
+          : selectedId
+            ? "Filed against the customer you picked."
+            : "No customer was added: the form needs both a name and a contact number for that.",
+      );
+
       // form.reset() only clears what the DOM owns; the oils are React state.
       formEl.reset();
       setOilsUsed([]);
@@ -353,7 +369,7 @@ export default function IntakeClient({
     <div className="space-y-6">
       {saved && (
         <p className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
-          Saved. The form is filed against that customer.
+          Saved. {savedNote}
         </p>
       )}
 

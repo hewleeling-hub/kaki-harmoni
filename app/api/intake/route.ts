@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { requireStaff } from "@/lib/auth";
 import { logActivity } from "@/lib/activity";
+import { phoneKeyFor } from "@/lib/customer";
 import {
   HEALTH_CONDITIONS,
   HEALTH_GOALS,
@@ -132,6 +133,68 @@ export async function POST(request: NextRequest) {
     }
   }
 
+  /* No customer picked, but the form carries a name and a number: put the
+     person in the customer list. A signed form is the first time a walk-in is
+     written down anywhere, so filing it without a customer record left them
+     findable only by scrolling the forms.
+
+     Matched on the phone number, the same identity the first-visit rule and
+     the customer number use (lib/customer.ts) — a returning guest is filed
+     against who they already are rather than collecting a second number. Needs
+     BOTH: a name with no usable number cannot be matched safely, so the form is
+     saved on its own and the response says so. */
+  let customer: { id: string; name: string | null; customer_no: number | null; created: boolean } | null = null;
+
+  if (!signup) {
+    const guestName = clean(form.get("guest_name"), 120);
+    const guestPhone = clean(form.get("contact_no"), 40);
+    const phoneKey = phoneKeyFor(guestPhone);
+
+    if (guestName && guestPhone && phoneKey) {
+      const { data: known } = await supabase
+        .from("signups")
+        .select("id, name, phone, customer_no")
+        .eq("phone_normalised", phoneKey)
+        .order("created_at", { ascending: true })
+        .limit(1)
+        .maybeSingle();
+
+      if (known) {
+        signup = known as IntakeSignupRow;
+        customer = { id: signup.id, name: signup.name, customer_no: signup.customer_no, created: false };
+      } else {
+        const { data: made, error: makeError } = await supabase
+          .from("signups")
+          .insert({
+            name: guestName,
+            email: null,
+            phone: guestPhone,
+            phone_normalised: phoneKey,
+            referral_source: "Walk-in",
+            status: "signed_up",
+          })
+          .select("id, name, phone, customer_no")
+          .single();
+
+        // Not fatal: the signed form is the record that matters, and losing the
+        // customer row costs a search result, not a consent record.
+        if (makeError || !made) {
+          console.error("intake: could not add the customer:", makeError?.message);
+        } else {
+          signup = made as IntakeSignupRow;
+          customer = { id: signup.id, name: signup.name, customer_no: signup.customer_no, created: true };
+          await logActivity(supabase, {
+            entity_type: "signup",
+            entity_id: signup.id,
+            action: "signup_created",
+            actor: user.email ?? "staff",
+            metadata: { source: "intake" },
+          });
+        }
+      }
+    }
+  }
+
   // ── The scan ──────────────────────────────────────────────────────────────
   // Optional: a form can be keyed in first and the scan added once the sheet
   // reaches the scanner. Type and size are checked here as well as on the
@@ -236,5 +299,5 @@ export async function POST(request: NextRequest) {
     metadata: { intake_id: savedRow.id, has_scan: !!scanPath },
   });
 
-  return NextResponse.json({ ok: true, id: savedRow.id, form: saved }, { status: 201 });
+  return NextResponse.json({ ok: true, id: savedRow.id, form: saved, customer }, { status: 201 });
 }

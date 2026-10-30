@@ -73,8 +73,21 @@ export type ExtractedForm = z.infer<typeof ExtractedForm>;
 
 const SYSTEM = `You read photographs of a signed paper spa intake form and return what is written on them. You are helping a member of staff key in a form; they will check everything you return before it is saved.
 
-THE FORM
-It is a bilingual Chinese/English "SPA SURVEY FORM" from the machine supplier. Its printed labels do not always match the field names you are filling in, so map them:
+THE FORMS
+There are two, and both may arrive.
+
+1. KAKI HARMONI'S OWN "GUEST INTAKE & CONSENT" form (the Kaki Harmoni logo at the top left, headed "GUEST INTAKE & CONSENT"). Map it like this:
+- Date, Customer no. -> the handwritten date is "survey_date"; ignore the customer number
+- 1. YOUR DETAILS: Name -> guest_name; IC / Passport no. -> ic_passport_no; Contact no. -> contact_no; "Who referred you (if anyone)" -> sponsor_name
+- 2. BEFORE YOU SOAK: each ticked box -> health_conditions, mapped to the closest option offered. Tick boxes under "Others" with writing go in "notes"
+- 3. WHAT WOULD YOU LIKE FROM TODAY? each ticked box -> health_goals. "Others" with writing goes in "notes"
+- 4. CONSENT: the signature and the date beside it; signature_present is about this box
+- FOR OUR TEAM: usually blank when the form is first filled in. Only report boxes that are actually ticked.
+This form DOES have a goals section. Pencil ticks and crosses through a box both count as ticked.
+
+2. THE SUPPLIER'S "SPA SURVEY FORM"
+
+It is a bilingual Chinese/English form from the machine supplier. Its printed labels do not always match the field names you are filling in, so map them:
 
 - 水量 WATER LEVEL: "七分满 70%" -> "${WATER_LEVELS[0]}", "不要过胸部 BELOW CHEST" -> "${WATER_LEVELS[1]}"
 - 水温 TEMPERATURE: 35°C / 38°C / 40°C, exactly as printed
@@ -83,7 +96,7 @@ It is a bilingual Chinese/English "SPA SURVEY FORM" from the machine supplier. I
 - 精油 AROMA OIL: the seven numbered oils are Pine, Juniper, Rosemary, Hayseed, Lavender, Camomile, Eucalyptus. At most ${MAX_AROMA_OILS} may be ticked.
 - 健康状况 HEALTH CONDITION: map each ticked box onto the closest option offered. "心脏，血管问题 HEART PROBLEMS" is "Heart or blood vessel problems"; "怀孕 PREGNANCY" is "Pregnancy (4 months & below)".
 
-The form has no section for goals and no section for salts. Leave those empty unless something is genuinely written there.
+The supplier's form has no section for goals and no section for salts; leave those empty for it unless something is genuinely written there.
 
 RULES
 - Report only boxes that are actually ticked, crossed or marked. An empty box is not a tick. Most forms come back with very few ticks, and returning an empty list is the correct answer when nothing is marked.
