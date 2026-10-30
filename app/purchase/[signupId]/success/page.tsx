@@ -57,7 +57,9 @@ export default async function PurchaseSuccessPage({ params }: { params: Promise<
     [
       `Hi Kaki Harmoni! I've just booked ${purchase?.product_name ?? "a visit"} and will pay ${money(amount)} at the door.`,
       hasBooking ? `Slot: ${purchase?.booking_date} at ${formatSlotTime(purchase?.booking_time)}.` : "",
-      hasVoucher ? `Voucher must be redeemed by ${ELEVEN_ELEVEN.redeemByLabel}.` : "",
+      hasVoucher
+        ? `Payment by ${ELEVEN_ELEVEN.sellUntilLabel} for the ${ELEVEN_ELEVEN.price} price; voucher must be redeemed by ${ELEVEN_ELEVEN.redeemByLabel}.`
+        : "",
       `Name: ${signup?.name ?? ""}. Booking ref: ${refCode}.`,
     ]
       .filter(Boolean)
@@ -168,7 +170,8 @@ export default async function PurchaseSuccessPage({ params }: { params: Promise<
             </p>
             {hasVoucher && (
               <p className="text-xs font-medium text-black/70">
-                Your 11.11 voucher can only be redeemed until {ELEVEN_ELEVEN.redeemByLabel}.
+                Pay by {ELEVEN_ELEVEN.sellUntilLabel} for the {ELEVEN_ELEVEN.price} price to be valid. Your 11.11
+                voucher can only be redeemed until {ELEVEN_ELEVEN.redeemByLabel}.
               </p>
             )}
             <a
@@ -193,7 +196,9 @@ export default async function PurchaseSuccessPage({ params }: { params: Promise<
             </p>
             {hasVoucher && (
               <p className="text-sm font-semibold" style={{ color: "#8a4a30" }}>
-                Your 11.11 voucher must be redeemed by {ELEVEN_ELEVEN.redeemByLabel}.
+                Payment must be made by {ELEVEN_ELEVEN.sellUntilLabel} for the {ELEVEN_ELEVEN.price}{" "}
+                voucher price to be valid. Your 11.11 voucher must be redeemed by{" "}
+                {ELEVEN_ELEVEN.redeemByLabel}.
               </p>
             )}
             <a
