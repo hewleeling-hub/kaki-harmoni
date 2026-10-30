@@ -48,6 +48,21 @@ export default async function PurchaseSuccessPage({ params }: { params: Promise<
     `Hi Kaki Harmoni! I've just paid ${money(amount)} for my launch reservation via DuitNow. My name is ${signup?.name ?? ""}.`,
   );
 
+  /* Pay-at-the-door bookings leave no payment message for staff to match, so
+     nothing tells the shop to record them. This is the customer's nudge: it
+     carries everything needed to write the booking down without looking it up. */
+  const refCode = purchase ? String(purchase.id).slice(0, 8).toUpperCase() : "";
+  const doorWa = whatsAppLink(
+    BUSINESS_WHATSAPP_NUMBER,
+    [
+      `Hi Kaki Harmoni! I've just booked ${purchase?.product_name ?? "a visit"} and will pay ${money(amount)} at the door.`,
+      hasBooking ? `Slot: ${purchase?.booking_date} at ${formatSlotTime(purchase?.booking_time)}.` : "",
+      `Name: ${signup?.name ?? ""}. Booking ref: ${refCode}.`,
+    ]
+      .filter(Boolean)
+      .join(" "),
+  );
+
   const heading = hasBooking
     ? "You're all booked!"
     : PRELAUNCH_MODE
@@ -171,9 +186,23 @@ export default async function PurchaseSuccessPage({ params }: { params: Promise<
         )}
 
         {isPending && !isPrepay && (
-          <p className="text-sm text-black/60">
-            Payment due at the door — {money(amount)}. See you soon!
-          </p>
+          <div className="space-y-3">
+            <p className="text-sm text-black/60">
+              Payment due at the door — {money(amount)}. See you soon!
+            </p>
+            <a
+              href={doorWa}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 font-semibold text-white"
+              style={{ background: "#25D366" }}
+            >
+              WhatsApp us to confirm
+            </a>
+            <p className="text-xs text-black/45">
+              Tap to send us your booking details so we can note it down.
+            </p>
+          </div>
         )}
 
         <Link href="/" className="inline-block rounded-lg px-4 py-2.5 font-medium text-white" style={{ background: "var(--clay)" }}>
