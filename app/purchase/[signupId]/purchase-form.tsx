@@ -6,7 +6,7 @@ import Link from "next/link";
 import { whatsAppLink, BUSINESS_WHATSAPP_NUMBER } from "@/lib/whatsapp";
 import { PRELAUNCH_MODE, FIRST_VISIT_PRICE_MYR } from "@/lib/config";
 import { withOption, PACKAGES_ARE_DOOR_ONLY } from "@/config/catalogue";
-import { isVoucherProduct } from "@/config/promotions";
+import { ELEVEN_ELEVEN, isVoucherProduct } from "@/config/promotions";
 
 type Product = {
   id: string;
@@ -369,6 +369,13 @@ export default function PurchaseForm({
           <p className="text-xs mt-2 rounded-lg px-3 py-2" style={{ background: "rgba(46,125,123,0.08)", color: "var(--lagoon-dark)" }}>
             Your spot is only locked once payment is received — we&apos;ll show you a
             DuitNow QR to scan on the next step. Fully refundable until your slot is confirmed.
+          </p>
+        )}
+        {/* Outside the prepay box on purpose: the deadline holds whichever way
+            they pay, and the voucher can be paid for at the door too. */}
+        {buyingVoucher && (
+          <p className="text-xs font-semibold mt-2 rounded-lg px-3 py-2" style={{ background: "rgba(201,124,93,0.12)", color: "#8a4a30" }}>
+            Your 11.11 voucher can only be redeemed until {ELEVEN_ELEVEN.redeemByLabel}.
           </p>
         )}
       </div>
