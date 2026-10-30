@@ -57,6 +57,7 @@ export default async function PurchaseSuccessPage({ params }: { params: Promise<
     [
       `Hi Kaki Harmoni! I've just booked ${purchase?.product_name ?? "a visit"} and will pay ${money(amount)} at the door.`,
       hasBooking ? `Slot: ${purchase?.booking_date} at ${formatSlotTime(purchase?.booking_time)}.` : "",
+      hasVoucher ? `Voucher must be redeemed by ${ELEVEN_ELEVEN.redeemByLabel}.` : "",
       `Name: ${signup?.name ?? ""}. Booking ref: ${refCode}.`,
     ]
       .filter(Boolean)
@@ -190,6 +191,11 @@ export default async function PurchaseSuccessPage({ params }: { params: Promise<
             <p className="text-sm text-black/60">
               Payment due at the door — {money(amount)}. See you soon!
             </p>
+            {hasVoucher && (
+              <p className="text-sm font-semibold" style={{ color: "#8a4a30" }}>
+                Your 11.11 voucher must be redeemed by {ELEVEN_ELEVEN.redeemByLabel}.
+              </p>
+            )}
             <a
               href={doorWa}
               target="_blank"
