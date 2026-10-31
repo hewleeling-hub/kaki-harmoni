@@ -154,15 +154,15 @@ export default function IntakeClient({
     }
   }
 
-  async function readPhoto() {
-    if (!scanFile) return;
+  async function readPhoto(file: File | null = scanFile) {
+    if (!file) return;
     setReading(true);
     setReadError(null);
     setUnclear(null);
 
     try {
       const body = new FormData();
-      body.append("scan", await shrinkForReading(scanFile));
+      body.append("scan", await shrinkForReading(file));
       const res = await fetch("/api/intake/extract", { method: "POST", body });
       const payload = await res.json().catch(() => ({}));
 
@@ -204,6 +204,17 @@ export default function IntakeClient({
       setReading(false);
     }
   }
+  /* Attaching a photo reads it straight away. It used to wait for a separate
+     "Read the form for me" press, and a photo attached then saved without that
+     press filed as "Unnamed" with nothing in it — the reader had been switched
+     on and was simply never asked. The button stays, to read again. */
+  function pickScan(file: File | null) {
+    setScanFile(file);
+    setUnclear(null);
+    setReadError(null);
+    if (file && canExtract && file.type.startsWith("image/")) void readPhoto(file);
+  }
+
   // Set after mount rather than at render: the server runs on UTC and the shop
   // is on +8, so rendering "today" in both places is a hydration mismatch
   // waiting for someone to open this after 8am.
@@ -612,19 +623,11 @@ export default function IntakeClient({
               <PickFile
                 label="Take a photo"
                 capture
-                onPick={(file) => {
-                  setScanFile(file);
-                  setUnclear(null);
-                  setReadError(null);
-                }}
+                onPick={pickScan}
               />
               <PickFile
                 label="Choose a file"
-                onPick={(file) => {
-                  setScanFile(file);
-                  setUnclear(null);
-                  setReadError(null);
-                }}
+                onPick={pickScan}
               />
             </div>
 
@@ -657,7 +660,7 @@ export default function IntakeClient({
               <div className="mt-3">
                 <button
                   type="button"
-                  onClick={readPhoto}
+                  onClick={() => readPhoto()}
                   disabled={reading}
                   className="rounded-lg border border-black/15 bg-white px-3.5 py-2 text-sm font-medium hover:bg-black/5 disabled:opacity-60"
                 >
@@ -778,11 +781,13 @@ export default function IntakeClient({
           <div className="flex flex-wrap gap-3">
             <button
               type="submit"
-              disabled={saving}
+              /* Not while a photo is being read: the boxes are about to be
+                 filled, and saving now would file the blank ones. */
+              disabled={saving || reading}
               className="rounded-xl px-5 py-3 text-sm font-semibold text-white disabled:opacity-60"
               style={{ background: "var(--lagoon-dark)" }}
             >
-              {saving ? "Saving…" : "Save form"}
+              {saving ? "Saving…" : reading ? "Reading the photo…" : "Save form"}
             </button>
             <button
               type="button"
