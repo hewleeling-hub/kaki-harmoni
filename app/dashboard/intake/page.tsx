@@ -4,6 +4,7 @@ import { requireStaff } from "@/lib/auth";
 import { INTAKE_COLUMNS } from "@/config/intake";
 import { extractionAvailable } from "@/lib/intake-extract";
 import { redirect } from "next/navigation";
+import BulkImport from "./bulk-import";
 import IntakeClient, { type IntakeForm, type IntakeSignup } from "./intake-client";
 
 export const metadata = {
@@ -83,6 +84,10 @@ export default async function IntakePage() {
           </p>
         </div>
       ) : (
+        <>
+        {/* Bulk import: many photos read and checked on one screen. Sits above
+            the single-form screen, which is unchanged. */}
+        <BulkImport canExtract={extractionAvailable()} />
         <IntakeClient
           signups={(signups ?? []) as IntakeSignup[]}
           // The column list is a runtime string, so supabase-js can't infer a
@@ -92,6 +97,7 @@ export default async function IntakePage() {
           // the button shouldn't appear if pressing it can only fail.
           canExtract={extractionAvailable()}
         />
+        </>
       )}
     </div>
   );
