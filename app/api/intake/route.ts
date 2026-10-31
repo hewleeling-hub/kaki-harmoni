@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { requireStaff } from "@/lib/auth";
 import { logActivity } from "@/lib/activity";
-import { phoneKeyFor } from "@/lib/customer";
+import { findOrCreateCustomer } from "@/lib/customer";
 import {
   HEALTH_CONDITIONS,
   HEALTH_GOALS,
@@ -148,41 +148,20 @@ export async function POST(request: NextRequest) {
   if (!signup) {
     const guestName = clean(form.get("guest_name"), 120);
     const guestPhone = clean(form.get("contact_no"), 40);
-    const phoneKey = phoneKeyFor(guestPhone);
 
-    if (guestName && guestPhone && phoneKey) {
-      const { data: known } = await supabase
-        .from("signups")
-        .select("id, name, phone, customer_no")
-        .eq("phone_normalised", phoneKey)
-        .order("created_at", { ascending: true })
-        .limit(1)
-        .maybeSingle();
-
-      if (known) {
-        signup = known as IntakeSignupRow;
-        customer = { id: signup.id, name: signup.name, customer_no: signup.customer_no, created: false };
-      } else {
-        const { data: made, error: makeError } = await supabase
-          .from("signups")
-          .insert({
-            name: guestName,
-            email: null,
-            phone: guestPhone,
-            phone_normalised: phoneKey,
-            referral_source: "Walk-in",
-            status: "signed_up",
-          })
-          .select("id, name, phone, customer_no")
-          .single();
-
-        // Not fatal: the signed form is the record that matters, and losing the
-        // customer row costs a search result, not a consent record.
-        if (makeError || !made) {
-          console.error("intake: could not add the customer:", makeError?.message);
-        } else {
-          signup = made as IntakeSignupRow;
-          customer = { id: signup.id, name: signup.name, customer_no: signup.customer_no, created: true };
+    if (guestName && guestPhone) {
+      // Not fatal when it comes back null: the signed form is the record that
+      // matters, and losing the customer row costs a search result, not a
+      // consent record.
+      const found = await findOrCreateCustomer(supabase, {
+        name: guestName,
+        phone: guestPhone,
+        source: "Walk-in",
+      });
+      if (found) {
+        signup = found.customer;
+        customer = { id: signup.id, name: signup.name, customer_no: signup.customer_no, created: found.created };
+        if (found.created) {
           await logActivity(supabase, {
             entity_type: "signup",
             entity_id: signup.id,

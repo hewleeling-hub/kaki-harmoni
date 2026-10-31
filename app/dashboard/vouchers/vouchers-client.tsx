@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { whatsAppLink } from "@/lib/whatsapp";
+import { customerRef } from "@/lib/customer";
 
 type Voucher = {
   id: string;
@@ -47,6 +48,16 @@ export default function VouchersClient() {
   const [filter, setFilter] = useState<Filter>("unpaid");
   const [busyId, setBusyId] = useState<string | null>(null);
 
+  // Walk-in sale form. Closed until asked for: most visits to this page are to
+  // mark an online voucher paid, and an open form would push the list down.
+  const [walkInOpen, setWalkInOpen] = useState(false);
+  const [wName, setWName] = useState("");
+  const [wPhone, setWPhone] = useState("");
+  const [wQty, setWQty] = useState(1);
+  const [wMethod, setWMethod] = useState("cash");
+  const [wSaving, setWSaving] = useState(false);
+  const [wDone, setWDone] = useState<string | null>(null);
+
   async function load() {
     setError(null);
     try {
@@ -86,6 +97,38 @@ export default function VouchersClient() {
     }
   }
 
+  async function recordWalkIn(e: React.FormEvent) {
+    e.preventDefault();
+    setWSaving(true);
+    setError(null);
+    setWDone(null);
+    try {
+      const res = await fetch("/api/vouchers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: wName, phone: wPhone, quantity: wQty, payment_method: wMethod }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Could not record the sale.");
+      const c = data.customer;
+      setWDone(
+        `Recorded ${data.quantity} voucher${data.quantity === 1 ? "" : "s"} for ${c.name} (${customerRef(c.customer_no)}) — ${money(data.total)} paid. ${c.created ? "New customer added." : "Filed against their existing customer record."}`,
+      );
+      setWName("");
+      setWPhone("");
+      setWQty(1);
+      setWMethod("cash");
+      setWalkInOpen(false);
+      await load();
+    } catch (err) {
+      // Kept open with what was typed, so a refusal (e.g. already at the limit)
+      // can be read and fixed rather than retyped.
+      setError(err instanceof Error ? err.message : "Could not record the sale.");
+    } finally {
+      setWSaving(false);
+    }
+  }
+
   if (loading) return <p className="text-black/50 text-sm">Loading vouchers…</p>;
 
   const today = todayKL();
@@ -103,6 +146,87 @@ export default function VouchersClient() {
         <div className="rounded-lg px-4 py-3 text-sm" style={{ background: "rgba(201,124,93,0.12)", color: "#8a4a30" }}>
           {error}
         </div>
+      )}
+
+      {wDone && (
+        <div className="rounded-lg px-4 py-3 text-sm bg-emerald-50 text-emerald-900 border border-emerald-200">{wDone}</div>
+      )}
+
+      {!walkInOpen ? (
+        <button
+          onClick={() => {
+            setWalkInOpen(true);
+            setWDone(null);
+          }}
+          className="text-sm font-semibold px-4 py-2 rounded-full text-white"
+          style={{ backgroundColor: "var(--lagoon-dark)" }}
+        >
+          Record a walk-in sale
+        </button>
+      ) : (
+        <form onSubmit={recordWalkIn} className="rounded-2xl border border-black/10 bg-white p-4 sm:p-5 space-y-3">
+          <p className="text-sm font-medium">Walk-in voucher sale — already paid at the counter</p>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <label className="text-sm">
+              <span className="block mb-1 text-black/60">Name</span>
+              <input
+                required
+                value={wName}
+                onChange={(e) => setWName(e.target.value)}
+                className="w-full rounded-lg border border-black/10 px-3 py-2 text-sm"
+              />
+            </label>
+            <label className="text-sm">
+              <span className="block mb-1 text-black/60">Phone</span>
+              <input
+                required
+                inputMode="tel"
+                value={wPhone}
+                onChange={(e) => setWPhone(e.target.value)}
+                className="w-full rounded-lg border border-black/10 px-3 py-2 text-sm"
+              />
+            </label>
+            <label className="text-sm">
+              <span className="block mb-1 text-black/60">How many vouchers</span>
+              <select
+                value={wQty}
+                onChange={(e) => setWQty(Number(e.target.value))}
+                className="w-full rounded-lg border border-black/10 px-3 py-2 text-sm bg-white"
+              >
+                <option value={1}>1 voucher</option>
+                <option value={2}>2 vouchers</option>
+              </select>
+            </label>
+            <label className="text-sm">
+              <span className="block mb-1 text-black/60">Paid by</span>
+              <select
+                value={wMethod}
+                onChange={(e) => setWMethod(e.target.value)}
+                className="w-full rounded-lg border border-black/10 px-3 py-2 text-sm bg-white"
+              >
+                <option value="cash">Cash</option>
+                <option value="duitnow">DuitNow / e-wallet</option>
+                <option value="card">Card</option>
+              </select>
+            </label>
+          </div>
+          <p className="text-xs text-black/50">
+            Counts toward the two-per-person limit on this phone number, and is redeemable until 31 December 2026.
+          </p>
+          <div className="flex gap-2 justify-end">
+            <button type="button" onClick={() => setWalkInOpen(false)} className="text-sm px-4 py-2 rounded-lg text-black/50">
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={wSaving}
+              className="text-sm font-semibold px-4 py-2 rounded-full text-white disabled:opacity-50"
+              style={{ backgroundColor: "var(--lagoon)" }}
+            >
+              {wSaving ? "Recording…" : "Record sale"}
+            </button>
+          </div>
+        </form>
       )}
 
       <div className="grid gap-3 grid-cols-2 md:grid-cols-4">

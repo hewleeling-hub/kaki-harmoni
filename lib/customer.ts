@@ -74,3 +74,61 @@ export function customerRef(customerNo: number | null | undefined): string {
   if (customerNo === null || customerNo === undefined) return "—";
   return `KH${String(customerNo).padStart(3, "0")}`;
 }
+
+
+export type CustomerRow = {
+  id: string;
+  name: string | null;
+  phone: string | null;
+  customer_no: number | null;
+};
+
+/**
+ * The person behind a phone number: the customer already on file, or a new one.
+ *
+ * Shared by the intake form and the walk-in voucher sale, so both put people
+ * in the customer list the same way. Matched on `phone_normalised`, the
+ * identity the first-visit rule, the voucher cap and the customer number all
+ * use — a returning guest is filed against who they already are and keeps their
+ * number rather than collecting a second one. The OLDEST row wins, since that
+ * is the one the number was first issued on.
+ *
+ * Returns null when there is no usable phone (nothing to match on, and a
+ * guess would merge two strangers) or when the insert failed. Callers decide
+ * whether that is fatal; for both current callers it is not.
+ */
+export async function findOrCreateCustomer(
+  supabase: ReturnType<typeof createAdminClient>,
+  { name, phone, source }: { name: string; phone: string; source: string },
+): Promise<{ customer: CustomerRow; created: boolean } | null> {
+  const phoneKey = phoneKeyFor(phone);
+  if (!phoneKey || !name.trim()) return null;
+
+  const { data: known } = await supabase
+    .from("signups")
+    .select("id, name, phone, customer_no")
+    .eq("phone_normalised", phoneKey)
+    .order("created_at", { ascending: true })
+    .limit(1)
+    .maybeSingle();
+  if (known) return { customer: known as CustomerRow, created: false };
+
+  const { data: made, error } = await supabase
+    .from("signups")
+    .insert({
+      name: name.trim(),
+      email: null,
+      phone: phone.trim(),
+      phone_normalised: phoneKey,
+      referral_source: source,
+      status: "signed_up",
+    })
+    .select("id, name, phone, customer_no")
+    .single();
+
+  if (error || !made) {
+    console.error("could not add the customer:", error?.message);
+    return null;
+  }
+  return { customer: made as CustomerRow, created: true };
+}
