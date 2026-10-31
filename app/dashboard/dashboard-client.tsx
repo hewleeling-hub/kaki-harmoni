@@ -466,7 +466,15 @@ export default function DashboardClient({ canDelete = false }: { canDelete?: boo
                       {new Date(s.created_at).toLocaleDateString()}
                       <div className="text-black/35">{daysAgo(s.created_at)}</div>
                     </Cell>
-                    <Cell label="Actions" className="space-x-2 whitespace-nowrap md:text-right">
+                    <Cell label="Actions" className="md:align-top">
+                      {/* Stacked, not in a row. Five buttons side by side made the
+                          Actions column wider than the rest of the table put
+                          together, so the rows ran off the screen and scrolling
+                          to reach a button lost the customer's name. One column
+                          of equal-width buttons keeps the whole row on screen.
+                          On a phone the row is a card, where wrapping reads
+                          better than a tall stack. */}
+                      <div className="flex flex-wrap gap-1.5 md:ml-auto md:w-36 md:flex-col md:flex-nowrap md:[&>button]:w-full">
                       {isEditing ? (
                         <>
                           <button
@@ -609,6 +617,7 @@ export default function DashboardClient({ canDelete = false }: { canDelete?: boo
                           )}
                         </>
                       )}
+                      </div>
                     </Cell>
                   </tr>
                 );
