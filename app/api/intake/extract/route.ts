@@ -22,6 +22,9 @@ export async function POST(request: NextRequest) {
   if (!user) return NextResponse.json({ error: "Please sign in." }, { status: 401 });
 
   if (!extractionAvailable()) {
+    // Said out loud: this refusal used to be silent, which made "the reader
+    // does nothing" indistinguishable from "the reader was never asked".
+    console.warn("intake extract: refused — ANTHROPIC_API_KEY is not set in this deployment");
     return NextResponse.json(
       { error: "Reading forms automatically isn't switched on. Key it in by hand." },
       { status: 503 },
@@ -51,9 +54,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "That photo is too large to read." }, { status: 400 });
   }
 
+  // Type and size only — never the image or anything read from it.
+  console.info(`intake extract: reading a ${file.type} of ${Math.round(file.size / 1024)} KB`);
+
   try {
     const buffer = Buffer.from(await file.arrayBuffer());
     const fields = await extractIntakeForm(buffer, file.type as (typeof READABLE)[number]);
+    console.info("intake extract: read ok");
     return NextResponse.json({ fields });
   } catch (error) {
     // Deliberately not echoed to the browser: an upstream error can carry
