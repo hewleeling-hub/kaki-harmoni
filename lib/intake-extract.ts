@@ -126,13 +126,20 @@ export async function extractIntakeForm(
   const client = new Anthropic();
 
   const response = await client.messages.parse({
-    model: "claude-opus-5",
-    max_tokens: 4000,
+    model: "claude-opus-5-5",
+    /* Thinking tokens are drawn from this same limit. 4000 left little room
+       after the thinking on a handwritten form, and a structured answer cut
+       off mid-object does not parse — the staff member would see "could not
+       read" for a photo that was readable. One form is cheap; give it room. */
+    max_tokens: 16000,
     system: SYSTEM,
     // Reading faint pencil ticks and Malaysian handwriting is exactly the kind
     // of careful looking that thinking helps with, and one form is cheap.
     thinking: { type: "adaptive" },
-    output_config: { format: zodOutputFormat(ExtractedForm) },
+    /* Effort is set rather than left to the model's default: Opus 5.5 defaults
+       to "medium", a step below what reading faint pencil ticks and Malaysian
+       handwriting was tuned at. */
+    output_config: { effort: "high", format: zodOutputFormat(ExtractedForm) },
     messages: [
       {
         role: "user",
