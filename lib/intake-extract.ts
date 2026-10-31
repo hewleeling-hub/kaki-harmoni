@@ -126,7 +126,11 @@ export async function extractIntakeForm(
   const client = new Anthropic();
 
   const response = await client.messages.parse({
-    model: "claude-opus-5-5",
+    /* Sonnet 5.5, not Opus: the output is reviewed by a person before anything is
+       saved, so the extra care of the dearest model buys little, and a form is
+       read many times over. If readings turn out poor on real handwriting,
+       this is the line to move back up. */
+    model: "claude-sonnet-5-5",
     /* Thinking tokens are drawn from this same limit. 4000 left little room
        after the thinking on a handwritten form, and a structured answer cut
        off mid-object does not parse — the staff member would see "could not
@@ -136,10 +140,11 @@ export async function extractIntakeForm(
     // Reading faint pencil ticks and Malaysian handwriting is exactly the kind
     // of careful looking that thinking helps with, and one form is cheap.
     thinking: { type: "adaptive" },
-    /* Effort is set rather than left to the model's default: Opus 5.5 defaults
-       to "medium", a step below what reading faint pencil ticks and Malaysian
-       handwriting was tuned at. */
-    output_config: { effort: "high", format: zodOutputFormat(ExtractedForm) },
+    /* Effort is set explicitly rather than left to the model's default, so a
+       change of model does not silently change how hard it looks. "medium"
+       trades some care on faint pencil ticks for cost; staff review every
+       answer, and `unclear` flags what the reader was unsure of. */
+    output_config: { effort: "medium", format: zodOutputFormat(ExtractedForm) },
     messages: [
       {
         role: "user",
