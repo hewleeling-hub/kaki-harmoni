@@ -21,7 +21,7 @@ type Voucher = {
   purchases: { booking_date: string | null; booking_time: string | null } | null;
 };
 
-type Filter = "unpaid" | "paid" | "all";
+type Filter = "unpaid" | "paid" | "redeemed" | "all";
 
 const money = (n: number) => `RM${Number(n).toFixed(2)}`;
 
@@ -97,6 +97,33 @@ export default function VouchersClient() {
     }
   }
 
+  async function redeem(v: Voucher) {
+    const who = v.signups?.name ?? "this customer";
+    // No undo for this one: it records a visit. Ask first.
+    if (!window.confirm(`Mark ${who}'s voucher as redeemed? This records a visit today and can't be undone from here.`)) return;
+    setBusyId(v.id);
+    setError(null);
+    try {
+      const res = await fetch(`/api/vouchers/${v.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "redeemed" }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Could not redeem the voucher.");
+      setWDone(
+        data.visit
+          ? `Redeemed ${who}'s voucher and recorded the visit.`
+          : `Redeemed ${who}'s voucher. No visit was recorded because the customer record was deleted.`,
+      );
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not redeem the voucher.");
+    } finally {
+      await load();
+      setBusyId(null);
+    }
+  }
+
   async function recordWalkIn(e: React.FormEvent) {
     e.preventDefault();
     setWSaving(true);
@@ -134,11 +161,12 @@ export default function VouchersClient() {
   const today = todayKL();
   const live = vouchers.filter((v) => v.status !== "cancelled");
   const unpaid = live.filter((v) => v.status === "reserved");
-  const paid = live.filter((v) => v.status === "paid" || v.status === "redeemed");
+  const paid = live.filter((v) => v.status === "paid"); // paid, still to be used
+  const redeemed = live.filter((v) => v.status === "redeemed");
   const owed = unpaid.reduce((sum, v) => sum + Number(v.price_myr), 0);
 
   const shown =
-    filter === "unpaid" ? unpaid : filter === "paid" ? paid : vouchers;
+    filter === "unpaid" ? unpaid : filter === "paid" ? paid : filter === "redeemed" ? redeemed : vouchers;
 
   return (
     <div className="space-y-6">
@@ -229,15 +257,16 @@ export default function VouchersClient() {
         </form>
       )}
 
-      <div className="grid gap-3 grid-cols-2 md:grid-cols-4">
+      <div className="grid gap-3 grid-cols-2 md:grid-cols-5">
         <Metric label="Claimed" value={String(live.length)} />
         <Metric label="Unpaid" value={String(unpaid.length)} accent="#8a4a30" />
-        <Metric label="Paid" value={String(paid.length)} />
+        <Metric label="To redeem" value={String(paid.length)} />
+        <Metric label="Redeemed" value={String(redeemed.length)} />
         <Metric label="Still to collect" value={money(owed)} accent="#8a4a30" />
       </div>
 
       <div className="flex gap-2">
-        {(["unpaid", "paid", "all"] as Filter[]).map((f) => (
+        {(["unpaid", "paid", "redeemed", "all"] as Filter[]).map((f) => (
           <button
             key={f}
             onClick={() => setFilter(f)}
@@ -274,6 +303,7 @@ export default function VouchersClient() {
                       {phone ?? `+${v.phone_normalised}`} · {money(v.price_myr)} · claimed {fmtDate(v.created_at)}
                     </p>
                     <p className="text-sm text-black/50">
+                      {v.status === "redeemed" && v.redeemed_at ? `Redeemed ${fmtDate(v.redeemed_at)} · ` : ""}
                       {slot} · redeem by {fmtDay(v.expires_on)}
                       {expired && v.status !== "redeemed" && (
                         <span className="font-semibold" style={{ color: "#8a4a30" }}> (expired)</span>
@@ -301,6 +331,17 @@ export default function VouchersClient() {
                       style={{ backgroundColor: "var(--lagoon)" }}
                     >
                       {busyId === v.id ? "Saving…" : "Mark paid"}
+                    </button>
+                  )}
+                  {v.status === "paid" && (
+                    <button
+                      onClick={() => redeem(v)}
+                      disabled={busyId === v.id || expired}
+                      title={expired ? "Past its redeem-by date" : undefined}
+                      className="text-sm font-semibold px-4 py-2 rounded-full text-white disabled:opacity-50"
+                      style={{ backgroundColor: "var(--lagoon-dark)" }}
+                    >
+                      {busyId === v.id ? "Saving…" : "Mark redeemed"}
                     </button>
                   )}
                   {v.status === "paid" && (
