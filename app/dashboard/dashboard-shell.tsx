@@ -22,6 +22,8 @@ export default function DashboardShell({
 
   const navItems = [
     { href: "/dashboard", label: "Dashboard", icon: DashboardIcon },
+    // Every role: whoever is on the floor needs to see who is booked in and when.
+    { href: "/dashboard/calendar", label: "Calendar", icon: CalendarIcon },
     // Every role, not just owners: whoever is on the floor is the one holding
     // the signed sheet. It sits inside the dashboard, so it is behind the same
     // login as everything else here and there is no public route to it.
@@ -165,6 +167,17 @@ function IntakeIcon() {
       <path d="M9.5 8.5h5" />
       <path d="M9.5 12h5" />
       <path d="M9.5 15.5h3" />
+    </svg>
+  );
+}
+
+function CalendarIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="5" width="18" height="16" rx="2" />
+      <path d="M3 10h18" />
+      <path d="M8 3v4" />
+      <path d="M16 3v4" />
     </svg>
   );
 }
