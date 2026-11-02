@@ -81,6 +81,12 @@ export default async function IntakePage() {
           >
             Print consent list
           </Link>
+          <Link
+            href="/dashboard/consent"
+            className="rounded-lg border border-black/10 px-3 py-1.5 text-sm font-medium hover:bg-black/5"
+          >
+            Record consent
+          </Link>
         </div>
       </div>
 
