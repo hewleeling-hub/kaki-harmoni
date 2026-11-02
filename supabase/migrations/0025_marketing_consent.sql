@@ -1,8 +1,8 @@
 -- Marketing consent: who has agreed to receive offers by WhatsApp, and when.
 --
--- NOT YET APPLIED. Written for review; run it before the code that writes these
--- columns goes live, or a customer who ticks the box would have their sign-up
--- rejected for naming a column that does not exist.
+-- APPLIED to production on 2 November 2026, on request. Verified afterwards: the
+-- three columns present, marketing_consent NOT NULL default false, and all 42
+-- customers on file read as not agreed (none counted as consenting).
 --
 -- WHY. Promotional messages need the customer's agreement (Malaysia's PDPA
 -- expects consent for direct marketing, and WhatsApp's own rules require an

@@ -75,6 +75,12 @@ export default async function IntakePage() {
           >
             Print consent stickers
           </Link>
+          <Link
+            href="/dashboard/intake/print/consent-list"
+            className="rounded-lg border border-black/10 px-3 py-1.5 text-sm font-medium hover:bg-black/5"
+          >
+            Print consent list
+          </Link>
         </div>
       </div>
 
