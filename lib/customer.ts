@@ -132,3 +132,38 @@ export async function findOrCreateCustomer(
   }
   return { customer: made as CustomerRow, created: true };
 }
+
+/**
+ * Record that a customer agreed to receive offers.
+ *
+ * Only ever turns consent ON, and only the first time: the date and source
+ * stay as the record of when and how they first said yes, and nothing here can
+ * switch consent off — a withdrawal is a deliberate act of its own, not a side
+ * effect of a form that happened not to carry the tick-box.
+ *
+ * Returns false rather than throwing. Callers have a real job to finish (a
+ * booking, a sale, a signed form) and must not lose it over this; the failure is
+ * logged so it can be found. Not recording a yes errs on the side of NOT
+ * messaging someone, which is the safe direction.
+ */
+export async function recordMarketingConsent(
+  supabase: ReturnType<typeof createAdminClient>,
+  signupId: string,
+  source: "web_form" | "walk_in_sale" | "paper_form",
+): Promise<boolean> {
+  const { error } = await supabase
+    .from("signups")
+    .update({
+      marketing_consent: true,
+      marketing_consent_at: new Date().toISOString(),
+      marketing_consent_source: source,
+    })
+    .eq("id", signupId)
+    .eq("marketing_consent", false);
+
+  if (error) {
+    console.error("could not record marketing consent (is migration 0025 applied?):", error.message);
+    return false;
+  }
+  return true;
+}

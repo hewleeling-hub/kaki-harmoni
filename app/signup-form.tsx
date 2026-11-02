@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { MARKETING_CONSENT_LABEL } from "@/config/consent";
 import { useRouter, useSearchParams } from "next/navigation";
 import { isCatalogueSlug, withOption } from "@/config/catalogue";
 import { offerForSlug } from "@/config/business";
@@ -22,6 +23,8 @@ export default function SignupForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  // Unticked by default and never required: agreeing to offers is separate from booking.
+  const [marketing, setMarketing] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [fieldError, setFieldError] = useState<{ field?: string; message: string } | null>(null);
   const [bannerError, setBannerError] = useState<string | null>(null);
@@ -46,7 +49,7 @@ export default function SignupForm() {
         // confirmation page, where it no longer stands between the customer
         // and the button. The column stays nullable and lead scoring already
         // handles a null.
-        body: JSON.stringify({ name, email, phone }),
+        body: JSON.stringify({ name, email, phone, marketing_consent: marketing }),
       });
       const data = await res.json();
 
@@ -163,6 +166,16 @@ export default function SignupForm() {
           </p>
         )}
       </div>
+
+      <label className="flex items-start gap-2 text-xs leading-relaxed text-black/60">
+        <input
+          type="checkbox"
+          checked={marketing}
+          onChange={(e) => setMarketing(e.target.checked)}
+          className="mt-0.5"
+        />
+        <span>{MARKETING_CONSENT_LABEL}</span>
+      </label>
 
       <button
         type="submit"

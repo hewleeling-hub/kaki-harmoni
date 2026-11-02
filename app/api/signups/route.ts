@@ -39,7 +39,7 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  let body: { name?: string; email?: string; phone?: string; referral_source?: string };
+  let body: { name?: string; email?: string; phone?: string; referral_source?: string; marketing_consent?: boolean };
   try {
     body = await request.json();
   } catch {
@@ -126,6 +126,17 @@ export async function POST(request: NextRequest) {
       // Omitted for a new person, so the column default issues the next number.
       ...(customer_no === null ? {} : { customer_no }),
       referral_source,
+      /* Written only when ticked. A signup that did not tick the box never
+         touches these columns, so an ordinary booking cannot be affected by
+         whether the consent migration has been applied. Never defaulted to
+         true: consent that nobody gave is not consent. */
+      ...(body.marketing_consent === true
+        ? {
+            marketing_consent: true,
+            marketing_consent_at: new Date().toISOString(),
+            marketing_consent_source: "web_form",
+          }
+        : {}),
       status: "signed_up",
       lead_score: score.lead_score,
       lead_score_source: score.lead_score_source,

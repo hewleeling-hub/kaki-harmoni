@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { customerRef } from "@/lib/customer";
+import { MARKETING_CONSENT_STAFF_LABEL } from "@/config/consent";
 import { shrinkForReading } from "./shrink-image";
 import {
   HEALTH_CONDITIONS,
@@ -748,6 +749,13 @@ export default function IntakeClient({
               {error}
             </p>
           )}
+
+          {/* Whether the guest ticked the offers box on the sheet. Not read from the
+              photo: the reader is not asked about it, so a person records it. */}
+          <label className="flex items-start gap-2 text-sm">
+            <input type="checkbox" name="marketing_consent" value="1" className="mt-1" />
+            <span>{MARKETING_CONSENT_STAFF_LABEL}</span>
+          </label>
 
           <div className="flex flex-wrap gap-3">
             <button

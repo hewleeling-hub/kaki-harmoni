@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { requireStaff } from "@/lib/auth";
 import { logActivity } from "@/lib/activity";
-import { findOrCreateCustomer } from "@/lib/customer";
+import { findOrCreateCustomer, recordMarketingConsent } from "@/lib/customer";
 import {
   HEALTH_CONDITIONS,
   HEALTH_GOALS,
@@ -172,6 +172,12 @@ export async function POST(request: NextRequest) {
         }
       }
     }
+  }
+
+  // The guest ticked the offers box on the paper form. Needs a customer to hang
+  // it on; the same never-switches-off, best-effort rule as everywhere else.
+  if (signup && form.get("marketing_consent")) {
+    await recordMarketingConsent(supabase, signup.id, "paper_form");
   }
 
   // ── The scan ──────────────────────────────────────────────────────────────

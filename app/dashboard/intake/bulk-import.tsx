@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { customerRef } from "@/lib/customer";
 import { HEALTH_CONDITIONS, HEALTH_GOALS } from "@/config/intake";
+import { MARKETING_CONSENT_STAFF_LABEL } from "@/config/consent";
 import { shrinkForReading } from "./shrink-image";
 
 /**
@@ -39,6 +40,8 @@ type Row = {
   survey_date: string;
   health_conditions: string[];
   health_goals: string[];
+  /** The guest ticked the offers box on the sheet. Never read from the photo: a person ticks it. */
+  marketing: boolean;
   /** Everything else the reader found — carried through, and shown, but not edited here. */
   extras: Record<string, unknown>;
   extrasSummary: string;
@@ -178,6 +181,7 @@ export default function BulkImport({ canExtract }: { canExtract: boolean }) {
         survey_date: "",
         health_conditions: [],
         health_goals: [],
+        marketing: false,
         extras: {},
         extrasSummary: "",
         unclear: [],
@@ -233,6 +237,7 @@ export default function BulkImport({ canExtract }: { canExtract: boolean }) {
       if (row.survey_date) body.set("survey_date", row.survey_date);
       row.health_conditions.forEach((v) => body.append("health_conditions", v));
       row.health_goals.forEach((v) => body.append("health_goals", v));
+      if (row.marketing) body.set("marketing_consent", "1");
       for (const k of EXTRA_TEXT) if (row.extras[k]) body.set(k, String(row.extras[k]));
       for (const k of EXTRA_LISTS) {
         const list = row.extras[k];
@@ -408,6 +413,16 @@ export default function BulkImport({ canExtract }: { canExtract: boolean }) {
                     {r.error && r.status === "error" && (
                       <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-900">{r.error}</p>
                     )}
+
+                    <label className="flex items-center gap-2 text-sm">
+                      <input
+                        type="checkbox"
+                        checked={r.marketing}
+                        disabled={r.status === "saving"}
+                        onChange={(e) => patch(r.id, { marketing: e.target.checked })}
+                      />
+                      {MARKETING_CONSENT_STAFF_LABEL}
+                    </label>
 
                     <label className="flex items-center gap-2 text-sm">
                       <input

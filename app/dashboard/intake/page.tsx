@@ -62,12 +62,20 @@ export default async function IntakePage() {
             The signed paper form is the record. Scan it in here and note what was used.
           </p>
         </div>
-        <Link
-          href="/dashboard/intake/print"
-          className="rounded-lg border border-black/10 px-3 py-1.5 text-sm font-medium hover:bg-black/5"
-        >
-          Print blank forms
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href="/dashboard/intake/print"
+            className="rounded-lg border border-black/10 px-3 py-1.5 text-sm font-medium hover:bg-black/5"
+          >
+            Print blank forms
+          </Link>
+          <Link
+            href="/dashboard/intake/print/stickers"
+            className="rounded-lg border border-black/10 px-3 py-1.5 text-sm font-medium hover:bg-black/5"
+          >
+            Print consent stickers
+          </Link>
+        </div>
       </div>
 
       {migrationMissing ? (

@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { MARKETING_CONSENT_LABEL } from "@/config/consent";
 import { requireStaff } from "@/lib/auth";
 import { businessConfig } from "@/config/business";
 import {
@@ -175,6 +176,11 @@ export default async function IntakePrintPage() {
             foot and leg bath for relaxation, and is not a medical treatment or a substitute for
             advice from a doctor.
           </p>
+          {/* Its own layout, not Box: the sentence is long and Box never wraps. */}
+          <div className="mt-2.5 flex items-start gap-1.5 text-[10.5px] leading-relaxed">
+            <span className="mt-[2px] inline-block h-[13px] w-[13px] shrink-0 border border-black/60" />
+            <span>{MARKETING_CONSENT_LABEL}</span>
+          </div>
           <div className="mt-4 flex items-end gap-8">
             <Rule label="Signature" width="52%" />
             <Rule label="Date" width="28%" />

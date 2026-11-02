@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { requireStaff } from "@/lib/auth";
 import { logActivity, logAudit } from "@/lib/activity";
-import { findOrCreateCustomer, phoneKeyFor } from "@/lib/customer";
+import { findOrCreateCustomer, phoneKeyFor, recordMarketingConsent } from "@/lib/customer";
 import { voucherAllowance, refuseVoucherClaim } from "@/lib/vouchers";
 import { activeVoucherOffer, ELEVEN_ELEVEN } from "@/config/promotions";
 
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Staff only." }, { status: 401 });
   }
 
-  let body: { name?: string; phone?: string; quantity?: number; payment_method?: string };
+  let body: { name?: string; phone?: string; quantity?: number; payment_method?: string; marketing_consent?: boolean };
   try {
     body = await request.json();
   } catch {
@@ -107,6 +107,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Could not add that customer. Please try again." }, { status: 500 });
   }
   const { customer } = found;
+
+  // Only when the customer said yes; never switches consent off. Best-effort —
+  // see recordMarketingConsent: the sale must not be lost over it.
+  if (body.marketing_consent === true) {
+    await recordMarketingConsent(admin, customer.id, "walk_in_sale");
+  }
 
   const actor = staff.email ?? "staff";
   const now = new Date().toISOString();
