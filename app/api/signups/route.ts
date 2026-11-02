@@ -5,7 +5,7 @@ import { logActivity, logAudit } from "@/lib/activity";
 import { scoreLead } from "@/lib/scoring";
 import { requireStaff } from "@/lib/auth";
 import { sendSalesAlert, newSignupEmail } from "@/lib/email";
-import { phoneKeyFor } from "@/lib/customer";
+import { phoneKeyFor, recordMarketingConsent } from "@/lib/customer";
 
 export async function GET() {
   const user = await requireStaff();
@@ -79,6 +79,13 @@ export async function POST(request: NextRequest) {
       .maybeSingle();
 
     if (existing) {
+      /* They already have a record, so no new row — but they have just ticked
+         the offers box, and dropping that would lose a yes they gave us. It goes
+         on the record they already have. Only when ticked; never turns consent
+         off. */
+      if (body.marketing_consent === true) {
+        await recordMarketingConsent(supabase, existing.id as string, "web_form");
+      }
       return NextResponse.json(
         {
           error: "You're already signed up with this email.",
