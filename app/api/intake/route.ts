@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { requireStaff } from "@/lib/auth";
 import { logActivity } from "@/lib/activity";
 import { findOrCreateCustomer, recordMarketingConsent } from "@/lib/customer";
+import { clean, one, many } from "@/lib/intake-fields";
 import {
   HEALTH_CONDITIONS,
   HEALTH_GOALS,
@@ -31,29 +32,12 @@ import {
  * call failed.
  */
 
-const MAX_TEXT = 2000;
-
 type IntakeSignupRow = {
   id: string;
   name: string | null;
   phone: string | null;
   customer_no: number | null;
 };
-
-const clean = (value: FormDataEntryValue | null, max = MAX_TEXT): string | null => {
-  if (typeof value !== "string") return null;
-  const trimmed = value.trim();
-  return trimmed ? trimmed.slice(0, max) : null;
-};
-
-/** Only ever a value from the known list, never what the request asked for. */
-const one = (value: FormDataEntryValue | null, allowed: readonly string[]): string | null => {
-  const v = clean(value, 60);
-  return v && allowed.includes(v) ? v : null;
-};
-
-const many = (values: FormDataEntryValue[], allowed: readonly string[]): string[] =>
-  allowed.filter((option) => values.includes(option));
 
 /**
  * The forms on file. With `customer_no`, just that one person's.

@@ -35,6 +35,8 @@ export type IntakeForm = {
   guest_name: string | null;
   contact_no: string | null;
   voucher_no: string | null;
+  ic_passport_no: string | null;
+  sponsor_name: string | null;
   health_conditions: string[] | null;
   health_goals: string[] | null;
   water_level: string | null;
@@ -827,6 +829,7 @@ export default function IntakeClient({
 function FormRow({ form, signup }: { form: IntakeForm; signup: IntakeSignup | null }) {
   const conditions = form.health_conditions ?? [];
   const oils = form.aroma_oils ?? [];
+  const [editing, setEditing] = useState(false);
 
   return (
     <li className="rounded-2xl border border-black/10 bg-white">
@@ -858,16 +861,29 @@ function FormRow({ form, signup }: { form: IntakeForm; signup: IntakeSignup | nu
         </summary>
 
         <div className="space-y-3 border-t border-black/5 px-3.5 pb-4 pt-3 text-sm sm:px-4">
-          {form.scan_path && (
-            <a
-              href={`/api/intake/${form.id}/scan`}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-block rounded-lg border border-black/10 px-3 py-1.5 text-sm font-medium hover:bg-black/5"
+          {editing ? (
+            <EditPanel form={form} onClose={() => setEditing(false)} />
+          ) : (
+            <>
+          <div className="flex flex-wrap gap-2">
+            {form.scan_path && (
+              <a
+                href={`/api/intake/${form.id}/scan`}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-block rounded-lg border border-black/10 px-3 py-1.5 text-sm font-medium hover:bg-black/5"
+              >
+                Open the signed form
+              </a>
+            )}
+            <button
+              type="button"
+              onClick={() => setEditing(true)}
+              className="rounded-lg border border-black/10 px-3 py-1.5 text-sm font-medium hover:bg-black/5"
             >
-              Open the signed form
-            </a>
-          )}
+              Edit
+            </button>
+          </div>
 
           <Detail label="To take care with" value={conditions.join(" · ")} tone="amber" />
           <Detail label="Came for" value={(form.health_goals ?? []).join(" · ")} />
@@ -898,11 +914,138 @@ function FormRow({ form, signup }: { form: IntakeForm; signup: IntakeSignup | nu
               .join(" · ")}
           />
           <Detail label="Served by" value={form.server_name} />
+          <Detail label="Referred by" value={form.sponsor_name} />
           <Detail label="Voucher" value={form.voucher_no} />
           <Detail label="Notes" value={form.notes} />
+            </>
+          )}
         </div>
       </details>
     </li>
+  );
+}
+
+/**
+ * Correcting a form that is already filed.
+ *
+ * Every field comes back on screen as it was filed, and saving sends the whole
+ * corrected form — so unticking a box genuinely removes it. The scan and the
+ * customer the form belongs to are deliberately not editable here: fixing a
+ * typo must not move a signed consent record to somebody else.
+ */
+function EditPanel({ form, onClose }: { form: IntakeForm; onClose: () => void }) {
+  const router = useRouter();
+  const [conditions, setConditions] = useState<string[]>(form.health_conditions ?? []);
+  const [goals, setGoals] = useState<string[]>(form.health_goals ?? []);
+  const [oilsUsed, setOilsUsed] = useState<string[]>(form.aroma_oils ?? []);
+  const [oilsNext, setOilsNext] = useState<string[]>(form.recommended_oils ?? []);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function submit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setSaving(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/intake/${form.id}`, {
+        method: "PATCH",
+        body: new FormData(event.currentTarget),
+      });
+      const payload = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(payload?.error ?? "Could not save that. Please try again.");
+        return;
+      }
+      router.refresh();
+      onClose();
+    } catch {
+      setError("Could not reach the server. Check the connection and try again.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <form onSubmit={submit} className="space-y-5">
+      <div className="grid gap-3 sm:grid-cols-2">
+        <Text name="guest_name" label="Name" defaultValue={form.guest_name} />
+        <Text name="contact_no" label="Contact number" defaultValue={form.contact_no} />
+        <Text name="ic_passport_no" label="IC / passport" defaultValue={form.ic_passport_no} />
+        <Text name="sponsor_name" label="Referred by" defaultValue={form.sponsor_name} />
+        <label className="block">
+          <span className="mb-1 block text-xs font-medium text-black/55">Date</span>
+          <input
+            type="date"
+            name="survey_date"
+            defaultValue={form.survey_date ?? ""}
+            className="w-full rounded-xl border border-black/15 px-3 py-2 text-sm"
+          />
+        </label>
+        <Text name="voucher_no" label="Voucher number" defaultValue={form.voucher_no} />
+      </div>
+
+      <Fieldset title="Anything to take care with">
+        <CheckGroup name="health_conditions" options={HEALTH_CONDITIONS} value={conditions} onChange={setConditions} />
+      </Fieldset>
+
+      <Fieldset title="Came for">
+        <CheckGroup name="health_goals" options={HEALTH_GOALS} value={goals} onChange={setGoals} />
+      </Fieldset>
+
+      <Fieldset title="What was set up">
+        <div className="grid gap-3 sm:grid-cols-3">
+          <Select name="water_level" label="Water level" options={WATER_LEVELS} defaultValue={form.water_level} />
+          <Select name="water_temp" label="Temperature" options={WATER_TEMPS} defaultValue={form.water_temp} />
+          <Select name="intensity" label="Intensity" options={INTENSITIES} defaultValue={form.intensity} />
+          <Select name="duration_min" label="Minutes" options={DURATIONS} defaultValue={form.duration_min} />
+          <Select name="salt_used" label="Salt used" options={SPA_SALTS} defaultValue={form.salt_used} />
+          <Select name="recommended_salt" label="Salt suggested next time" options={SPA_SALTS} defaultValue={form.recommended_salt} />
+        </div>
+        <p className="mb-1.5 mt-4 text-xs font-medium text-black/55">
+          Oils used <span className="text-black/35">— up to {MAX_AROMA_OILS}</span>
+        </p>
+        <CheckGroup name="aroma_oils" options={AROMA_OILS} hints={AROMA_OIL_PURPOSE} max={MAX_AROMA_OILS} value={oilsUsed} onChange={setOilsUsed} />
+        <p className="mb-1.5 mt-4 text-xs font-medium text-black/55">
+          Oils suggested next time <span className="text-black/35">— up to {MAX_AROMA_OILS}</span>
+        </p>
+        <CheckGroup name="recommended_oils" options={AROMA_OILS} hints={AROMA_OIL_PURPOSE} max={MAX_AROMA_OILS} value={oilsNext} onChange={setOilsNext} />
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <Text name="server_name" label="Served by" defaultValue={form.server_name} />
+        </div>
+        <label className="mt-3 block">
+          <span className="mb-1 block text-xs font-medium text-black/55">Notes</span>
+          <textarea
+            name="notes"
+            rows={3}
+            defaultValue={form.notes ?? ""}
+            className="w-full rounded-xl border border-black/15 px-3 py-2 text-sm"
+          />
+        </label>
+      </Fieldset>
+
+      {error && (
+        <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900">{error}</p>
+      )}
+
+      <div className="flex flex-wrap gap-3">
+        <button
+          type="submit"
+          disabled={saving}
+          className="rounded-xl px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60"
+          style={{ background: "var(--lagoon-dark)" }}
+        >
+          {saving ? "Saving…" : "Save changes"}
+        </button>
+        <button
+          type="button"
+          onClick={onClose}
+          disabled={saving}
+          className="rounded-xl border border-black/10 px-5 py-2.5 text-sm font-medium hover:bg-black/5"
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
   );
 }
 
@@ -979,10 +1122,12 @@ function Text({
   name,
   label,
   placeholder,
+  defaultValue,
 }: {
   name: string;
   label: string;
   placeholder?: string;
+  defaultValue?: string | null;
 }) {
   return (
     <label className="block">
@@ -991,6 +1136,7 @@ function Text({
         type="text"
         name={name}
         placeholder={placeholder}
+        defaultValue={defaultValue ?? ""}
         className="w-full rounded-xl border border-black/15 px-3 py-2 text-sm"
       />
     </label>
@@ -1001,17 +1147,19 @@ function Select({
   name,
   label,
   options,
+  defaultValue,
 }: {
   name: string;
   label: string;
   options: readonly string[];
+  defaultValue?: string | null;
 }) {
   return (
     <label className="block">
       <span className="mb-1 block text-xs font-medium text-black/55">{label}</span>
       <select
         name={name}
-        defaultValue=""
+        defaultValue={defaultValue ?? ""}
         className="w-full rounded-xl border border-black/15 bg-white px-3 py-2 text-sm"
       >
         <option value="">—</option>

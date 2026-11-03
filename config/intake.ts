@@ -170,6 +170,8 @@ export const INTAKE_COLUMNS = [
   "guest_name",
   "contact_no",
   "voucher_no",
+  "ic_passport_no",
+  "sponsor_name",
   "health_conditions",
   "health_goals",
   "water_level",
