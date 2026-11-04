@@ -18,6 +18,9 @@ export async function GET() {
   const { data: signups, error } = await supabase
     .from("signups")
     .select("*")
+    // Enquiries (WhatsApp/Messenger chats) have their own page and must not
+    // count as signups, or they pull the conversion rate down.
+    .not("status", "like", "enquiry%")
     .order("lead_score", { ascending: false, nullsFirst: false });
 
   if (error) {

@@ -54,3 +54,24 @@ export function draftWinBack(name: string, daysSinceLastVisit: number | null): s
     daysSinceLastVisit && daysSinceLastVisit >= 60 ? "a little while" : "a few weeks";
   return `Hi ${who}! It's Lotti from Kaki Harmoni 🌸 It's been ${gap} since your last soak — your feet must be missing the bubbles! Come back for a warm foot soak + coffee, no rush. Want me to save you a spot this week? 💛`;
 }
+
+// Nudge for someone who messaged the shop (WhatsApp / Messenger) and went quiet
+// after hearing about services and location. Ends on a single easy next step.
+// Draft only — staff review it before anything is sent.
+//
+// While a voucher is on sale the nudge sells THAT, with the real end date from
+// config/promotions.ts, and links straight to the voucher checkout. Otherwise it
+// offers the standing first visit. Prices and dates are read, never typed in.
+export function draftEnquiryFollowup(input: {
+  name: string;
+  bookingLink: string;
+  voucher: { price: string; sellUntilLabel: string; redeemByLabel: string } | null;
+}): string {
+  const who = firstName(input.name);
+  if (input.voucher) {
+    const v = input.voucher;
+    return `Hi ${who}! It's Kaki Harmoni 🌸 Just checking in after your message. Our 11.11 Foot Spa Voucher is ${v.price} a session, on sale until ${v.sellUntilLabel}, and you can use it any time up to ${v.redeemByLabel}. You can grab one here: ${input.bookingLink} — or tell me a day that suits you and I'll help you book. 💛`;
+  }
+  const first = businessConfig.pricing.firstVisit;
+  return `Hi ${who}! It's Kaki Harmoni 🌸 Just checking in after your message. Your first-visit foot soak is RM${first} — you can pick a time here: ${input.bookingLink} — or tell me a day that suits you and I'll help you book. 💛`;
+}

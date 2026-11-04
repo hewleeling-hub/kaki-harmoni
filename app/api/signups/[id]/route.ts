@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { logActivity, logAudit } from "@/lib/activity";
 import { requireStaff, requireManager } from "@/lib/auth";
+import { ENQUIRY_STATUSES } from "@/lib/enquiry";
 
 export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -56,7 +57,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   const updates: Record<string, unknown> = {};
   if (typeof body.name === "string" && body.name.trim()) updates.name = body.name.trim();
   if (typeof body.phone === "string") updates.phone = body.phone.trim() || null;
-  if (typeof body.status === "string" && ["signed_up", "converted"].includes(body.status)) {
+  if (typeof body.status === "string" && ["signed_up", "converted", ...ENQUIRY_STATUSES].includes(body.status)) {
     updates.status = body.status;
   }
   // Sprint 5: staff move a scored lead through review (unreviewed -> approved / flagged).

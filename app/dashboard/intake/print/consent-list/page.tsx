@@ -46,11 +46,13 @@ export default async function ConsentListPage() {
   const full = await admin
     .from("signups")
     .select("customer_no, name, phone, created_at, marketing_consent")
-    .not("phone", "is", null);
+    .not("phone", "is", null)
+    .not("status", "like", "enquiry%");
 
   let rows: Row[];
   if (full.error) {
-    const plain = await admin.from("signups").select("customer_no, name, phone, created_at").not("phone", "is", null);
+    const plain = await admin.from("signups").select("customer_no, name, phone, created_at").not("phone", "is", null)
+    .not("status", "like", "enquiry%");
     rows = (plain.data ?? []) as Row[];
   } else {
     rows = (full.data ?? []) as Row[];

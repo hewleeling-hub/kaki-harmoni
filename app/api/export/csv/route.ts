@@ -22,6 +22,7 @@ export async function GET() {
   const { data: signups, error } = await supabase
     .from("signups")
     .select("*")
+    .not("status", "like", "enquiry%")
     .order("created_at", { ascending: false });
 
   if (error) {

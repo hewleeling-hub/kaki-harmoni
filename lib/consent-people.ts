@@ -40,11 +40,13 @@ export async function loadConsentPeople(
   const full = await admin
     .from("signups")
     .select("customer_no, name, phone, created_at, marketing_consent, marketing_consent_at, marketing_consent_source")
-    .not("customer_no", "is", null);
+    .not("customer_no", "is", null)
+    .not("status", "like", "enquiry%");
 
   let rows: Row[];
   if (full.error) {
-    const plain = await admin.from("signups").select("customer_no, name, phone, created_at").not("customer_no", "is", null);
+    const plain = await admin.from("signups").select("customer_no, name, phone, created_at").not("customer_no", "is", null)
+    .not("status", "like", "enquiry%");
     rows = (plain.data ?? []) as Row[];
   } else {
     rows = (full.data ?? []) as Row[];
