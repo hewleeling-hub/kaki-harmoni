@@ -1,5 +1,6 @@
 import type { createAdminClient } from "@/lib/supabase/admin";
 import { normalisePhoneForWhatsApp } from "@/lib/whatsapp";
+import type { ConsentSource } from "@/config/consent";
 
 /**
  * "Have we met this person before?"
@@ -149,7 +150,7 @@ export async function findOrCreateCustomer(
 export async function recordMarketingConsent(
   supabase: ReturnType<typeof createAdminClient>,
   signupId: string,
-  source: "web_form" | "walk_in_sale" | "paper_form",
+  source: ConsentSource,
 ): Promise<boolean> {
   const { error } = await supabase
     .from("signups")

@@ -15,4 +15,4 @@ export const MARKETING_CONSENT_STAFF_LABEL =
   "Customer agreed to receive offers on WhatsApp (ticked the box, or said yes)";
 
 /** How a yes was given. Stored with the consent so it can be traced. */
-export type ConsentSource = "web_form" | "walk_in_sale" | "paper_form";
+export type ConsentSource = "web_form" | "walk_in_sale" | "paper_form" | "whatsapp";
