@@ -16,12 +16,17 @@ const validNumbers = (v: unknown): number[] | null =>
     ? (Array.from(new Set(v)) as number[])
     : null;
 
-// POST { customer_nos: number[] } — they said yes on the paper list.
+// How a yes recorded in bulk was given. A fixed list, never whatever the request
+// says: the source is the trace of where the consent can be proved from.
+const BULK_SOURCES = ["paper_form", "whatsapp"] as const;
+
+// POST { customer_nos: number[], source?: "paper_form" | "whatsapp" } — they said yes,
+// on the signed paper list or in a WhatsApp message.
 export async function POST(request: NextRequest) {
   const staff = await requireStaff();
   if (!staff) return NextResponse.json({ error: "Staff only." }, { status: 401 });
 
-  let body: { customer_nos?: unknown };
+  let body: { customer_nos?: unknown; source?: unknown };
   try {
     body = await request.json();
   } catch {
@@ -29,6 +34,13 @@ export async function POST(request: NextRequest) {
   }
   const nos = validNumbers(body.customer_nos);
   if (!nos) return NextResponse.json({ error: `Choose between 1 and ${MAX_BATCH} customers.` }, { status: 400 });
+  // Omitted means the paper list, which is how this route was first used. Anything
+  // ELSE that is not on the list is refused rather than quietly recorded as paper:
+  // a mislabelled source would misstate where the consent can be proved from.
+  if (body.source !== undefined && !(BULK_SOURCES as readonly unknown[]).includes(body.source)) {
+    return NextResponse.json({ error: "Choose how they agreed." }, { status: 400 });
+  }
+  const source = (body.source ?? "paper_form") as (typeof BULK_SOURCES)[number];
 
   const admin = createAdminClient();
   const actor = staff.email ?? "staff";
@@ -40,7 +52,7 @@ export async function POST(request: NextRequest) {
     .update({
       marketing_consent: true,
       marketing_consent_at: new Date().toISOString(),
-      marketing_consent_source: "paper_form",
+      marketing_consent_source: source,
     })
     .in("customer_no", nos)
     .eq("marketing_consent", false)
@@ -58,7 +70,7 @@ export async function POST(request: NextRequest) {
       entity_id: row.id as string,
       action: "marketing_consent_recorded",
       actor,
-      metadata: { source: "paper_form" },
+      metadata: { source },
     });
     await logAudit(supabase, {
       table_name: "signups",

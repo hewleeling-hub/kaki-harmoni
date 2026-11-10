@@ -20,6 +20,8 @@ export default function ConsentClient({ people }: { people: ConsentPerson[] }) {
   const [query, setQuery] = useState("");
   const [picked, setPicked] = useState<Set<number>>(new Set());
   const [confirmed, setConfirmed] = useState(false);
+  // How the ticked people agreed. Decides the source recorded, so it has to be true.
+  const [how, setHow] = useState<"paper_form" | "whatsapp">("paper_form");
   const [saving, setSaving] = useState(false);
   const [note, setNote] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -55,7 +57,7 @@ export default function ConsentClient({ people }: { people: ConsentPerson[] }) {
       const res = await fetch("/api/consent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ customer_nos: [...picked] }),
+        body: JSON.stringify({ customer_nos: [...picked], source: how }),
       });
       const payload = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(payload?.error ?? "Could not save that.");
@@ -192,8 +194,8 @@ export default function ConsentClient({ people }: { people: ConsentPerson[] }) {
           />
         </div>
         <p className="text-sm text-black/60">
-          Tick the people who said yes on the paper list. Tick only what is on the paper — nobody is on the offers list unless they
-          actually agreed.
+          Tick the people who said yes — on the paper list or in a WhatsApp message — and choose which below. Tick only people who
+          actually agreed: nobody is on the offers list otherwise.
         </p>
 
         <div className="overflow-hidden rounded-2xl border border-black/5 bg-white/70">
@@ -224,9 +226,24 @@ export default function ConsentClient({ people }: { people: ConsentPerson[] }) {
 
         {picked.size > 0 && (
           <div className="sticky bottom-3 space-y-2 rounded-xl border border-black/10 bg-white p-4 shadow-sm">
+            <fieldset className="space-y-1 text-sm">
+              <legend className="mb-1 text-xs font-medium text-black/55">How did they agree?</legend>
+              <label className="flex items-center gap-2">
+                <input type="radio" name="how" checked={how === "paper_form"} onChange={() => { setHow("paper_form"); setConfirmed(false); }} />
+                On the signed paper list
+              </label>
+              <label className="flex items-center gap-2">
+                <input type="radio" name="how" checked={how === "whatsapp"} onChange={() => { setHow("whatsapp"); setConfirmed(false); }} />
+                In a WhatsApp message
+              </label>
+            </fieldset>
             <label className="flex items-start gap-2 text-sm">
               <input type="checkbox" className="mt-1" checked={confirmed} onChange={(e) => setConfirmed(e.target.checked)} />
-              <span>These customers ticked yes on the signed paper list.</span>
+              <span>
+                {how === "paper_form"
+                  ? "These customers ticked yes on the signed paper list."
+                  : "These customers agreed in a WhatsApp message, and I have those messages."}
+              </span>
             </label>
             <button
               onClick={save}
