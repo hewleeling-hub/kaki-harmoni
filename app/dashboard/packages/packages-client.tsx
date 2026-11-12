@@ -107,6 +107,24 @@ export default function PackagesClient({ customers, packages }: { customers: Vou
     }
   }
 
+  async function undoVisit(s: Sale) {
+    if (!window.confirm(`Undo the last visit on ${s.signups?.name ?? "this"} package? The visit will be deleted.`)) return;
+    setBusyId(s.id);
+    setError(null);
+    setDone(null);
+    try {
+      const res = await fetch(`/api/packages/${s.id}`, { method: "DELETE" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Could not undo the visit.");
+      setDone(`Last visit undone for ${s.signups?.name ?? "the customer"}.`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not undo the visit.");
+    } finally {
+      await load();
+      setBusyId(null);
+    }
+  }
+
   const matches = query.trim()
     ? customers
         .filter((c) => [c.name ?? "", c.phone ?? "", customerRef(c.customer_no)].join(" ").toLowerCase().includes(query.trim().toLowerCase()))
@@ -255,6 +273,15 @@ export default function PackagesClient({ customers, packages }: { customers: Vou
                   <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-black/5">
                     {left > 0 ? `${left} left` : "All used"}
                   </span>
+                  {used > 0 && (
+                    <button
+                      onClick={() => undoVisit(s)}
+                      disabled={busyId === s.id}
+                      className="text-sm px-3 py-1.5 rounded-lg text-black/50 hover:bg-black/5 disabled:opacity-50"
+                    >
+                      Undo last visit
+                    </button>
+                  )}
                   <button
                     onClick={() => recordVisit(s)}
                     disabled={busyId === s.id || left <= 0 || expired}

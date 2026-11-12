@@ -94,3 +94,38 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
   return NextResponse.json({ ok: true, used: after, of: pkg.package_visits });
 }
+
+// DELETE /api/packages/[id] — take back the most recent visit used from a package
+// (staff only), for a wrong tap. Only ever removes a RM0 visit that points at this
+// package, so it can never touch a sale or a visit from anywhere else.
+export async function DELETE(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const staff = await requireStaff();
+  if (!staff) return NextResponse.json({ error: "Staff only." }, { status: 401 });
+
+  const admin = createAdminClient();
+  const { data: last } = await admin
+    .from("purchases")
+    .select("id, booking_date")
+    .eq("package_id", id)
+    .eq("amount_myr", 0)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (!last) return NextResponse.json({ error: "There is no visit to undo on this package." }, { status: 404 });
+
+  await admin.from("order_items").delete().eq("purchase_id", last.id);
+  const { error } = await admin.from("purchases").delete().eq("id", last.id).eq("package_id", id);
+  if (error) return NextResponse.json({ error: "Could not undo the visit." }, { status: 500 });
+
+  const supabase = await createClient();
+  await logActivity(supabase, {
+    entity_type: "purchase",
+    entity_id: id,
+    action: "package_visit_undone",
+    actor: staff.email ?? "staff",
+    metadata: { visit_purchase_id: last.id, visit_on: last.booking_date },
+  });
+
+  return NextResponse.json({ ok: true });
+}
