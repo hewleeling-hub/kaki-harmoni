@@ -31,6 +31,8 @@ export default function DashboardShell({
     // Every role, for the same reason as Intake: the person who gets the
     // WhatsApp payment screenshot is the one who marks the voucher paid.
     { href: "/dashboard/vouchers", label: "Vouchers", icon: VoucherIcon },
+    // Every role: the person taking the payment at the counter records the package.
+    { href: "/dashboard/packages", label: "Packages", icon: VoucherIcon },
     ...(role === "owner" || role === "manager"
       ? [
           { href: "/dashboard/retention", label: "Retention", icon: RetentionIcon },
