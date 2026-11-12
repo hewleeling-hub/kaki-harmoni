@@ -21,12 +21,15 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     return NextResponse.json({ error: "Staff only." }, { status: 401 });
   }
 
-  let body: { status?: string };
+  let body: { status?: string; redeemed_on?: string };
   try {
     body = await request.json();
   } catch {
     return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
   }
+
+  // Correct the date of a voucher that is already redeemed.
+  if (body.redeemed_on !== undefined) return changeRedeemedDate(id, body.redeemed_on, staff.email ?? "staff");
 
   if (body.status === "redeemed") return redeem(id, staff.email ?? "staff");
 
@@ -216,4 +219,81 @@ async function redeem(id: string, actor: string) {
   });
 
   return NextResponse.json({ voucher: { id, status: "redeemed" }, visit });
+}
+
+/**
+ * Change the date a voucher was redeemed (it was marked late, or on the wrong day).
+ *
+ * Moves the voucher's own date and, when redemption wrote a RM0 visit, that
+ * visit's date too, so the guest's history and the retention numbers agree with
+ * the list. A voucher redeemed against a booked slot keeps the booking as it is:
+ * that booking has its own date, which is when they were actually booked in.
+ * The visit is found through the activity log entry redemption wrote.
+ */
+async function changeRedeemedDate(id: string, on: string, actor: string) {
+  const today = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kuala_Lumpur" });
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(on) || Number.isNaN(Date.parse(`${on}T00:00:00Z`)) || on > today) {
+    return NextResponse.json({ error: "Choose a date that is not in the future." }, { status: 400 });
+  }
+
+  const admin = createAdminClient();
+  const { data: v } = await admin
+    .from("vouchers")
+    .select("id, status, redeemed_at")
+    .eq("id", id)
+    .maybeSingle();
+  if (!v) return NextResponse.json({ error: "Voucher not found." }, { status: 404 });
+  if (v.status !== "redeemed") {
+    return NextResponse.json({ error: "Only a redeemed voucher has a redeemed date." }, { status: 409 });
+  }
+
+  // Midday Kuala Lumpur, so the date reads the same in any time zone.
+  const at = new Date(`${on}T12:00:00+08:00`).toISOString();
+  const { data: updated, error } = await admin
+    .from("vouchers")
+    .update({ redeemed_at: at })
+    .eq("id", id)
+    .eq("status", "redeemed")
+    .select("id")
+    .maybeSingle();
+  if (error || !updated) {
+    return NextResponse.json({ error: "Could not change the date. Refresh and try again." }, { status: 409 });
+  }
+
+  const supabase = await createClient();
+  const { data: acts } = await supabase
+    .from("activities")
+    .select("metadata")
+    .eq("entity_type", "voucher")
+    .eq("entity_id", id)
+    .eq("action", "voucher_redeemed")
+    .order("created_at", { ascending: false })
+    .limit(1);
+  const meta = (acts?.[0]?.metadata ?? {}) as { visit_purchase_id?: string | null; visit_created?: boolean };
+  let visitMoved = false;
+  if (meta.visit_created && meta.visit_purchase_id) {
+    const { error: visitError } = await admin
+      .from("purchases")
+      .update({ booking_date: on, created_at: at })
+      .eq("id", meta.visit_purchase_id);
+    visitMoved = !visitError;
+  }
+
+  await logActivity(supabase, {
+    entity_type: "voucher",
+    entity_id: id,
+    action: "voucher_redeemed_date_changed",
+    actor,
+    metadata: { from: v.redeemed_at, to: at, visit_moved: visitMoved },
+  });
+  await logAudit(supabase, {
+    table_name: "vouchers",
+    row_id: id,
+    operation: "UPDATE",
+    old_data: { redeemed_at: v.redeemed_at },
+    new_data: { redeemed_at: at },
+    actor,
+  });
+
+  return NextResponse.json({ voucher: { id, redeemed_at: at }, visit_moved: visitMoved });
 }

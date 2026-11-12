@@ -107,6 +107,30 @@ export default function VouchersClient({ customers }: { customers: VoucherCustom
     }
   }
 
+  // Correcting the date a voucher was redeemed.
+  const [dateEditId, setDateEditId] = useState<string | null>(null);
+  const [dateEditValue, setDateEditValue] = useState("");
+
+  async function saveRedeemedDate(v: Voucher) {
+    setBusyId(v.id);
+    setError(null);
+    try {
+      const res = await fetch(`/api/vouchers/${v.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ redeemed_on: dateEditValue }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Could not change the date.");
+      setDateEditId(null);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not change the date.");
+    } finally {
+      await load();
+      setBusyId(null);
+    }
+  }
+
   async function redeem(v: Voucher) {
     const who = v.signups?.name ?? "this customer";
     // No undo for this one: it records a visit. Ask first.
@@ -432,6 +456,42 @@ export default function VouchersClient({ customers }: { customers: VoucherCustom
                     >
                       {busyId === v.id ? "Saving…" : "Mark paid"}
                     </button>
+                  )}
+                  {v.status === "redeemed" && v.redeemed_at && (
+                    dateEditId === v.id ? (
+                      <span className="flex items-center gap-2">
+                        <input
+                          type="date"
+                          value={dateEditValue}
+                          max={todayKL()}
+                          onChange={(e) => setDateEditValue(e.target.value)}
+                          className="rounded-lg border border-black/10 px-2 py-1 text-sm"
+                        />
+                        <button
+                          onClick={() => saveRedeemedDate(v)}
+                          disabled={busyId === v.id || !dateEditValue}
+                          className="text-sm font-semibold px-3 py-1.5 rounded-full text-white disabled:opacity-50"
+                          style={{ backgroundColor: "var(--lagoon)" }}
+                        >
+                          {busyId === v.id ? "Saving…" : "Save"}
+                        </button>
+                        <button onClick={() => setDateEditId(null)} className="text-sm px-2 py-1.5 text-black/50">
+                          Cancel
+                        </button>
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          setDateEditId(v.id);
+                          setDateEditValue(
+                            new Date(v.redeemed_at as string).toLocaleDateString("en-CA", { timeZone: "Asia/Kuala_Lumpur" }),
+                          );
+                        }}
+                        className="text-sm px-3 py-1.5 rounded-lg text-black/50 hover:bg-black/5"
+                      >
+                        Change date
+                      </button>
+                    )
                   )}
                   {v.status === "paid" && (
                     <button
