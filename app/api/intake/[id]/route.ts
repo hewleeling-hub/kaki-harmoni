@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { requireStaff } from "@/lib/auth";
 import { logActivity } from "@/lib/activity";
+import { findOrCreateCustomer } from "@/lib/customer";
 import { clean, one, many } from "@/lib/intake-fields";
 import {
   HEALTH_CONDITIONS,
@@ -19,10 +20,12 @@ import {
 //
 // The edit panel submits every field, so what arrives is the whole corrected
 // form: an unticked box really means "not ticked now", and a field emptied on
-// screen is cleared. It does NOT touch the scan, the customer the form is filed
-// against, or its status — correcting a typo must not move a signed consent
-// record from one person to another, and the customer's own record is edited
-// where the customer is, not here.
+// screen is cleared. It does NOT touch the scan or its status, and it never MOVES
+// a form from one customer to another — correcting a typo must not shift a signed
+// consent record between people, and the customer's own record is edited where the
+// customer is, not here. The one exception is a form with NO customer yet: once it
+// has a name and a phone number it is filed against the matching customer (or a
+// new one), exactly as it would have been had the number been there at filing.
 //
 // The activity log records WHICH fields changed and never their values, like the
 // rest of intake: health answers live in one place only.
@@ -81,6 +84,30 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     notes: clean(form.get("notes")),
   };
 
+  // An unlinked form that now has a name and a number joins the customer list.
+  // Matched on the phone, like filing: a returning guest keeps their number.
+  let linked: { customer_no: number | null; created: boolean } | null = null;
+  if (!old.signup_id && updates.guest_name && updates.contact_no) {
+    const found = await findOrCreateCustomer(supabase, {
+      name: updates.guest_name as string,
+      phone: updates.contact_no as string,
+      source: "Walk-in",
+    });
+    if (found) {
+      updates.signup_id = found.customer.id;
+      linked = { customer_no: found.customer.customer_no, created: found.created };
+      if (found.created) {
+        await logActivity(supabase, {
+          entity_type: "signup",
+          entity_id: found.customer.id,
+          action: "signup_created",
+          actor: user.email ?? "staff",
+          metadata: { source: "intake_edit" },
+        });
+      }
+    }
+  }
+
   const same = (a: unknown, b: unknown) => JSON.stringify(a ?? null) === JSON.stringify(b ?? null);
   const changed = Object.keys(updates).filter((k) => !same(updates[k], old[k]));
   if (changed.length === 0) return NextResponse.json({ ok: true, changed: [] });
@@ -106,5 +133,5 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     metadata: { intake_id: id, fields: changed },
   });
 
-  return NextResponse.json({ ok: true, changed, form: saved });
+  return NextResponse.json({ ok: true, changed, form: saved, linked });
 }
