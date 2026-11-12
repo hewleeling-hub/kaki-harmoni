@@ -27,3 +27,26 @@ export async function shrinkForReading(file: File): Promise<File> {
     return file;
   }
 }
+
+/** iPhone photos arrive as HEIC/HEIF. Browsers on Windows and Android can't open them and often report no type at all. */
+export function isHeic(file: File): boolean {
+  return /^image\/hei[cf]/i.test(file.type) || /\.hei[cf]$/i.test(file.name);
+}
+
+/**
+ * Turn an iPhone HEIC photo into a JPEG, in the browser, before anything else
+ * sees it. The reader accepts JPEG/PNG/WebP only and the filing step has the
+ * same list, so without this a HEIC photo was refused as "not a photo" and could
+ * not be filed or read. The JPEG is what gets read AND filed, so it also opens
+ * everywhere afterwards. Anything that isn't HEIC is returned untouched.
+ * Throws if the conversion fails, so the caller can say so instead of silently
+ * carrying on with a file nothing can read.
+ */
+export async function normalisePhoto(file: File): Promise<File> {
+  if (!isHeic(file)) return file;
+  // Loaded only now: the converter is a large WebAssembly bundle and touches `window`.
+  const { default: heic2any } = await import("heic2any");
+  const out = await heic2any({ blob: file, toType: "image/jpeg", quality: 0.9 });
+  const blob = Array.isArray(out) ? out[0] : out;
+  return new File([blob], file.name.replace(/\.hei[cf]$/i, "") + ".jpg", { type: "image/jpeg" });
+}

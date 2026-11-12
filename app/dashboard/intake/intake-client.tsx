@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { customerRef } from "@/lib/customer";
 import { MARKETING_CONSENT_STAFF_LABEL } from "@/config/consent";
-import { shrinkForReading } from "./shrink-image";
+import { isHeic, normalisePhoto, shrinkForReading } from "./shrink-image";
 import {
   HEALTH_CONDITIONS,
   HEALTH_GOALS,
@@ -182,10 +182,24 @@ export default function IntakeClient({
      "Read the form for me" press, and a photo attached then saved without that
      press filed as "Unnamed" with nothing in it — the reader had been switched
      on and was simply never asked. The button stays, to read again. */
-  function pickScan(file: File | null) {
-    setScanFile(file);
+  async function pickScan(picked: File | null) {
     setUnclear(null);
     setReadError(null);
+    let file = picked;
+    // iPhone photos (HEIC) are converted to JPEG first, or nothing can read or file them.
+    if (picked && isHeic(picked)) {
+      setReading(true);
+      try {
+        file = await normalisePhoto(picked);
+      } catch {
+        setReading(false);
+        setScanFile(null);
+        setReadError("Could not open that iPhone photo. Take it again with the camera button, or save it as a JPEG first.");
+        return;
+      }
+      setReading(false);
+    }
+    setScanFile(file);
     if (file && canExtract && file.type.startsWith("image/")) void readPhoto(file);
   }
 
@@ -1070,7 +1084,7 @@ function PickFile({
       {label}
       <input
         type="file"
-        accept={INTAKE_SCAN_TYPES.join(",")}
+        accept={[...INTAKE_SCAN_TYPES, "image/heic", "image/heif", ".heic", ".heif"].join(",")}
         {...(capture ? { capture: "environment" as const } : {})}
         onChange={(e) => onPick(e.target.files?.[0] ?? null)}
         className="hidden"

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { customerRef } from "@/lib/customer";
 import { HEALTH_CONDITIONS, HEALTH_GOALS } from "@/config/intake";
 import { MARKETING_CONSENT_STAFF_LABEL } from "@/config/consent";
-import { shrinkForReading } from "./shrink-image";
+import { normalisePhoto, shrinkForReading } from "./shrink-image";
 
 /**
  * Bulk intake: many photographed forms read, checked on one screen, then filed.
@@ -153,7 +153,7 @@ export default function BulkImport({ canExtract }: { canExtract: boolean }) {
     }
   }
 
-  function addFiles(list: FileList | null) {
+  function addFiles(list: FileList | File[] | null) {
     if (!list || list.length === 0) return;
     const added: Row[] = [];
 
@@ -310,11 +310,21 @@ export default function BulkImport({ canExtract }: { canExtract: boolean }) {
         <input
           type="file"
           multiple
-          accept="image/jpeg,image/png,image/webp"
+          accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif"
           disabled={!canExtract || saving}
-          onChange={(e) => {
-            addFiles(e.target.files);
+          onChange={async (e) => {
+            const picked = Array.from(e.target.files ?? []);
             e.target.value = "";
+            // iPhone HEIC photos become JPEG first; one that won't convert is skipped.
+            const ready: File[] = [];
+            for (const f of picked) {
+              try {
+                ready.push(await normalisePhoto(f));
+              } catch {
+                /* skipped: the count shown below tells staff it did not arrive */
+              }
+            }
+            addFiles(ready);
           }}
           className="hidden"
         />
