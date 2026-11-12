@@ -5,7 +5,7 @@ import { requireStaff } from "@/lib/auth";
 import { logActivity, logAudit } from "@/lib/activity";
 import { findOrCreateCustomer, phoneKeyFor, recordMarketingConsent } from "@/lib/customer";
 import { voucherAllowance, refuseVoucherClaim } from "@/lib/vouchers";
-import { activeVoucherOffer, ELEVEN_ELEVEN } from "@/config/promotions";
+import { activeVoucherOffer, offerOnSaleAt, ELEVEN_ELEVEN } from "@/config/promotions";
 
 // GET /api/vouchers — every voucher with its owner and booked slot (staff only).
 //
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Staff only." }, { status: 401 });
   }
 
-  let body: { name?: string; phone?: string; quantity?: number; payment_method?: string; marketing_consent?: boolean };
+  let body: { name?: string; phone?: string; quantity?: number; payment_method?: string; marketing_consent?: boolean; sold_on?: string };
   try {
     body = await request.json();
   } catch {
@@ -70,8 +70,24 @@ export async function POST(request: NextRequest) {
   }
   if (!method) return NextResponse.json({ error: "Choose how they paid." }, { status: 400 });
 
-  const liveOffer = activeVoucherOffer();
-  const offer = liveOffer ?? ELEVEN_ELEVEN;
+  const offer = activeVoucherOffer() ?? ELEVEN_ELEVEN;
+
+  /* WHEN they paid, not when it is being written down. Staff often record a
+     payment (an e-wallet transfer, say) a day or more after it arrived, and the
+     offer ends at midnight on 11 November: judging by "today" would refuse
+     somebody who paid on the 10th just because the entry was made on the 12th.
+     So the sale date is a field, defaulting to today, and the offer window is
+     checked against THAT. It cannot be in the future, and a date outside the
+     window is refused exactly as a live sale outside it would be. */
+  const todayKL = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kuala_Lumpur" });
+  const soldOn = body.sold_on?.trim() || todayKL;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(soldOn) || soldOn > todayKL) {
+    return NextResponse.json({ error: "Choose the date they paid — it can't be in the future." }, { status: 400 });
+  }
+  const backdated = soldOn < todayKL;
+  // Midday Kuala Lumpur on that day: unambiguously inside it, whatever the time zone.
+  const saleMoment = backdated ? new Date(`${soldOn}T12:00:00+08:00`) : new Date();
+  const onSale = offerOnSaleAt(offer, saleMoment);
   if (!Number.isInteger(quantity) || quantity < 1 || quantity > offer.maxPerPerson) {
     return NextResponse.json({ error: `Choose 1 to ${offer.maxPerPerson} vouchers.` }, { status: 400 });
   }
@@ -84,10 +100,15 @@ export async function POST(request: NextRequest) {
     offer,
     allowance: await voucherAllowance(admin, phone, offer),
     wanted: quantity,
-    onSale: !!liveOffer,
+    onSale,
   });
   if (refusal) {
-    return NextResponse.json({ error: refusal.message, reason: refusal.reason }, { status: 409 });
+    // The commonest cause by far after the offer ends: the entry is dated today.
+    const hint =
+      refusal.reason === "sale_closed" && !backdated
+        ? ` If they paid on or before ${offer.sellUntilLabel}, set the date they paid to that day.`
+        : "";
+    return NextResponse.json({ error: refusal.message + hint, reason: refusal.reason }, { status: 409 });
   }
 
   // The price is the catalogue's, never the request's.
@@ -115,7 +136,11 @@ export async function POST(request: NextRequest) {
   }
 
   const actor = staff.email ?? "staff";
-  const now = new Date().toISOString();
+  // paid_at is when the money arrived; for a payment recorded later that is the
+  // day it was made. The rows are dated the same, so reports and the cap's
+  // history show the sale on the day it happened.
+  const now = saleMoment.toISOString();
+  const dated = backdated ? { created_at: now } : {};
 
   const { data: purchase, error: purchaseError } = await admin
     .from("purchases")
@@ -125,6 +150,7 @@ export async function POST(request: NextRequest) {
       amount_myr: total,
       payment_method: method,
       status: "confirmed",
+      ...dated,
     })
     .select("id")
     .single();
@@ -159,7 +185,10 @@ export async function POST(request: NextRequest) {
         paid_at: now,
         expires_on: offer.redeemByISO,
         purchase_id: null,
-        notes: `Walk-in sale recorded by ${actor}.`,
+        notes: backdated
+          ? `Walk-in sale recorded by ${actor} on ${todayKL}; paid ${soldOn}.`
+          : `Walk-in sale recorded by ${actor}.`,
+        ...dated,
       })),
     )
     .select("id");
@@ -188,7 +217,7 @@ export async function POST(request: NextRequest) {
     entity_id: purchase.id,
     action: "walk_in_voucher_sold",
     actor,
-    metadata: { quantity, payment_method: method },
+    metadata: { quantity, payment_method: method, ...(backdated ? { paid_on: soldOn, recorded_on: todayKL } : {}) },
   });
   await logAudit(supabase, {
     table_name: "purchases",

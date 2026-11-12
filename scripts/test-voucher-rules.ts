@@ -1,4 +1,4 @@
-import { ELEVEN_ELEVEN, isVoucherProduct, activeVoucherOffer, voucherBuyHref } from "@/config/promotions";
+import { ELEVEN_ELEVEN, isVoucherProduct, activeVoucherOffer, voucherBuyHref, offerOnSaleAt } from "@/config/promotions";
 import { productIdForSlug, isCatalogueSlug } from "@/config/catalogue";
 import { refuseVoucherClaim } from "@/lib/vouchers";
 import { offerForSlug } from "@/config/business";
@@ -18,6 +18,16 @@ ok("buy href enters the booking form", voucherBuyHref(ELEVEN_ELEVEN) === "/?opti
 ok("signup form can name the voucher", offerForSlug("eleven-eleven" as never)?.name === ELEVEN_ELEVEN.title, JSON.stringify(offerForSlug("eleven-eleven" as never)));
 ok("voucher product is recognised", isVoucherProduct(V));
 ok("offer is on sale today", !!activeVoucherOffer());
+
+// ── a payment is judged by WHEN it was made, not when it was written down ───
+const at = (iso: string) => new Date(iso);
+ok("paid at midday on the first day → in window", offerOnSaleAt(ELEVEN_ELEVEN, at("2026-10-28T04:00:00Z")));
+ok("paid at midday on 10 Nov KL → in window", offerOnSaleAt(ELEVEN_ELEVEN, at("2026-11-10T04:00:00Z")));
+ok("paid at midday on 11 Nov KL → in window", offerOnSaleAt(ELEVEN_ELEVEN, at("2026-11-11T04:00:00Z")));
+ok("paid 11:59pm 11 Nov KL (15:59Z) → in window", offerOnSaleAt(ELEVEN_ELEVEN, at("2026-11-11T15:59:00Z")));
+ok("paid at midnight ending 11 Nov (16:00Z) → closed", !offerOnSaleAt(ELEVEN_ELEVEN, at("2026-11-11T16:00:00Z")));
+ok("paid midday 12 Nov KL → closed", !offerOnSaleAt(ELEVEN_ELEVEN, at("2026-11-12T04:00:00Z")));
+ok("paid before the offer began → closed", !offerOnSaleAt(ELEVEN_ELEVEN, at("2026-10-27T04:00:00Z")));
 
 // ── the cap must reason about the real quantity ────────────────────────────
 const allow = (held: number) => ({

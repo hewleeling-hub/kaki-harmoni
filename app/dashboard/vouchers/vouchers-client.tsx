@@ -57,6 +57,9 @@ export default function VouchersClient() {
   const [wQty, setWQty] = useState(1);
   const [wMethod, setWMethod] = useState("cash");
   const [wConsent, setWConsent] = useState(false);
+  // The day they paid. Today by default; set earlier for a payment that came in
+  // before it was written down — the 11.11 offer is judged by this date.
+  const [wSoldOn, setWSoldOn] = useState(() => todayKL());
   const [wSaving, setWSaving] = useState(false);
   const [wDone, setWDone] = useState<string | null>(null);
 
@@ -135,19 +138,20 @@ export default function VouchersClient() {
       const res = await fetch("/api/vouchers", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: wName, phone: wPhone, quantity: wQty, payment_method: wMethod, marketing_consent: wConsent }),
+        body: JSON.stringify({ name: wName, phone: wPhone, quantity: wQty, payment_method: wMethod, marketing_consent: wConsent, sold_on: wSoldOn }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Could not record the sale.");
       const c = data.customer;
       setWDone(
-        `Recorded ${data.quantity} voucher${data.quantity === 1 ? "" : "s"} for ${c.name} (${customerRef(c.customer_no)}) — ${money(data.total)} paid. ${c.created ? "New customer added." : "Filed against their existing customer record."}`,
+        `Recorded ${data.quantity} voucher${data.quantity === 1 ? "" : "s"} for ${c.name} (${customerRef(c.customer_no)}) — ${money(data.total)} paid${wSoldOn !== todayKL() ? `, dated ${fmtDay(wSoldOn)}` : ""}. ${c.created ? "New customer added." : "Filed against their existing customer record."}`,
       );
       setWName("");
       setWPhone("");
       setWQty(1);
       setWMethod("cash");
       setWConsent(false);
+      setWSoldOn(todayKL());
       setWalkInOpen(false);
       await load();
     } catch (err) {
@@ -227,6 +231,20 @@ export default function VouchersClient() {
                 <option value={1}>1 voucher</option>
                 <option value={2}>2 vouchers</option>
               </select>
+            </label>
+            <label className="text-sm sm:col-span-2">
+              <span className="block mb-1 text-black/60">Date they paid</span>
+              <input
+                type="date"
+                required
+                max={todayKL()}
+                value={wSoldOn}
+                onChange={(e) => e.target.value && setWSoldOn(e.target.value)}
+                className="w-full rounded-lg border border-black/10 px-3 py-2 text-sm sm:w-48"
+              />
+              <span className="mt-1 block text-xs text-black/50">
+                Today unless the payment came in earlier. The 11.11 offer counts payments made up to 11 November.
+              </span>
             </label>
             <label className="text-sm">
               <span className="block mb-1 text-black/60">Paid by</span>

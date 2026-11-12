@@ -217,6 +217,18 @@ export const ELEVEN_ELEVEN: VoucherOffer = {
 
 const VOUCHERS: VoucherOffer[] = [ELEVEN_ELEVEN];
 
+/**
+ * Was this offer on sale at a given moment?
+ *
+ * For recording a sale after the fact: a customer who paid on 10 November and is
+ * written down on the 12th bought under the offer, because the offer is judged by
+ * when they PAID, not by when staff got round to entering it. Nothing stretches
+ * the window — a payment made after sellUntil is still refused.
+ */
+export function offerOnSaleAt(offer: VoucherOffer, at: Date): boolean {
+  return at >= offer.sellFrom && at < offer.sellUntil;
+}
+
 /** The voucher offer on sale right now, or null. Takes `now` so it is testable. */
 export function activeVoucherOffer(now: Date = new Date()): VoucherOffer | null {
   return VOUCHERS.find((v) => now >= v.sellFrom && now < v.sellUntil) ?? null;
