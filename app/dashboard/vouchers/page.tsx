@@ -1,5 +1,7 @@
 import { redirect } from "next/navigation";
 import { getProfile } from "@/lib/auth";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { loadVoucherCustomers } from "@/lib/voucher-customers";
 import VouchersClient from "./vouchers-client";
 
 // Every role: whoever receives the WhatsApp payment screenshot is the one
@@ -7,6 +9,10 @@ import VouchersClient from "./vouchers-client";
 export default async function VouchersPage() {
   const profile = await getProfile();
   if (!profile) redirect("/login");
+
+  // For picking an existing customer on the walk-in form. Read on the server with
+  // the service-role client: the tables are not readable from the browser.
+  const customers = await loadVoucherCustomers(createAdminClient());
 
   return (
     <div className="space-y-8">
@@ -18,7 +24,7 @@ export default async function VouchersPage() {
           RM11 vouchers claimed on the site. Mark one paid when the payment screenshot arrives.
         </p>
       </div>
-      <VouchersClient />
+      <VouchersClient customers={customers} />
     </div>
   );
 }

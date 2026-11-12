@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { whatsAppLink } from "@/lib/whatsapp";
 import { customerRef } from "@/lib/customer";
 import { MARKETING_CONSENT_STAFF_LABEL } from "@/config/consent";
+import type { VoucherCustomer } from "@/lib/voucher-customers";
 
 type Voucher = {
   id: string;
@@ -42,7 +43,7 @@ const STATUS_STYLE: Record<Voucher["status"], { bg: string; color: string; label
   cancelled: { bg: "rgba(0,0,0,0.06)", color: "rgba(0,0,0,0.4)", label: "Cancelled" },
 };
 
-export default function VouchersClient() {
+export default function VouchersClient({ customers }: { customers: VoucherCustomer[] }) {
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -52,6 +53,10 @@ export default function VouchersClient() {
   // Walk-in sale form. Closed until asked for: most visits to this page are to
   // mark an online voucher paid, and an open form would push the list down.
   const [walkInOpen, setWalkInOpen] = useState(false);
+  // Picking somebody already on file, rather than retyping them. Typing the name or
+  // number yourself clears the pick, so what is shown always matches what is sent.
+  const [pickQuery, setPickQuery] = useState("");
+  const [picked, setPicked] = useState<VoucherCustomer | null>(null);
   const [wName, setWName] = useState("");
   const [wPhone, setWPhone] = useState("");
   const [wQty, setWQty] = useState(1);
@@ -152,6 +157,8 @@ export default function VouchersClient() {
       setWMethod("cash");
       setWConsent(false);
       setWSoldOn(todayKL());
+      setPicked(null);
+      setPickQuery("");
       setWalkInOpen(false);
       await load();
     } catch (err) {
@@ -201,13 +208,78 @@ export default function VouchersClient() {
       ) : (
         <form onSubmit={recordWalkIn} className="rounded-2xl border border-black/10 bg-white p-4 sm:p-5 space-y-3">
           <p className="text-sm font-medium">Walk-in voucher sale — already paid at the counter</p>
+
+          <div className="relative">
+            <label className="text-sm">
+              <span className="block mb-1 text-black/60">Pick an existing customer</span>
+              <input
+                value={pickQuery}
+                onChange={(e) => setPickQuery(e.target.value)}
+                placeholder="Search by name, number or KH number"
+                className="w-full rounded-lg border border-black/10 px-3 py-2 text-sm"
+              />
+            </label>
+            {pickQuery.trim() && (
+              <ul className="absolute z-10 mt-1 max-h-64 w-full overflow-auto rounded-lg border border-black/10 bg-white shadow-md">
+                {customers
+                  .filter((c) =>
+                    [c.name ?? "", c.phone ?? "", customerRef(c.customer_no)]
+                      .join(" ")
+                      .toLowerCase()
+                      .includes(pickQuery.trim().toLowerCase()),
+                  )
+                  .slice(0, 8)
+                  .map((c) => (
+                    <li key={c.customer_no}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setWName(c.name ?? "");
+                          setWPhone(c.phone ?? "");
+                          setPicked(c);
+                          setPickQuery("");
+                        }}
+                        className="flex w-full items-center gap-3 px-3 py-2 text-left text-sm hover:bg-black/5"
+                      >
+                        <span className="w-12 shrink-0 text-xs text-black/40">{customerRef(c.customer_no)}</span>
+                        <span className="min-w-0 flex-1 truncate font-medium">{c.name ?? "—"}</span>
+                        <span className="text-xs text-black/50">{c.phone}</span>
+                        <span className="text-xs text-black/40">{c.held > 0 ? `holds ${c.held}` : ""}</span>
+                      </button>
+                    </li>
+                  ))}
+              </ul>
+            )}
+          </div>
+
+          {picked && (
+            <div className="space-y-1 rounded-lg bg-black/[0.04] px-3 py-2 text-sm">
+              <p>
+                Using <span className="font-medium">{picked.name}</span> ({customerRef(picked.customer_no)}) — holds{" "}
+                {picked.held} voucher{picked.held === 1 ? "" : "s"} already.
+              </p>
+              {picked.unpaid > 0 && (
+                <p className="text-[#8a4a30]">
+                  {picked.unpaid} of those {picked.unpaid === 1 ? "is" : "are"} still unpaid. If this payment is for them, close this form
+                  and press <b>Mark paid</b> on their rows instead — recording a sale here would count them twice.
+                </p>
+              )}
+              {picked.held >= 2 && picked.unpaid === 0 && (
+                <p className="text-[#8a4a30]">They are at the limit of 2, so a new sale will be refused.</p>
+              )}
+            </div>
+          )}
+
           <div className="grid gap-3 sm:grid-cols-2">
             <label className="text-sm">
               <span className="block mb-1 text-black/60">Name</span>
               <input
                 required
                 value={wName}
-                onChange={(e) => setWName(e.target.value)}
+                onChange={(e) => {
+                  setWName(e.target.value);
+                  setPicked(null);
+                }}
                 className="w-full rounded-lg border border-black/10 px-3 py-2 text-sm"
               />
             </label>
@@ -217,7 +289,10 @@ export default function VouchersClient() {
                 required
                 inputMode="tel"
                 value={wPhone}
-                onChange={(e) => setWPhone(e.target.value)}
+                onChange={(e) => {
+                  setWPhone(e.target.value);
+                  setPicked(null);
+                }}
                 className="w-full rounded-lg border border-black/10 px-3 py-2 text-sm"
               />
             </label>
