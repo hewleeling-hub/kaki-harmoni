@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Staff only." }, { status: 401 });
   }
 
-  let body: { name?: string; phone?: string; quantity?: number; payment_method?: string; marketing_consent?: boolean; sold_on?: string };
+  let body: { name?: string; phone?: string; quantity?: number; payment_method?: string; marketing_consent?: boolean; sold_on?: string; after_close?: boolean };
   try {
     body = await request.json();
   } catch {
@@ -87,7 +87,14 @@ export async function POST(request: NextRequest) {
   const backdated = soldOn < todayKL;
   // Midday Kuala Lumpur on that day: unambiguously inside it, whatever the time zone.
   const saleMoment = backdated ? new Date(`${soldOn}T12:00:00+08:00`) : new Date();
-  const onSale = offerOnSaleAt(offer, saleMoment);
+  /* The owner's one-off override: honour the offer price for a sale made AFTER it
+     closed. Staff tick it on the form for that sale only — the public site stays
+     closed, the two-per-person cap still applies, and a date before the offer
+     opened is still refused. It only does anything when the offer really was
+     closed on that date. The sale note and activity log say it was honoured late. */
+  const regularlyOnSale = offerOnSaleAt(offer, saleMoment);
+  const honouredLate = !regularlyOnSale && body.after_close === true && saleMoment >= offer.sellFrom;
+  const onSale = regularlyOnSale || honouredLate;
   if (!Number.isInteger(quantity) || quantity < 1 || quantity > offer.maxPerPerson) {
     return NextResponse.json({ error: `Choose 1 to ${offer.maxPerPerson} vouchers.` }, { status: 400 });
   }
@@ -185,9 +192,11 @@ export async function POST(request: NextRequest) {
         paid_at: now,
         expires_on: offer.redeemByISO,
         purchase_id: null,
-        notes: backdated
-          ? `Walk-in sale recorded by ${actor} on ${todayKL}; paid ${soldOn}.`
-          : `Walk-in sale recorded by ${actor}.`,
+        notes:
+          (backdated
+            ? `Walk-in sale recorded by ${actor} on ${todayKL}; paid ${soldOn}.`
+            : `Walk-in sale recorded by ${actor}.`) +
+          (honouredLate ? ` Offer honoured after it closed (${offer.sellUntilLabel}).` : ""),
         ...dated,
       })),
     )
@@ -217,7 +226,7 @@ export async function POST(request: NextRequest) {
     entity_id: purchase.id,
     action: "walk_in_voucher_sold",
     actor,
-    metadata: { quantity, payment_method: method, ...(backdated ? { paid_on: soldOn, recorded_on: todayKL } : {}) },
+    metadata: { quantity, payment_method: method, ...(honouredLate ? { honoured_after_close: true } : {}), ...(backdated ? { paid_on: soldOn, recorded_on: todayKL } : {}) },
   });
   await logAudit(supabase, {
     table_name: "purchases",

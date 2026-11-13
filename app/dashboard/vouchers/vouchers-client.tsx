@@ -62,6 +62,7 @@ export default function VouchersClient({ customers }: { customers: VoucherCustom
   const [wQty, setWQty] = useState(1);
   const [wMethod, setWMethod] = useState("cash");
   const [wConsent, setWConsent] = useState(false);
+  const [wAfterClose, setWAfterClose] = useState(false);
   // The day they paid. Today by default; set earlier for a payment that came in
   // before it was written down — the 11.11 offer is judged by this date.
   const [wSoldOn, setWSoldOn] = useState(() => todayKL());
@@ -167,7 +168,7 @@ export default function VouchersClient({ customers }: { customers: VoucherCustom
       const res = await fetch("/api/vouchers", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: wName, phone: wPhone, quantity: wQty, payment_method: wMethod, marketing_consent: wConsent, sold_on: wSoldOn }),
+        body: JSON.stringify({ name: wName, phone: wPhone, quantity: wQty, payment_method: wMethod, marketing_consent: wConsent, sold_on: wSoldOn, after_close: wAfterClose }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Could not record the sale.");
@@ -181,6 +182,7 @@ export default function VouchersClient({ customers }: { customers: VoucherCustom
       setWMethod("cash");
       setWConsent(false);
       setWSoldOn(todayKL());
+      setWAfterClose(false);
       setPicked(null);
       setPickQuery("");
       setWalkInOpen(false);
@@ -361,6 +363,15 @@ export default function VouchersClient({ customers }: { customers: VoucherCustom
           <label className="flex items-start gap-2 text-sm">
             <input type="checkbox" className="mt-1" checked={wConsent} onChange={(e) => setWConsent(e.target.checked)} />
             <span>{MARKETING_CONSENT_STAFF_LABEL}</span>
+          </label>
+          <label className="flex items-start gap-2 text-sm">
+            <input type="checkbox" className="mt-1" checked={wAfterClose} onChange={(e) => setWAfterClose(e.target.checked)} />
+            <span>
+              Honour the 11.11 price after the offer closed
+              <span className="block text-xs text-black/50">
+                Only for a sale you are choosing to honour. The two-per-person limit still applies, and the sale is noted as honoured late.
+              </span>
+            </span>
           </label>
           <p className="text-xs text-black/50">
             Counts toward the two-per-person limit on this phone number, and is redeemable until 31 December 2026.
