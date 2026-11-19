@@ -40,8 +40,9 @@ export function LocalBusinessJsonLd() {
       addressCountry: "MY",
     },
     openingHoursSpecification: [
-      // Two specs, because the shop closes earlier at the weekend. One
-      // all-week entry would tell Google we're open until 6pm on a Sunday.
+      // Two specs, because the shop closes earlier on Saturday. Sunday is by
+      // appointment only, so it is deliberately NOT listed: an opening-hours
+      // entry for Sunday would tell Google people can simply walk in.
       {
         "@type": "OpeningHoursSpecification",
         dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
@@ -50,7 +51,7 @@ export function LocalBusinessJsonLd() {
       },
       {
         "@type": "OpeningHoursSpecification",
-        dayOfWeek: ["Saturday", "Sunday"],
+        dayOfWeek: ["Saturday"],
         opens: `${String(hours.openHour).padStart(2, "0")}:00`,
         closes: `${String(hours.closeHourWeekend).padStart(2, "0")}:00`,
       },

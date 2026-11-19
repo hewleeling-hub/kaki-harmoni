@@ -5,7 +5,7 @@ import { LocalBusinessJsonLd, SITE_URL } from "@/components/seo/LocalBusinessJso
 
 const TITLE = "Kaki Harmoni | Your 15-Minute Daily Reset";
 const DESCRIPTION =
-  `A warm 15-minute leg soak and a good coffee at ${businessConfig.address.name}, Kuala Lumpur — short enough to fit into every day. Open daily; book online or walk in.`;
+  `A warm 15-minute leg soak and a good coffee at ${businessConfig.address.name}, Kuala Lumpur — short enough to fit into every day. Open Monday to Saturday, Sunday by appointment; book online or walk in.`;
 
 /**
  * The share card. Without openGraph, a link pasted into WhatsApp renders as a

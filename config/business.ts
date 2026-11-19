@@ -71,10 +71,10 @@ export const businessConfig = {
    * `lastSoak` sentences with it, since nothing forces those to agree.
    */
   hours: {
-    label: "Open daily",
-    display: "Mon–Fri 10:00am – 6:00pm · Sat–Sun 10:00am – 4:00pm",
+    label: "Open Monday to Saturday",
+    display: "Mon–Fri 10:00am – 6:00pm · Sat 10:00am – 4:00pm · Sun by appointment only",
     lastSoak:
-      "First soak begins at 10:30am. Last soak begins at 5:30pm on weekdays, 3:30pm at weekends.",
+      "First soak begins at 10:30am. Last soak begins at 5:30pm on weekdays, 3:30pm on Saturdays. Sundays are by appointment only — message us on WhatsApp to arrange a time.",
     openHour: 10,
     /**
      * Minutes past openHour before the FIRST soak can start.
@@ -221,7 +221,7 @@ export const packageValidityLabel = "6 months" as const;
 export const faqs = [
   {
     q: "When can I visit?",
-    a: "Booking is open — share your details, pick a time slot, then pay to confirm it.",
+    a: "Booking is open — share your details, pick a time slot, then pay to confirm it. We're open Monday to Saturday; Sundays are by appointment only, so please message us on WhatsApp to arrange a time.",
   },
   {
     q: "How long is each session?",
