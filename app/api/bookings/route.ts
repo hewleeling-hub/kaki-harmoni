@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { logActivity, logAudit } from "@/lib/activity";
-import { MAX_CAPACITY_PER_SLOT, isClosedDate, CLOSED_DATE_MESSAGE } from "@/lib/slots";
+import { MAX_CAPACITY_PER_SLOT, isClosedDate, closedMessageFor } from "@/lib/slots";
 
 export async function POST(request: NextRequest) {
   let body: { purchase_id?: string; slot_date?: string; slot_time?: string };
@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
   }
 
   if (isClosedDate(slot_date)) {
-    return NextResponse.json({ error: CLOSED_DATE_MESSAGE, closed: true }, { status: 409 });
+    return NextResponse.json({ error: closedMessageFor(slot_date), closed: true }, { status: 409 });
   }
 
   const supabase = createAdminClient();

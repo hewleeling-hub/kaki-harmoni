@@ -143,16 +143,41 @@ export function remainingFor(
  * still the mistakes to avoid.
  */
 
-/** Is the shop shut for the whole of this date? See hours.closedDates. */
-export function isClosedDate(dateISO: string): boolean {
+/** Is the shop genuinely shut for the whole of this date? See hours.closedDates. */
+export function isShopClosedDate(dateISO: string): boolean {
   return businessConfig.hours.closedDates.includes(dateISO);
+}
+
+/** Is this date a by-appointment-only weekday (Sunday)? Parsed as a plain calendar date, like closeHourForDate. */
+export function isByAppointmentDate(dateISO: string): boolean {
+  const [y, m, d] = dateISO.split("-").map(Number);
+  const day = new Date(y, (m ?? 1) - 1, d ?? 1).getDay();
+  return businessConfig.hours.byAppointmentWeekdays.includes(day);
+}
+
+/**
+ * Can a customer NOT book this date online? True for a closed day and for a
+ * by-appointment day. This is the customer-facing gate (slots, checkout,
+ * booking); the staff calendar uses isShopClosedDate so it still shows Sunday.
+ */
+export function isClosedDate(dateISO: string): boolean {
+  return isShopClosedDate(dateISO) || isByAppointmentDate(dateISO);
 }
 
 /** What to tell somebody who asks for a closed date. One sentence, one place. */
 export const CLOSED_DATE_MESSAGE = "We're closed on that day — please pick another date.";
 
+/** The right sentence for the date: a Sunday is by appointment, not closed. */
+export function closedMessageFor(dateISO: string): string {
+  return !isShopClosedDate(dateISO) && isByAppointmentDate(dateISO)
+    ? "Sundays are by appointment only — please message us on WhatsApp to arrange a time."
+    : CLOSED_DATE_MESSAGE;
+}
+
 export function generateSlotsForDay(dateISO: string): string[] {
-  if (isClosedDate(dateISO)) return [];
+  // Real closures only: a by-appointment Sunday still has a grid, which the
+  // staff calendar needs. Customers are kept out by isClosedDate at their routes.
+  if (isShopClosedDate(dateISO)) return [];
   const closeHour = closeHourForDate(dateISO);
   const slots: string[] = [];
   /* The first soak is later than the door: the shop opens on the hour and the

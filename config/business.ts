@@ -98,6 +98,14 @@ export const businessConfig = {
      * nothing else needs to change; remove it once it has passed.
      */
     closedDates: ["2026-11-01"] as readonly string[],
+    /**
+     * Weekdays (0 = Sunday … 6 = Saturday) that are by appointment only. The
+     * ONLINE calendar offers no slots on these and /api/purchases and
+     * /api/bookings refuse them, so a customer has to message the shop to
+     * arrange a time. They are NOT closed days: the staff calendar still shows
+     * them, so an appointment that was arranged can be seen there.
+     */
+    byAppointmentWeekdays: [0] as readonly number[],
   },
 
   /**

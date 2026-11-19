@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { requireStaff } from "@/lib/auth";
 import { occupancyForDate } from "@/lib/capacity";
-import { generateSlotsForDay, remainingFor, isClosedDate, MAX_CAPACITY_PER_SLOT } from "@/lib/slots";
+import { generateSlotsForDay, remainingFor, isShopClosedDate, MAX_CAPACITY_PER_SLOT } from "@/lib/slots";
 
 // GET /api/schedule?date=YYYY-MM-DD — one day's slots with who is booked in
 // each, plus the week around it (staff only).
@@ -99,11 +99,11 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.json({
     date,
-    closed: isClosedDate(date),
+    closed: isShopClosedDate(date),
     capacity: MAX_CAPACITY_PER_SLOT,
     slots,
     other,
     undated,
-    week: week.map((d) => ({ date: d, count: counts.get(d) ?? 0, closed: isClosedDate(d) })),
+    week: week.map((d) => ({ date: d, count: counts.get(d) ?? 0, closed: isShopClosedDate(d) })),
   });
 }
