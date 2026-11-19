@@ -18,7 +18,9 @@ export async function GET() {
   const { data: signups, error } = await supabase
     .from("signups")
     .select("*")
-    .order("lead_score", { ascending: false, nullsFirst: false });
+    // Newest sign-up first: the person who just walked in or booked is the one
+    // staff look for. (It used to be highest lead score first, which buried them.)
+    .order("created_at", { ascending: false });
 
   if (error) {
     return NextResponse.json({ error: "Could not load signups." }, { status: 500 });
