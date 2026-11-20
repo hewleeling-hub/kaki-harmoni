@@ -95,6 +95,69 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   return NextResponse.json({ ok: true, used: after, of: pkg.package_visits });
 }
 
+// PATCH /api/packages/[id] — change the date of one visit used from a package
+// (staff only). Body: { visit_id, visit_on }. The visit must belong to THIS
+// package, and the date can't be in the future, before the package was bought, or
+// after it expired.
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const staff = await requireStaff();
+  if (!staff) return NextResponse.json({ error: "Staff only." }, { status: 401 });
+
+  let body: { visit_id?: string; visit_on?: string };
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
+  }
+  const on = body.visit_on?.trim() ?? "";
+  const todayKL = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kuala_Lumpur" });
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(on) || Number.isNaN(Date.parse(`${on}T00:00:00Z`)) || on > todayKL) {
+    return NextResponse.json({ error: "Choose a date that is not in the future." }, { status: 400 });
+  }
+
+  const admin = createAdminClient();
+  const { data: pkg } = await admin
+    .from("purchases")
+    .select("id, package_expires_on, created_at")
+    .eq("id", id)
+    .not("package_visits", "is", null)
+    .maybeSingle();
+  if (!pkg) return NextResponse.json({ error: "Package not found." }, { status: 404 });
+  if (on < (pkg.created_at as string).slice(0, 10)) {
+    return NextResponse.json({ error: "A visit can't be dated before the package was bought." }, { status: 400 });
+  }
+  if (pkg.package_expires_on && on > pkg.package_expires_on) {
+    return NextResponse.json({ error: `A visit can't be dated after the package expired (${pkg.package_expires_on}).` }, { status: 400 });
+  }
+
+  const { data: visit } = await admin
+    .from("purchases")
+    .select("id, booking_date")
+    .eq("id", body.visit_id ?? "")
+    .eq("package_id", id)
+    .maybeSingle();
+  if (!visit) return NextResponse.json({ error: "That visit isn't part of this package." }, { status: 404 });
+
+  const { error } = await admin
+    .from("purchases")
+    .update({ booking_date: on, created_at: new Date(`${on}T12:00:00+08:00`).toISOString() })
+    .eq("id", visit.id)
+    .eq("package_id", id);
+  if (error) return NextResponse.json({ error: "Could not change the date." }, { status: 500 });
+
+  const supabase = await createClient();
+  await logActivity(supabase, {
+    entity_type: "purchase",
+    entity_id: id,
+    action: "package_visit_date_changed",
+    actor: staff.email ?? "staff",
+    metadata: { visit_purchase_id: visit.id, from: visit.booking_date, to: on },
+  });
+
+  return NextResponse.json({ ok: true });
+}
+
 // DELETE /api/packages/[id] — take back the most recent visit used from a package
 // (staff only), for a wrong tap. Only ever removes a RM0 visit that points at this
 // package, so it can never touch a sale or a visit from anywhere else.

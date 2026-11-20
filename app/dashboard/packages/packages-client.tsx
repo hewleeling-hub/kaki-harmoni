@@ -13,7 +13,7 @@ type Sale = {
   payment_method: string | null;
   package_visits: number;
   package_expires_on: string | null;
-  visit_dates: string[];
+  visits: { id: string; date: string }[];
   signups: { name: string | null; phone: string | null; customer_no: number | null } | null;
 };
 
@@ -101,6 +101,32 @@ export default function PackagesClient({ customers, packages }: { customers: Vou
       setDone(`Visit ${data.used} of ${data.of} recorded for ${s.signups?.name ?? "the customer"}.`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not record the visit.");
+    } finally {
+      await load();
+      setBusyId(null);
+    }
+  }
+
+  // Correcting the date of one visit already used.
+  const [editVisitId, setEditVisitId] = useState<string | null>(null);
+  const [editVisitDate, setEditVisitDate] = useState("");
+
+  async function saveVisitDate(s: Sale, visitId: string) {
+    setBusyId(s.id);
+    setError(null);
+    setDone(null);
+    try {
+      const res = await fetch(`/api/packages/${s.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ visit_id: visitId, visit_on: editVisitDate }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Could not change the date.");
+      setEditVisitId(null);
+      setDone("Visit date changed.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not change the date.");
     } finally {
       await load();
       setBusyId(null);
@@ -250,7 +276,7 @@ export default function PackagesClient({ customers, packages }: { customers: Vou
         ) : (
           <ul className="divide-y divide-black/5">
             {sales.map((s) => {
-              const used = s.visit_dates.length;
+              const used = s.visits.length;
               const left = s.package_visits - used;
               const expired = !!s.package_expires_on && s.package_expires_on < today;
               return (
@@ -265,10 +291,51 @@ export default function PackagesClient({ customers, packages }: { customers: Vou
                     </p>
                     <p className="text-sm text-black/50">
                       {used} of {s.package_visits} used
-                      {used > 0 && ` (${s.visit_dates.map((d) => fmtDay(d).replace(/ \d{4}$/, "")).join(", ")})`}
                       {s.package_expires_on && ` · valid until ${fmtDay(s.package_expires_on)}`}
                       {expired && left > 0 && <span className="font-semibold" style={{ color: "#8a4a30" }}> (expired)</span>}
                     </p>
+                    {s.visits.map((v, i) => (
+                      <p key={v.id} className="mt-0.5 flex flex-wrap items-center gap-2 text-sm text-black/60">
+                        {editVisitId === v.id ? (
+                          <>
+                            <span>Visit {i + 1}</span>
+                            <input
+                              type="date"
+                              value={editVisitDate}
+                              max={todayKL()}
+                              onChange={(e) => setEditVisitDate(e.target.value)}
+                              className="rounded-lg border border-black/10 px-2 py-1 text-sm"
+                            />
+                            <button
+                              onClick={() => saveVisitDate(s, v.id)}
+                              disabled={busyId === s.id || !editVisitDate}
+                              className="text-sm font-semibold px-3 py-1 rounded-full text-white disabled:opacity-50"
+                              style={{ backgroundColor: "var(--lagoon)" }}
+                            >
+                              {busyId === s.id ? "Saving…" : "Save"}
+                            </button>
+                            <button onClick={() => setEditVisitId(null)} className="text-sm text-black/50">
+                              Cancel
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <span>
+                              Visit {i + 1} · {fmtDay(v.date)}
+                            </span>
+                            <button
+                              onClick={() => {
+                                setEditVisitId(v.id);
+                                setEditVisitDate(v.date);
+                              }}
+                              className="text-xs text-black/50 underline"
+                            >
+                              Change date
+                            </button>
+                          </>
+                        )}
+                      </p>
+                    ))}
                   </div>
                   <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-black/5">
                     {left > 0 ? `${left} left` : "All used"}

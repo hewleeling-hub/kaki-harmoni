@@ -22,22 +22,22 @@ export async function GET() {
   if (error) return NextResponse.json({ error: "Could not load packages." }, { status: 500 });
 
   const ids = (sales ?? []).map((s) => s.id);
-  const used = new Map<string, string[]>();
+  const used = new Map<string, { id: string; date: string }[]>();
   if (ids.length) {
     const { data: visits } = await admin
       .from("purchases")
-      .select("package_id, booking_date, created_at")
+      .select("id, package_id, booking_date, created_at")
       .in("package_id", ids)
       .order("created_at", { ascending: true });
     for (const v of visits ?? []) {
       const list = used.get(v.package_id as string) ?? [];
-      list.push((v.booking_date as string | null) ?? (v.created_at as string).slice(0, 10));
+      list.push({ id: v.id as string, date: (v.booking_date as string | null) ?? (v.created_at as string).slice(0, 10) });
       used.set(v.package_id as string, list);
     }
   }
 
   return NextResponse.json({
-    packages: (sales ?? []).map((s) => ({ ...s, visit_dates: used.get(s.id) ?? [] })),
+    packages: (sales ?? []).map((s) => ({ ...s, visits: used.get(s.id) ?? [] })),
   });
 }
 
