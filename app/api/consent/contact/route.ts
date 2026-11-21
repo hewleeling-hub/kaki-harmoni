@@ -5,16 +5,17 @@ import { requireStaff } from "@/lib/auth";
 import { logActivity, logAudit } from "@/lib/activity";
 import { findOrCreateCustomer, phoneKeyFor, recordMarketingConsent } from "@/lib/customer";
 
-// POST /api/consent/contact { name, phone, confirmed } — add somebody who is not a
-// customer yet but has asked, on WhatsApp, to hear about our specials (staff only).
+// POST /api/consent/contact { name, phone, source, confirmed } — add somebody who is
+// not a customer yet but has asked to hear about our specials, either in a WhatsApp
+// message or on a signed paper form (staff only).
 //
 // They go into the same customer list as everyone else, already marked as agreed
 // with "whatsapp" as the source, so they appear under Agreed on the consent page
 // and on any list built from it. Nothing is sent to them here.
 //
-// The proof of the yes is the WhatsApp conversation itself, which this system
-// does not hold — so `confirmed` must be true: the person adding them is stating
-// that the message exists. That statement and who made it go in the activity log.
+// The proof of the yes is the WhatsApp conversation or the signed sheet itself,
+// which this system does not hold — so `confirmed` must be true: the person adding
+// them is stating that the message or form exists. That statement and who made it go in the activity log.
 //
 // A number that is already on file is not duplicated: the existing person is
 // marked as agreed instead, the same way every other form matches on phone.
@@ -23,7 +24,7 @@ export async function POST(request: NextRequest) {
   const staff = await requireStaff();
   if (!staff) return NextResponse.json({ error: "Staff only." }, { status: 401 });
 
-  let body: { name?: string; phone?: string; confirmed?: boolean };
+  let body: { name?: string; phone?: string; confirmed?: boolean; source?: string };
   try {
     body = await request.json();
   } catch {
@@ -36,15 +37,22 @@ export async function POST(request: NextRequest) {
   if (!phone || !phoneKeyFor(phone)) {
     return NextResponse.json({ error: "Enter a phone number we can message." }, { status: 400 });
   }
+  // Default stays WhatsApp so an older page that doesn't send a source behaves as before.
+  const source = body.source === "paper_form" ? "paper_form" : "whatsapp";
   if (body.confirmed !== true) {
     return NextResponse.json(
-      { error: "Only add someone who has agreed — tick the box to confirm you have their WhatsApp message." },
+      {
+        error:
+          source === "paper_form"
+            ? "Only add someone who has agreed — tick the box to confirm you have their signed form."
+            : "Only add someone who has agreed — tick the box to confirm you have their WhatsApp message.",
+      },
       { status: 400 },
     );
   }
 
   const admin = createAdminClient();
-  const found = await findOrCreateCustomer(admin, { name, phone, source: "WhatsApp" });
+  const found = await findOrCreateCustomer(admin, { name, phone, source: source === "paper_form" ? "Paper form" : "WhatsApp" });
   if (!found) {
     return NextResponse.json({ error: "Could not add that contact. Please try again." }, { status: 500 });
   }
@@ -65,7 +73,7 @@ export async function POST(request: NextRequest) {
   const supabase = await createClient();
 
   if (!alreadyAgreed) {
-    const ok = await recordMarketingConsent(admin, customer.id, "whatsapp");
+    const ok = await recordMarketingConsent(admin, customer.id, source);
     if (!ok) {
       return NextResponse.json({ error: "Could not save that. Nothing was changed." }, { status: 500 });
     }
@@ -75,7 +83,7 @@ export async function POST(request: NextRequest) {
         entity_id: customer.id,
         action: "signup_created",
         actor,
-        metadata: { source: "whatsapp_enquiry" },
+        metadata: { source: source === "paper_form" ? "paper_form_contact" : "whatsapp_enquiry" },
       });
     }
     await logActivity(supabase, {
@@ -83,7 +91,7 @@ export async function POST(request: NextRequest) {
       entity_id: customer.id,
       action: "marketing_consent_recorded",
       actor,
-      metadata: { source: "whatsapp", confirmed_message_on_file: true },
+      metadata: { source, confirmed_proof_on_file: true },
     });
     await logAudit(supabase, {
       table_name: "signups",

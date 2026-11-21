@@ -30,6 +30,7 @@ export default function ConsentClient({ people }: { people: ConsentPerson[] }) {
   // Add a contact: somebody who is not a customer yet but agreed on WhatsApp.
   const [cName, setCName] = useState("");
   const [cPhone, setCPhone] = useState("");
+  const [cSource, setCSource] = useState<"paper_form" | "whatsapp">("paper_form");
   const [cConfirmed, setCConfirmed] = useState(false);
   const [cSaving, setCSaving] = useState(false);
 
@@ -81,7 +82,7 @@ export default function ConsentClient({ people }: { people: ConsentPerson[] }) {
       const res = await fetch("/api/consent/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: cName, phone: cPhone, confirmed: cConfirmed }),
+        body: JSON.stringify({ name: cName, phone: cPhone, source: cSource, confirmed: cConfirmed }),
       });
       const payload = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(payload?.error ?? "Could not add that contact.");
@@ -142,7 +143,7 @@ export default function ConsentClient({ people }: { people: ConsentPerson[] }) {
           Add a contact
         </h2>
         <p className="text-sm text-black/60">
-          For someone who isn&apos;t a customer yet but has told us on WhatsApp that they&apos;d like to hear about our specials.
+          For someone who isn&apos;t a customer yet but has told us they&apos;d like to hear about our specials — on a signed paper form or in a WhatsApp message.
         </p>
         <form onSubmit={addContact} className="space-y-3 rounded-2xl border border-black/10 bg-white p-4">
           <div className="grid gap-3 sm:grid-cols-2">
@@ -166,9 +167,24 @@ export default function ConsentClient({ people }: { people: ConsentPerson[] }) {
               />
             </label>
           </div>
+          <fieldset className="flex flex-wrap gap-4 text-sm">
+            <legend className="mb-1 text-xs font-medium text-black/55">How did they agree?</legend>
+            <label className="flex items-center gap-2">
+              <input type="radio" name="cSource" checked={cSource === "paper_form"} onChange={() => setCSource("paper_form")} />
+              Signed paper form
+            </label>
+            <label className="flex items-center gap-2">
+              <input type="radio" name="cSource" checked={cSource === "whatsapp"} onChange={() => setCSource("whatsapp")} />
+              WhatsApp message
+            </label>
+          </fieldset>
           <label className="flex items-start gap-2 text-sm">
             <input type="checkbox" className="mt-1" checked={cConfirmed} onChange={(e) => setCConfirmed(e.target.checked)} />
-            <span>They agreed in a WhatsApp message, and I have that message.</span>
+            <span>
+              {cSource === "paper_form"
+                ? "They signed to agree, and I have the signed form."
+                : "They agreed in a WhatsApp message, and I have that message."}
+            </span>
           </label>
           <button
             type="submit"
