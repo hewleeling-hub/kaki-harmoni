@@ -17,6 +17,10 @@ interface Signup {
   lead_score: number | null;
   lead_score_review_status: string | null;
   customer_no: number | null;
+  /** Agreed to offers on WhatsApp. Absent until migration 0025 is applied. */
+  marketing_consent?: boolean | null;
+  marketing_consent_at?: string | null;
+  marketing_consent_source?: string | null;
 }
 
 interface Purchase {
@@ -272,7 +276,7 @@ export default function DashboardClient({ canDelete = false }: { canDelete?: boo
           </div>
         ) : (
           <div className="overflow-x-auto">
-            {/* ONE table, two shapes. Seven columns need 720px, which is twice
+            {/* ONE table, two shapes. Eight columns need 820px, which is twice
                 a phone; below md every row restacks into a card, each cell
                 labelled by the header it lost. Same markup either way — a
                 separate mobile list would be a second place to update, and
@@ -280,8 +284,9 @@ export default function DashboardClient({ canDelete = false }: { canDelete?: boo
 
                 On md and up the scroll container still matters: without it the
                 Actions column was pushed off the right edge and could not be
-                reached at all. */}
-            <table className="block w-full text-sm md:table md:min-w-[720px]">
+                reached at all. The Offers column (WhatsApp marketing consent)
+                is the eighth, so the minimum width grew from 720 to 820. */}
+            <table className="block w-full text-sm md:table md:min-w-[820px]">
             <thead className="hidden md:table-header-group">
               <tr className="text-left text-black/50 border-b border-black/5">
                 {/* Email lives under the name rather than in its own column.
@@ -291,6 +296,7 @@ export default function DashboardClient({ canDelete = false }: { canDelete?: boo
                 <th className="px-4 py-3 font-medium">Name</th>
                 <th className="px-4 py-3 font-medium">Source</th>
                 <th className="px-4 py-3 font-medium">Status</th>
+                <th className="px-4 py-3 font-medium">Offers</th>
                 <th className="px-4 py-3 font-medium">Visit</th>
                 <th className="px-4 py-3 font-medium">Lead score</th>
                 <th className="px-4 py-3 font-medium">Signed up</th>
@@ -351,6 +357,9 @@ export default function DashboardClient({ canDelete = false }: { canDelete?: boo
                           className="mt-1 rounded border border-black/10 px-2 py-1 w-full text-xs"
                         />
                       )}
+                    </Cell>
+                    <Cell label="Offers (WhatsApp)">
+                      <ConsentBadge signup={s} />
                     </Cell>
                     <Cell label="Visit" className="text-black/70 text-xs">
                       {(() => {
@@ -812,6 +821,62 @@ function Counter({
       >
         {value}
       </p>
+    </div>
+  );
+}
+
+const CONSENT_SOURCE_LABEL: Record<string, string> = {
+  web_form: "Website",
+  walk_in_sale: "Counter sale",
+  paper_form: "Paper form",
+  whatsapp: "WhatsApp",
+};
+
+/**
+ * Whether this customer agreed to offers on WhatsApp. Read-only: a yes is
+ * recorded where it was given (the signed form, the sale, the sign-up page) or
+ * on the Offers permission page, so each carries its source and date.
+ *
+ * Three states, not two. A withdrawal sets consent back to false but leaves the
+ * date and source of the original yes, so "never agreed" and "agreed, then
+ * asked us to stop" are told apart: the second must not be contacted and must
+ * not read like a customer we simply have not asked yet.
+ */
+function ConsentBadge({ signup }: { signup: Signup }) {
+  const at = signup.marketing_consent_at ? new Date(signup.marketing_consent_at).toLocaleDateString() : null;
+  const via = signup.marketing_consent_source ? (CONSENT_SOURCE_LABEL[signup.marketing_consent_source] ?? signup.marketing_consent_source) : null;
+  const detail = [via, at].filter(Boolean).join(" · ");
+
+  if (signup.marketing_consent === true) {
+    return (
+      <div className="space-y-0.5">
+        <span className="inline-block text-xs font-medium px-2 py-0.5 rounded-full bg-green-100 text-green-800">
+          Agreed
+        </span>
+        {detail && <div className="text-[11px] text-black/45">{detail}</div>}
+      </div>
+    );
+  }
+  if (signup.marketing_consent_at) {
+    return (
+      <div className="space-y-0.5">
+        <span className="inline-block text-xs font-medium px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">
+          Stopped
+        </span>
+        <div className="text-[11px] text-black/45">Do not send offers{at ? ` · agreed ${at}` : ""}</div>
+      </div>
+    );
+  }
+  return (
+    <div className="space-y-0.5">
+      <span className="inline-block text-xs font-medium px-2 py-0.5 rounded-full bg-black/5 text-black/55">
+        Not agreed
+      </span>
+      <div className="text-[11px]">
+        <a href="/dashboard/consent" className="text-black/45 underline underline-offset-2 hover:text-black/70">
+          Record
+        </a>
+      </div>
     </div>
   );
 }
