@@ -56,10 +56,18 @@ export default function DashboardClient({ canDelete = false }: { canDelete?: boo
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [draft, setDraft] = useState<{ name: string; phone: string; status: string }>({
+  const [draft, setDraft] = useState<{
+    name: string;
+    phone: string;
+    status: string;
+    consent: boolean;
+    consentSource: "paper_form" | "whatsapp";
+  }>({
     name: "",
     phone: "",
     status: "signed_up",
+    consent: false,
+    consentSource: "paper_form",
   });
   const [savingId, setSavingId] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Signup | null>(null);
@@ -93,20 +101,63 @@ export default function DashboardClient({ canDelete = false }: { canDelete?: boo
 
   function startEdit(s: Signup) {
     setEditingId(s.id);
-    setDraft({ name: s.name, phone: s.phone ?? "", status: s.status });
+    setDraft({
+      name: s.name,
+      phone: s.phone ?? "",
+      status: s.status,
+      consent: s.marketing_consent === true,
+      consentSource: "paper_form",
+    });
   }
 
   async function saveEdit(id: string) {
+    const before = signups?.find((s) => s.id === id);
+    const wasAgreed = before?.marketing_consent === true;
+    const consentChanged = !!before?.customer_no && draft.consent !== wasAgreed;
+
+    // Taking consent away is "they asked us to stop" — confirm it, so an
+    // untick by mistake does not silently end someone's offers.
+    if (consentChanged && !draft.consent) {
+      const ok = window.confirm(
+        `Record that ${before?.name ?? "this customer"} has asked us to stop sending offers on WhatsApp?`,
+      );
+      if (!ok) return;
+    }
+
     setSavingId(id);
     try {
       const res = await fetch(`/api/signups/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(draft),
+        body: JSON.stringify({ name: draft.name, phone: draft.phone, status: draft.status }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       setSignups((prev) => prev!.map((s) => (s.id === id ? data.signup : s)));
+
+      // Consent goes through the same routes as the Offers permission page, so
+      // the date, the source and the audit trail are written exactly as they
+      // are there — and it applies to every sign-up sharing this customer
+      // number, so the list is reloaded afterwards.
+      if (consentChanged && before?.customer_no) {
+        const consentRes = draft.consent
+          ? await fetch("/api/consent", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ customer_nos: [before.customer_no], source: draft.consentSource }),
+            })
+          : await fetch("/api/consent", {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ customer_no: before.customer_no }),
+            });
+        if (!consentRes.ok) {
+          setEditingId(null);
+          setError("Your changes were saved, but the offers permission could not be updated. Please try again.");
+          return;
+        }
+        await load();
+      }
       setEditingId(null);
     } catch {
       setError("Could not save changes. Please try again.");
@@ -359,7 +410,40 @@ export default function DashboardClient({ canDelete = false }: { canDelete?: boo
                       )}
                     </Cell>
                     <Cell label="Offers (WhatsApp)">
-                      <ConsentBadge signup={s} />
+                      {isEditing ? (
+                        s.customer_no ? (
+                          <div className="space-y-1">
+                            <label className="flex items-start gap-1.5 text-xs">
+                              <input
+                                type="checkbox"
+                                checked={draft.consent}
+                                onChange={(e) => setDraft({ ...draft, consent: e.target.checked })}
+                                className="mt-0.5"
+                              />
+                              <span>Agreed to offers on WhatsApp</span>
+                            </label>
+                            {draft.consent && s.marketing_consent !== true && (
+                              <select
+                                value={draft.consentSource}
+                                onChange={(e) =>
+                                  setDraft({ ...draft, consentSource: e.target.value as "paper_form" | "whatsapp" })
+                                }
+                                className="w-full rounded border border-black/10 px-1.5 py-1 text-xs"
+                                aria-label="How they agreed"
+                              >
+                                <option value="paper_form">Ticked on paper</option>
+                                <option value="whatsapp">Said yes on WhatsApp</option>
+                              </select>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="text-[11px] text-black/45">
+                            No customer number yet, so consent cannot be recorded here.
+                          </span>
+                        )
+                      ) : (
+                        <ConsentBadge signup={s} />
+                      )}
                     </Cell>
                     <Cell label="Visit" className="text-black/70 text-xs">
                       {(() => {
@@ -833,9 +917,10 @@ const CONSENT_SOURCE_LABEL: Record<string, string> = {
 };
 
 /**
- * Whether this customer agreed to offers on WhatsApp. Read-only: a yes is
- * recorded where it was given (the signed form, the sale, the sign-up page) or
- * on the Offers permission page, so each carries its source and date.
+ * Whether this customer agreed to offers on WhatsApp. This only displays it: a
+ * yes is recorded where it was given (the signed form, the sale, the sign-up
+ * page), from the Edit row, or on the Offers permission page — all through the
+ * same routes, so each carries its source and date.
  *
  * Three states, not two. A withdrawal sets consent back to false but leaves the
  * date and source of the original yes, so "never agreed" and "agreed, then
